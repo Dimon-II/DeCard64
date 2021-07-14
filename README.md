@@ -12,7 +12,8 @@ Each cards-project is stored in a separate directory and consists of:
 - subdirectory with pictures;
 - subdirectory local fonts;
 - can include an additional library of SVG-elements (clipart).
-These file and directory names are stored in xml project file.
+
+These names of files and directories are stored in XML-project file.
 
 The basic principle: there are no "drag and drop" actions, only "text of this table cell is... ":
 - wrapped text in this area
@@ -30,6 +31,7 @@ https://github.com/synopse/SynPDF
 
 Text editor with syntax highlighting (Delphi package)
 https://github.com/SynEdit/SynEdit
+Install this package into Delphi manually or through the menu [Tools]-[GetIt package manager...].
 
 Icon pack
 https://www.flaticon.com/
