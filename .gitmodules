@@ -1,0 +1,3 @@
+[submodule "Decard64/SynPDF"]
+	path = Decard64/SynPDF
+	url = https://github.com/synopse/SynPDF
