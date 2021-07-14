@@ -1,0 +1,367 @@
+<?xml version="1.0"?>
+<help>
+  <elements>
+	<svg>
+		<documentation>Root XML container.</documentation>
+	</svg>
+	<circle>
+		<documentation>Draw circles based on a center point and a radius.</documentation>
+		<cx>The x-axis coordinate of the center of the circle.</cx>
+		<cy>The y-axis coordinate of the center of the circle.</cy>
+		<r>The radius of the circle. A value lower or equal to zero disables rendering of the circle.</r>
+	</circle>
+	<ellipse>
+		<documentation>Draw ellipses based on a center coordinate, and both their x and y radius.</documentation>
+		<cx>The x position of the ellipse.</cx>
+		<cy>The y position of the ellipse.</cy>
+		<rx>The radius of the ellipse on the x axis.</rx>
+		<ry>The radius of the ellipse on the y axis.</ry>
+	</ellipse>
+	<line>
+		<documentation>Draw a line connecting two points.</documentation>
+		<x1>Defines the x-axis coordinate of the line starting point.</x1>
+		<x2>Defines the x-axis coordinate of the line ending point.</x2>
+		<y1>Defines the y-axis coordinate of the line starting point.</y1>
+		<y2>Defines the y-axis coordinate of the line ending point.</y2>
+	</line>
+	<rect>
+		<documentation>Draw rectangles, defined by their position, width, and height. The rectangles may have their corners rounded.</documentation>
+		<x>The x coordinate of the rect.</x>
+		<y>The y coordinate of the rect.</y>
+		<width>The width of the rect.</width>
+		<height>The height of the rect.</height>
+		<rx>The horizontal corner radius of the rect. Defaults to ry if it is specified.</rx>
+		<ry>The vertical corner radius of the rect. Defaults to rx if it is specified.</ry>
+	</rect>
+	<polygon>
+		<documentation>Defines a closed shape consisting of a set of connected straight line segments. The last point is connected to the first point.</documentation>
+		<points>This attribute defines the list of points (pairs of x,y absolute coordinates) required to draw the polygon.</points>
+	</polygon>
+	<polyline>
+		<documentation>Draw straight lines connecting several points. Typically a polyline is used to create open shapes as the last point doesn't have to be connected to the first point. For closed shapes see the (polygon) element.</documentation>
+		<points>This attribute defines the list of points (pairs of x,y absolute coordinates) required to draw the polyline.</points>
+	</polyline>
+ 	<image>
+		<documentation>Display raster image files, embedded raster image or other SVG files (unsupported this version of render engine).</documentation>
+		<x>Positions the image horizontally from the origin.</x>
+		<y>Positions the image vertically from the origin.</y>
+		<width> The width the image renders at. Required.</width>
+		<height>The height the image renders at. Required.</height>
+		<xlink:href>Points at a URL for the image file or contains embedded base64 data.</xlink:href>
+		<href>Points at a URL for the image file or contains embedded base64 data.</href>
+		<preserveAspectRatio>Controls how the image is scaled.</preserveAspectRatio>
+	</image>
+	<use>
+		<documentation>Takes nodes from within the SVG document, and duplicates them somewhere else.</documentation>
+		<xlink:href>Takes nodes from within the SVG document, and duplicates them somewhere else.</xlink:href>
+		<href>Points at a URL for the image file or contains embedded base64 data.</href>
+		<x>The x coordinate of the use element.</x>
+		<y>The y coordinate of the use element.</y>
+		<width>The width of the use element.  Note: Only affects the link to the "symbol" element that has the "viewbox".</width>
+		<height>The height of the use element.  Note: Only affects the link to the "symbol" element that has the "viewbox".</height>
+	</use>
+	<path>
+		<documentation>Create complex shapes by combining multiple straight lines or curved lines.</documentation>
+		<d>This attribute defines the shape of the path. https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Paths</d>
+	</path>
+	<g>
+		<documentation>A named container used to group other SVG elements. Transformations applied to the "g" element are performed on its child elements, and its attributes are inherited by its children. It can also group multiple elements to be referenced later with the "use" element.</documentation>
+	</g>
+	<defs>
+		<documentation>Contains graphical objects that will be used at a later time. Objects created inside a "defs" element are not rendered directly. To display them you have to reference them (with a "use" element for example).</documentation>
+	</defs>
+	<symbol>
+		<documentation>Element is used to define graphical template objects which can be instantiated by a "use" element. Alternative of "defs" section.</documentation>
+		<height>This attribute determines the height of the symbol.</height>
+		<preserveAspectRatio>This attribute defines how the svg fragment must be deformed if it is embedded in a container with a different aspect ratio.</preserveAspectRatio>
+		<refX>This attribute determines the x coordinate of the reference point of the symbol.</refX>
+		<refY>This attribute determines the y coordinate of the reference point of the symbol.</refY>
+		<viewBox>This attribute defines the bound of the SVG viewport for the current symbol.</viewBox>
+		<width>This attribute determines the width of the symbol.</width>
+		<x>This attribute determines the x coordinate of the symbol.</x>
+		<y>This attribute determines the y coordinate of the symbol.</y>
+	</symbol>
+	<mask>
+		<documentation>Defines an alpha mask for compositing the current object into the background. A mask is used/referenced using the mask property.</documentation>
+		<height>This attribute defines the height of the masking area.</height>
+		<maskContentUnits>This attribute defines the coordinate system for the contents of the "mask".</maskContentUnits>
+		<maskUnits>This attribute defines defines the coordinate system for attributes x, y, width and height on the "mask".</maskUnits>
+		<x>This attribute defines the x-axis coordinate of the top-left corner of the masking area.</x>
+		<y>This attribute defines the y-axis coordinate of the top-left corner of the masking area.</y>
+		<width>This attribute defines the width of the masking area.</width>
+	</mask>
+	<clipPath>
+		<documentation>A clipping path restricts the region to which paint can be applied. Conceptually, parts of the drawing that lie outside of the region bounded by the clipping path are not drawn.</documentation>
+	</clipPath>
+
+	<pattern>
+		<documentation>Defines a graphics object which can be redrawn at repeated x- and y-coordinate intervals ("tiled") to cover an area. The "pattern"> is referenced by the fill and/or stroke attributes on other graphics elements to fill or stroke those elements with the referenced pattern.</documentation>
+		<height>This attribute determines the height of the pattern tile.</height>
+		<patternContentUnits>This attribute defines the coordinate system for the contents of the "pattern". Note: This attribute has no effect if a viewBox attribute is specified on the "pattern" element.</patternContentUnits>
+		<patternTransform>This attribute contains the definition of an optional additional transformation from the pattern coordinate system onto the target coordinate system.</patternTransform>
+		<patternUnits>This attribute defines the coordinate system for attributes x, y, width , and height.</patternUnits>
+		<preserveAspectRatio>This attribute defines how the SVG fragment must be deformed if it is embedded in a container with a different aspect ratio.</preserveAspectRatio>
+		<viewBox>This attribute defines the bound of the SVG viewport for the pattern fragment.</viewBox>
+		<width>This attribute determines the width of the pattern tile.</width>
+		<x>This attribute determines the x coordinate shift of the pattern tile.</x>
+		<xlink:href>This attribute reference a template pattern that provides default values for the "pattern" attributes.</xlink:href>
+		<href>This attribute reference a template pattern that provides default values for the "pattern" attributes.</href>
+		<y>This attribute determines the y coordinate shift of the pattern tile.</y>
+	</pattern>
+	<linearGradient>
+		<documentation>Define linear gradients that can be applied to "fill" or "stroke" of graphical elements.</documentation>
+		<gradientUnits>This attribute defines the coordinate system for attributes x1, x2, y1, y2</gradientUnits>
+		<gradientTransform>This attribute provides additional transformation to the gradient coordinate system.</gradientTransform>
+		<spreadMethod>This attribute indicates how the gradient behaves if it starts or ends inside the bounds of the shape containing the gradient.</spreadMethod>
+		<x1>This attribute defines the x coordinate of the starting point of the vector gradient along which the linear gradient is drawn.</x1>
+		<x2>This attribute defines the x coordinate of the ending point of the vector gradient along which the linear gradient is drawn.</x2>
+		<xlink:href>This attribute defines a reference to another "linearGradient" element that will be used as a template.</xlink:href>
+		<href>This attribute defines a reference to another "linearGradient" element that will be used as a template.</href>
+		<y1>This attribute defines the y coordinate of the starting point of the vector gradient along which the linear gradient is drawn.</y1>
+		<y2>This attribute defines the y coordinate of the ending point of the vector gradient along which the linear gradient is drawn.</y2>
+	</linearGradient>
+
+	<radialGradient>
+		<documentation>Define radial gradients that can be applied to fill or stroke of graphical elements.</documentation>
+		<cx>This attribute defines the x coordinate of the end circle of the radial gradient.</cx>
+		<cy>This attribute defines the y coordinate of the end circle of the radial gradient.</cy>
+		<fr>This attribute defines the radius of the start circle of the radial gradient. The gradient will be drawn such that the 0% "stop" is mapped to the perimeter of the start circle.</fr>
+		<fx>This attribute defines the x coordinate of the start circle of the radial gradient.</fx>
+		<fy>This attribute defines the y coordinate of the start circle of the radial gradient.</fy>
+		<gradientUnits>This attribute defines the coordinate system for attributes x1, x2, y1, y2</gradientUnits>
+		<gradientTransform>This attribute provides additional transformation to the gradient coordinate system.</gradientTransform>
+		<r>This attribute defines the radius of the end circle of the radial gradient. The gradient will be drawn such that the 100% "stop" is mapped to the perimeter of the end circle.</r>
+		<spreadMethod>This attribute indicates how the gradient behaves if it starts or ends inside the bounds of the shape containing the gradient.</spreadMethod>
+		<xlink:href>This attribute defines a reference to another "linearGradient" element that will be used as a template.</xlink:href>
+		<href>This attribute defines a reference to another "linearGradient" element that will be used as a template.</href>
+	</radialGradient>
+	<stop>
+		<documentation>Defines a color and its position to use on a gradient. This element is always a child of a "linearGradient" or "radialGradient" element.</documentation>
+		<offset>This attribute defines where the gradient stop is placed along the gradient vector.</offset>
+		<stop-color>This attribute defines the color of the gradient stop.</stop-color>
+		<stop-opacity>This attribute defines the opacity of the gradient stop.</stop-opacity>
+	</stop>
+	<filter>
+		<documentation>Defines a custom filter effect by grouping atomic filter primitives. It is never rendered itself, but must be used by the filter attribute on SVG elements.</documentation>
+	</filter>
+	<foreignObject>
+		<documentation>Includes elements from a different XML namespace. In the context of a browser, it is most likely (X)HTML.</documentation>
+		<height>The height of the foreignObject.</height>
+		<width>The width of the foreignObject.</width>
+		<x>The x coordinate of the foreignObject.</x>
+		<y>The y coordinate of the foreignObject.</y>
+		<decard-format>Non-standart vertical alignment setting.</decard-format>
+		<body>Not an attribute, but xml-text between the opening and ending tags.</body>
+	</foreignObject>
+
+	<text>
+		<documentation>Draws a graphics element consisting of text. It's possible to apply a gradient, pattern, clipping path, mask, or filter to "text", like any other SVG graphics element.</documentation>
+		<x>The x coordinate of the starting point of the text baseline.</x>
+		<y>The y coordinate of the starting point of the text baseline.</y>
+		<dx>Shifts the text position horizontally from a previous text element.</dx>
+		<dy>Shifts the text position vertically from a previous text element.</dy>
+		<rotate>Rotates orientation of each individual glyph. Can rotate glyphs individually.</rotate>
+		<lengthAdjust>How the text is stretched or compressed to fit the width defined by the textLength attribute.</lengthAdjust>
+		<textLength>A width that the text should be scaled to fit.</textLength>
+		<decard-format>Non-standart vertical alignment setting.</decard-format>
+		<text>Not an attribute, but text between the opening and ending tags.</text>
+	</text>
+	<textPath> 
+		<documentation>Render enclosed text along the shape of a "path".</documentation>
+		<xlink:href>The URL to the path or basic shape on which to render the text. If the path attribute is set, href has no effect.</xlink:href>
+		<href>The URL to the path or basic shape on which to render the text. If the path attribute is set, href has no effect.</href>
+		<lengthAdjust>Where length adjustment should be applied to the text: the space between glyphs, or both the space and the glyphs themselves.</lengthAdjust>
+		<method>Which method to render individual glyphs along the path.</method>
+		<path>The path on which the text should be rendered.</path>
+		<side>Which side of the path the text should be rendered.</side>
+		<spacing>How space between glyphs should be handled.</spacing>
+		<startOffset>How far the beginning of the text should be offset from the beginning of the path.</startOffset>
+		<textLength>The width of the space into which the text will render.</textLength>
+		<text>Not an attribute, but text between the opening and ending tags.</text>
+	</textPath> 
+	<tspan>
+		<documentation>Defines a subtext within a "text" element or another "tspan"> element. It allows for adjustment of the style and/or position of that subtext as needed.</documentation>
+		<x>The x coordinate of the starting point of the text baseline.</x>
+		<y>The y coordinate of the starting point of the text baseline.</y>
+		<dx>Shifts the text position horizontally from a previous text element.</dx>
+		<dy>Shifts the text position vertically from a previous text element.</dy>
+		<rotate>Rotates orientation of each individual glyph. Can rotate glyphs individually.</rotate>
+		<lengthAdjust>How the text is stretched or compressed to fit the width defined by the textLength attribute.</lengthAdjust>
+		<textLength>A width that the text should be scaled to fit.</textLength>
+		<text>Not an attribute, but text between the opening and ending tags.</text>
+	</tspan>
+  </elements>
+  <attributes>
+	<id>Assigns a unique name to an element.</id>
+	<clip-path>Specifies a clipping path with the element it is related to.</clip-path>
+	<fill>Defines the color (or any SVG paint servers like gradients or patterns) used to paint the element.</fill>
+	<fill-opacity>Defining the opacity of the paint server (color, gradient, pattern, etc) applied to a shape.</fill-opacity>
+	<filter>Specifies the filter effects defined by the "filter" element that shall be applied to its element.</filter>
+	<mask>Bind a given alpha chanel "mask" element used to paint the element.</mask>
+	<opacity>Specifies the transparency of an object or of a group of objects, that is, the degree to which the background behind the element is overlaid.</opacity>
+	<stroke>Defining the color (or any SVG paint servers like gradients or patterns) used to paint the outline of the shape.</stroke>
+	<stroke-opacity>Defining the opacity of the paint server (color, gradient, pattern, etc) applied to the stroke of a shape.</stroke-opacity>
+	<stroke-width>Defining the width of the stroke to be applied to the shape.</stroke-width>
+	<text-anchor>Used to align (start-, middle- or end-alignment) a string of pre-formatted text.</text-anchor>
+	<transform>Defines a list of transform definitions (scale, rotate, translate, skew...) that are applied to an element and the element's children.</transform>
+	<visibility>Control the visibility of graphical elements.</visibility>
+	<font-family>Defines  font family will be used to render the text, specified as a prioritized list of font family names and/or generic family names.</font-family>
+	<font-size>Refers to the size of the font from baseline to baseline when multiple lines of text are set solid in a multiline layout environment.</font-size>
+	<font-style>Specifies whether the text is to be rendered using a normal, italic, or oblique face.</font-style>
+	<font-weight>Refers to the boldness or lightness of the glyphs used to render the text, relative to other fonts in the same font family.</font-weight>
+	<text-decoration>Defines whether text is decorated with an underline, overline and/or strike-through.</text-decoration>
+	<style>Set of attributes that can be specified on any visible SVG element.</style>
+	<letter-spacing>Sets the spacing behavior between text characters.</letter-spacing>
+        <font-variant>Indicates the variant in which the text or font is to be rendered. (normal, small, caps)</font-variant>
+  </attributes>
+</help>
+<config>
+	<sorting>
+		<id/>
+		<xlink:href/>
+		<points/>	
+		<href/>
+		<preserveAspectRatio/>
+		<text/>
+		<x/>
+		<y/>
+		<dx/>
+		<dy/>
+		<x1/>
+		<y1/>
+		<x2/>
+		<y2/>
+		<cx/>
+		<cy/>
+		<r/>
+		<width/>
+		<height/>
+		<rx/>
+		<ry/>
+		<transform/>
+		<visibility/>
+		<body/>
+		<d/>
+		<decard-format/>
+		<style/>
+	</sorting>
+	<grouping>
+		<Common>
+			<id/>
+			<xlink:href/>
+			<points/>	
+			<href/>
+			<preserveAspectRatio/>
+			<text/>
+			<x/>
+			<y/>
+			<dx/>
+			<dy/>
+			<x1/>
+			<y1/>
+			<x2/>
+			<y2/>
+			<cx/>
+			<cy/>
+			<r/>
+			<width/>
+			<height/>
+			<rx/>
+			<ry/>
+			<transform/>
+			<visibility/>
+			<body/>
+			<d/>
+			<decard-format/>
+			<style/>
+			<stroke/>
+			<fill/>
+			<stroke-width/>
+			<stroke-opacity/>
+			<opacity/>
+			<mask/>
+			<text/>
+			<body/>
+			<filter/>
+			<offset/>
+			<stop-opacity/>
+			<stop-color/>
+			<font-size/>
+			<text-anchor/>
+			<font-family/>
+			<font-style/>
+			<font-weight/>
+			<visibility/>
+			<spreadMethod/>
+			<gradientUnits/>
+			<gradientTransform/>
+			<mask/>
+			<letter-spacing/>
+			<preserveAspectRatio/>
+			<lengthAdjust/>
+			<word-spacing/>
+			<textLength/>
+			<decard-format/>
+			<clip-path/>
+			<font-variant/>
+			<xlink:href/>	
+			<href/>	
+			<points/>	
+		</Common>
+		<Font>
+			<font-size/>
+			<text-anchor/>
+			<font-family/>
+			<font-style/>
+			<font-weight/>
+			<font-variant/>
+			<text/>
+			<letter-spacing/>
+			<word-spacing/>
+			<text-decoration/>
+		</Font>
+	</grouping>
+
+	<exclude>
+		<requiredFeatures/>
+		<requiredExtensions/>
+		<systemLanguage/>
+		<externalResourcesRequired/>
+		<class/>
+		<onfocusin/>
+		<onfocusout/>
+		<onactivate/>
+		<onclick/>
+		<onmousedown/>
+		<onmouseup/>
+		<onmouseover/>
+		<onmousemove/>
+		<onmouseout/>
+		<onload/>
+		<cursor/>
+		<color-interpolation/>
+		<color-rendering/>
+		<image-rendering/>
+		<pointer-events/>
+		<color/>
+		<shape-rendering/>
+		<color-interpolation-filters/>
+		<flood-color/>
+		<flood-opacity/>
+		<writing-mode/>
+		<clip/>
+		<overflow/>
+		<display/>
+		<contentScriptType/>
+		<contentStyleType/>
+		<onunload/>
+		<onabort/>
+		<onerror/>
+		<onresize/>
+		<onscroll/>
+		<onzoom/>
+		<enable-background/>
+	</exclude>
+
+</config>
+
