@@ -347,7 +347,7 @@ procedure TSvgInspectorFrame.SetSVGNode(const Value: TXML_Nod);
       en:=UrlList('clipPath',en)
     else
     if (Aname='mask') then
-      en:=UrlList('amsk',en)
+      en:=UrlList('mask',en)
     else
     if (Aname='filter') then
       en:=UrlList('filter',en);
