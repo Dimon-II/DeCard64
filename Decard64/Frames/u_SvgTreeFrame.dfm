@@ -164,6 +164,10 @@ object SvgTreeFrame: TSvgTreeFrame
       Caption = 'Crop area <clipPath/>'
       OnClick = clipPath1Click
     end
+    object miPattert: TMenuItem
+      Caption = 'Feeling pattern <pattern/>'
+      OnClick = miPattertClick
+    end
     object milinearGradient: TMenuItem
       Caption = 'Gradient [||] <linearGradient/>'
       OnClick = milinearGradientClick

@@ -54,6 +54,7 @@ type
     treeTemplate: TTreeView;
     tbXML: TToolButton;
     svgFindDialog: TFindDialog;
+    miPattert: TMenuItem;
     procedure treeTemplateCollapsing(Sender: TObject; Node: TTreeNode;
       var AllowCollapse: Boolean);
     procedure tbXMLClick(Sender: TObject);
@@ -87,6 +88,7 @@ type
     procedure miTurbulenceClick(Sender: TObject);
     procedure miOuterCrossClick(Sender: TObject);
     procedure miInnerCrssClick(Sender: TObject);
+    procedure miPattertClick(Sender: TObject);
   private
     { Private declarations }
     FSVG: TXML_Doc;
@@ -313,14 +315,15 @@ begin
    or ((SVGNode.LocalName='radialGradient')and (pos('<stop', AXML)=1))
    or ((SVGNode.LocalName='filter') and (pos('<fe', AXML)=1))
   then begin
-    nod:=SVGNode.Add;
     TreNod := treeTemplate.Items.AddChild(FocusedNode,'');
+    nod:=SVGNode.Add;
   end
   else
   begin
     nod := SVGNode.parent.Add;
     nod.index := SVGNode.index;
     TreNod := treeTemplate.Items.Add(FocusedNode,'');
+    TreNod.MoveTo(FocusedNode,naInsert);
   end;
   nod.ResetXml(AXML);
   ResetSvg(nod, TreNod);
@@ -431,6 +434,13 @@ procedure TSvgTreeFrame.miPasteTagClick(Sender: TObject);
 begin
   if StoredTag<>'' then
     InsertTag(StoredTag);
+end;
+
+procedure TSvgTreeFrame.miPattertClick(Sender: TObject);
+begin
+  InsertTag('<clipPath/>');
+  if @FOnResizeClick<>nil then
+    OnResizeClick(Sender);
 end;
 
 procedure TSvgTreeFrame.miradialGradientClick(Sender: TObject);
