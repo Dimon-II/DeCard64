@@ -281,7 +281,6 @@
 			<opacity/>
 			<mask/>
 			<text/>
-			<body/>
 			<filter/>
 			<offset/>
 			<stop-opacity/>
@@ -307,6 +306,8 @@
 			<xlink:href/>	
 			<href/>	
 			<points/>	
+			<flood-color/>
+			<flood-opacity/>
 		</Common>
 		<Font>
 			<font-size/>
@@ -320,6 +321,18 @@
 			<word-spacing/>
 			<text-decoration/>
 		</Font>
+		<Color>
+			<fill/>
+			<fill-opacity/>
+			<stroke/>
+			<stroke-opacity/>
+			<stroke-width/>
+			<stop-opacity/>
+			<stop-color/>
+			<flood-color/>
+			<flood-opacity/>
+			<opacity/>
+		</Color>
 	</grouping>
 
 	<exclude>
@@ -346,8 +359,6 @@
 		<color/>
 		<shape-rendering/>
 		<color-interpolation-filters/>
-		<flood-color/>
-		<flood-opacity/>
 		<writing-mode/>
 		<clip/>
 		<overflow/>

@@ -202,6 +202,10 @@ type
     Label4: TLabel;
     Label5: TLabel;
     lblCellSize: TLabel;
+    ToolBar1: TToolBar;
+    ToolButton10: TToolButton;
+    ToolButton11: TToolButton;
+    ToolButton12: TToolButton;
     procedure sbOpenRootClick(Sender: TObject);
     procedure sbOpenTextClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -319,6 +323,7 @@ type
     procedure PrepareClipart;
     function ResultName(S:string;Cnt,Npp,N:integer):string;
     procedure ShowRendering(AFlag:boolean);
+    procedure SaveTable(AFileName:string);
   end;
 
 
@@ -2140,8 +2145,6 @@ begin
 end;
 
 procedure TMainForm.Save2Click(Sender: TObject);
-var i,j:Integer;
-  s: string;
 
 begin
   chdir(edCfgRoot.Text);
@@ -2150,16 +2153,7 @@ begin
   MainData.dlgSaveContent.FileName := edCfgRoot.Text + edCfgCardsFile.Text;
 
   if  MainData.dlgSaveContent.Execute then
-  with TStringList.Create do
-  try
-    for i := 1 to sgText.RowCount-1 do
-    begin
-      s:=sgText.cells[1,i];
-      for j := 2 to sgText.ColCount-1 do
-        s := s + #9 + sgText.cells[j,i];
-      Add(s);
-    end;
-
+  begin
 
     if MainData.dlgSaveContent.Encodings[MainData.dlgOpenText.EncodingIndex]='default' then
     begin
@@ -2175,13 +2169,32 @@ begin
 
     edCfgCardsFile.Text := ExtractRelativePath(edCfgRoot.Text, MainData.dlgSaveContent.FileName);
 
+    SaveTable(edCfgRoot.Text+edCfgCardsFile.Text);
+  end;
+end;
+
+procedure TMainForm.SaveTable(AFileName: string);
+var i,j:Integer;
+  s: string;
+begin
+  with TStringList.Create do
+  try
+    for i := 1 to sgText.RowCount-1 do
+    begin
+      s:=sgText.cells[1,i];
+      for j := 2 to sgText.ColCount-1 do
+        s := s + #9 + sgText.cells[j,i];
+      Add(s);
+    end;
+
     if lblEncoding.Caption = 'UTF-8' then
-      SaveToFile(edCfgRoot.Text+edCfgCardsFile.Text, Encoding.UTF8)
+      SaveToFile(AFileName, Encoding.UTF8)
     else
-      SaveToFile(edCfgRoot.Text+edCfgCardsFile.Text);
+      SaveToFile(AFileName, Encoding.ANSI);
   finally
     Free;
   end;
+
 end;
 
 procedure TMainForm.sbOpenClipartClick(Sender: TObject);
@@ -2988,6 +3001,20 @@ begin
     end;
 
     Config.SaveToFile(MainData.dlgSaveXML.FileName);
+
+    if MainData.dlgSaveXML.FilterIndex=1 then
+    begin
+      if (sgText.ColCount>2)or(sgText.RowCount>2)or(sgText.Cells[1,1]<>'') then
+        SaveTable(edCfgRoot.Text+edCfgCardsFile.Text);
+
+      SVG.Node['svg'].Attribute['xmlns:dekart']:='http://127.0.0.1';
+      if SVG.Node['svg'].Nodes.Count>0 then
+        SVG.SaveToFile(edCfgRoot.Text+edCfgPropotype.text);
+
+      Clipart.Node['svg'].Attribute['xmlns:dekart']:='http://127.0.0.1';
+      if Clipart.Node['svg'].Nodes.Count>0 then
+        Clipart.SaveToFile(edCfgRoot.Text+edCfgClipart.text);
+    end;
   end;
 end;
 

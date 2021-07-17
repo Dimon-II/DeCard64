@@ -1584,7 +1584,7 @@ object MainForm: TMainForm
         ExplicitHeight = 471
       end
       object Splitter2: TSplitter
-        Left = 564
+        Left = 643
         Top = 0
         Width = 5
         Height = 419
@@ -1700,14 +1700,71 @@ object MainForm: TMainForm
           ExplicitHeight = 358
           inherited tbrTemplate: TToolBar
             Width = 276
+            Height = 46
+            ButtonHeight = 44
+            ButtonWidth = 32
             ExplicitWidth = 276
+            ExplicitHeight = 46
+            inherited ToolButton37: TToolButton
+              ExplicitWidth = 32
+              ExplicitHeight = 44
+            end
+            inherited ToolButton3: TToolButton
+              Left = 32
+              ExplicitLeft = 32
+              ExplicitHeight = 44
+            end
+            inherited btnNewObject: TToolButton
+              Left = 40
+              ExplicitLeft = 40
+              ExplicitWidth = 32
+              ExplicitHeight = 44
+            end
+            inherited tbCopyTag: TToolButton
+              Left = 72
+              ExplicitLeft = 72
+              ExplicitWidth = 32
+              ExplicitHeight = 44
+            end
+            inherited btn10: TToolButton
+              Left = 104
+              ExplicitLeft = 104
+              ExplicitWidth = 32
+              ExplicitHeight = 44
+            end
+            inherited btnUp: TToolButton
+              Left = 136
+              ExplicitLeft = 136
+              ExplicitWidth = 32
+              ExplicitHeight = 44
+            end
+            inherited btnDown: TToolButton
+              Left = 168
+              ExplicitLeft = 168
+              ExplicitWidth = 32
+              ExplicitHeight = 44
+            end
+            inherited btnSearch1: TToolButton
+              Left = 200
+              ExplicitLeft = 200
+              ExplicitWidth = 32
+              ExplicitHeight = 44
+            end
+            inherited tbXML: TToolButton
+              Left = 232
+              ExplicitLeft = 232
+              ExplicitWidth = 32
+              ExplicitHeight = 44
+            end
           end
           inherited treeTemplate: TTreeView
+            Top = 46
             Width = 276
             Height = 312
             OnChange = SvgTreeFrame1treeTemplateChange
+            ExplicitTop = 49
             ExplicitWidth = 276
-            ExplicitHeight = 312
+            ExplicitHeight = 309
           end
           inherited pmFileSVG: TPopupMenu
             inherited File1: TMenuItem
@@ -1722,118 +1779,169 @@ object MainForm: TMainForm
         end
       end
       inline InspectorFrame: TSvgInspectorFrame
-        Left = 569
+        Left = 648
         Top = 0
-        Width = 400
+        Width = 321
         Height = 419
         Align = alRight
         TabOrder = 1
-        ExplicitLeft = 569
-        ExplicitWidth = 400
+        ExplicitLeft = 648
+        ExplicitWidth = 321
         ExplicitHeight = 419
         inherited pcAtrInspector: TPageControl
-          Width = 400
+          Width = 321
           Height = 419
           ExplicitWidth = 400
           ExplicitHeight = 419
           inherited tsAtr: TTabSheet
             AlignWithMargins = True
             ExplicitLeft = 7
-            ExplicitTop = 27
             ExplicitWidth = 386
             ExplicitHeight = 385
             inherited splInspector: TSplitter
               Top = 281
-              Width = 386
+              Width = 307
               ExplicitTop = 464
               ExplicitWidth = 392
             end
             inherited sgAttr: TStringGrid
-              Width = 386
+              Top = 36
+              Width = 307
               Height = 245
+              ExplicitTop = 36
               ExplicitWidth = 386
               ExplicitHeight = 245
             end
             inherited meHint: TMemo
               Top = 287
-              Width = 386
+              Width = 307
               ExplicitTop = 287
               ExplicitWidth = 386
             end
             inherited ToolBar1: TToolBar
-              Width = 386
+              Width = 307
+              Height = 36
+              ButtonHeight = 36
+              ButtonWidth = 32
               ExplicitWidth = 386
+              ExplicitHeight = 36
               inherited cbAtrShow: TComboBox
-                Top = 0
-                ExplicitTop = 0
+                Top = 7
+                Height = 21
+                ExplicitTop = 7
+                ExplicitHeight = 21
               end
               inherited tbResize: TToolButton
                 OnClick = InspectorFrametbResizeClick
+                ExplicitWidth = 32
+                ExplicitHeight = 36
+              end
+              inherited tbEdit: TToolButton
+                Left = 112
+                ExplicitLeft = 112
+                ExplicitWidth = 32
+                ExplicitHeight = 36
+              end
+              inherited ToolButton16: TToolButton
+                Left = 144
+                ExplicitLeft = 144
+                ExplicitHeight = 36
+              end
+              inherited tbSetColor: TToolButton
+                Left = 152
+                ExplicitLeft = 152
+                ExplicitWidth = 32
+                ExplicitHeight = 36
+              end
+              inherited tbFont: TToolButton
+                Left = 184
+                ExplicitLeft = 184
+                ExplicitWidth = 32
+                ExplicitHeight = 36
+              end
+              inherited tbFileXlink: TToolButton
+                Left = 216
+                ExplicitLeft = 216
+                ExplicitWidth = 32
+                ExplicitHeight = 36
+              end
+              inherited ToolButton28: TToolButton
+                Left = 248
+                ExplicitLeft = 248
+                ExplicitWidth = 32
+                ExplicitHeight = 36
               end
             end
           end
           inherited tsReplace: TTabSheet
-            ExplicitLeft = 4
             ExplicitTop = 24
-            ExplicitWidth = 610
             ExplicitHeight = 533
+            inherited ReplaceFrame: TSynEditFrame
+              Height = 533
+              ExplicitHeight = 533
+              inherited SynEditor: TSynEdit
+                Height = 505
+                ExplicitHeight = 505
+              end
+            end
           end
         end
       end
       object gbPreview: TGroupBox
         Left = 285
         Top = 0
-        Width = 279
+        Width = 358
         Height = 419
         Align = alClient
         Caption = 'Preview'
         TabOrder = 2
+        ExplicitWidth = 279
         object Panel3: TPanel
           Left = 2
           Top = 15
-          Width = 275
-          Height = 45
+          Width = 354
+          Height = 47
           Align = alTop
           AutoSize = True
           BevelOuter = bvNone
           TabOrder = 0
           object Label1: TLabel
-            Left = 8
-            Top = 3
+            Left = 110
+            Top = 4
             Width = 26
             Height = 13
             Caption = 'Zoom'
           end
           object Label2: TLabel
-            Left = 5
+            Left = 110
             Top = 26
             Width = 30
             Height = 13
             Caption = 'Frame'
           end
           object Label4: TLabel
-            Left = 98
-            Top = 3
+            Left = 204
+            Top = 4
             Width = 30
             Height = 13
             Caption = 'X-cells'
           end
           object Label5: TLabel
-            Left = 98
+            Left = 204
             Top = 26
             Width = 30
             Height = 13
             Caption = 'Y-cells'
           end
           object lblCellSize: TLabel
-            Left = 186
+            Left = 292
             Top = 16
             Width = 16
             Height = 13
             Caption = '0:0'
           end
           object cbZoom: TComboBox
-            Left = 39
+            Left = 145
             Top = 0
             Width = 53
             Height = 21
@@ -1849,7 +1957,7 @@ object MainForm: TMainForm
               '200%')
           end
           object seFrame: TSpinEdit
-            Left = 39
+            Left = 145
             Top = 23
             Width = 53
             Height = 22
@@ -1871,8 +1979,8 @@ object MainForm: TMainForm
             OnEnter = seFrameEnter
           end
           object seGridX: TSpinEdit
-            Left = 132
-            Top = 0
+            Left = 238
+            Top = 1
             Width = 48
             Height = 22
             MaxValue = 50
@@ -1884,7 +1992,7 @@ object MainForm: TMainForm
             OnExit = seGridXExit
           end
           object seGridY: TSpinEdit
-            Left = 132
+            Left = 238
             Top = 23
             Width = 48
             Height = 22
@@ -1896,18 +2004,52 @@ object MainForm: TMainForm
             OnClick = seGridXChange
             OnEnter = seGridXEnter
           end
+          object ToolBar1: TToolBar
+            Left = 0
+            Top = 3
+            Width = 99
+            Height = 44
+            Align = alNone
+            AutoSize = True
+            ButtonHeight = 44
+            ButtonWidth = 33
+            Images = MainData.ilDecard
+            ShowCaptions = True
+            TabOrder = 4
+            Wrapable = False
+            object ToolButton10: TToolButton
+              Left = 0
+              Top = 0
+              Action = aShow
+              ParentShowHint = False
+              ShowHint = True
+            end
+            object ToolButton11: TToolButton
+              Left = 33
+              Top = 0
+              Action = aPrev
+            end
+            object ToolButton12: TToolButton
+              Left = 66
+              Top = 0
+              Action = aNext
+            end
+          end
         end
         object scrlPreview: TScrollBox
           Left = 2
-          Top = 60
-          Width = 275
-          Height = 357
+          Top = 62
+          Width = 354
+          Height = 355
           Align = alClient
           TabOrder = 1
+          ExplicitTop = 60
+          ExplicitWidth = 275
+          ExplicitHeight = 357
           object shpBkg: TShape
             Left = 0
             Top = 0
-            Width = 275
+            Width = 329
             Height = 529
             Align = alClient
             Brush.Color = clSilver
@@ -1915,6 +2057,7 @@ object MainForm: TMainForm
             Pen.Style = psClear
             ExplicitLeft = -21
             ExplicitTop = -194
+            ExplicitWidth = 275
           end
           object imgPreview: TImage
             Left = 0
@@ -2022,10 +2165,69 @@ object MainForm: TMainForm
         Align = alLeft
         TabOrder = 0
         ExplicitHeight = 596
+        inherited tbrTemplate: TToolBar
+          Height = 46
+          ButtonHeight = 44
+          ButtonWidth = 32
+          ExplicitHeight = 46
+          inherited ToolButton37: TToolButton
+            ExplicitWidth = 32
+            ExplicitHeight = 44
+          end
+          inherited ToolButton3: TToolButton
+            Left = 32
+            ExplicitLeft = 32
+            ExplicitHeight = 44
+          end
+          inherited btnNewObject: TToolButton
+            Left = 40
+            ExplicitLeft = 40
+            ExplicitWidth = 32
+            ExplicitHeight = 44
+          end
+          inherited tbCopyTag: TToolButton
+            Left = 72
+            ExplicitLeft = 72
+            ExplicitWidth = 32
+            ExplicitHeight = 44
+          end
+          inherited btn10: TToolButton
+            Left = 104
+            ExplicitLeft = 104
+            ExplicitWidth = 32
+            ExplicitHeight = 44
+          end
+          inherited btnUp: TToolButton
+            Left = 136
+            ExplicitLeft = 136
+            ExplicitWidth = 32
+            ExplicitHeight = 44
+          end
+          inherited btnDown: TToolButton
+            Left = 168
+            ExplicitLeft = 168
+            ExplicitWidth = 32
+            ExplicitHeight = 44
+          end
+          inherited btnSearch1: TToolButton
+            Left = 200
+            ExplicitLeft = 200
+            ExplicitWidth = 32
+            ExplicitHeight = 44
+          end
+          inherited tbXML: TToolButton
+            Left = 232
+            ExplicitLeft = 232
+            ExplicitWidth = 32
+            ExplicitHeight = 44
+          end
+        end
         inherited treeTemplate: TTreeView
+          Top = 46
           Height = 550
           OnChange = ClipartFrametreeTemplateChange
-          ExplicitHeight = 550
+          ExplicitTop = 49
+          ExplicitHeight = 547
         end
         inherited pmFileSVG: TPopupMenu
           inherited File1: TMenuItem
@@ -2068,7 +2270,6 @@ object MainForm: TMainForm
           ExplicitWidth = 522
           ExplicitHeight = 596
           inherited tsAtr: TTabSheet
-            ExplicitLeft = 4
             ExplicitTop = 24
             ExplicitWidth = 514
             ExplicitHeight = 568
@@ -2079,8 +2280,10 @@ object MainForm: TMainForm
               ExplicitWidth = 514
             end
             inherited sgAttr: TStringGrid
+              Top = 36
               Width = 514
               Height = 428
+              ExplicitTop = 36
               ExplicitWidth = 514
               ExplicitHeight = 428
             end
@@ -2092,21 +2295,68 @@ object MainForm: TMainForm
             end
             inherited ToolBar1: TToolBar
               Width = 514
+              Height = 36
+              ButtonHeight = 36
+              ButtonWidth = 32
               ExplicitWidth = 514
+              ExplicitHeight = 36
               inherited cbAtrShow: TComboBox
-                Top = 0
-                ExplicitTop = 0
+                Height = 21
+                ExplicitHeight = 21
               end
               inherited tbResize: TToolButton
                 Visible = False
+                ExplicitWidth = 32
+                ExplicitHeight = 36
+              end
+              inherited tbEdit: TToolButton
+                Left = 112
+                ExplicitLeft = 112
+                ExplicitWidth = 32
+                ExplicitHeight = 36
+              end
+              inherited ToolButton16: TToolButton
+                Left = 144
+                ExplicitLeft = 144
+                ExplicitHeight = 36
+              end
+              inherited tbSetColor: TToolButton
+                Left = 152
+                ExplicitLeft = 152
+                ExplicitWidth = 32
+                ExplicitHeight = 36
+              end
+              inherited tbFont: TToolButton
+                Left = 184
+                ExplicitLeft = 184
+                ExplicitWidth = 32
+                ExplicitHeight = 36
+              end
+              inherited tbFileXlink: TToolButton
+                Left = 216
+                ExplicitLeft = 216
+                ExplicitWidth = 32
+                ExplicitHeight = 36
+              end
+              inherited ToolButton28: TToolButton
+                Left = 248
+                ExplicitLeft = 248
+                ExplicitWidth = 32
+                ExplicitHeight = 36
               end
             end
           end
           inherited tsReplace: TTabSheet
-            ExplicitLeft = 4
             ExplicitTop = 24
-            ExplicitWidth = 610
             ExplicitHeight = 533
+            inherited ReplaceFrame: TSynEditFrame
+              Height = 533
+              ExplicitHeight = 533
+              inherited SynEditor: TSynEdit
+                Height = 505
+                ExplicitHeight = 505
+              end
+            end
           end
         end
       end

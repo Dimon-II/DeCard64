@@ -594,6 +594,9 @@ begin
   else
     dkr:='';
 
+  if SVGNode.LocalName='feFlood' then
+    MainData.dlgColor.Color := ColorHex(SVGNode.Attribute[dkr + 'flood-color'])
+  else
   if SVGNode.LocalName='stop' then
     MainData.dlgColor.Color := ColorHex(SVGNode.Attribute[dkr + 'stop-color'])
   else
@@ -605,6 +608,9 @@ begin
 
   if MainData.dlgColor.Execute then
   begin
+    if  SVGNode.LocalName='feFlood' then
+      SVGNode.Attribute[dkr + 'flood-color'] := '#'+HexColor(MainData.dlgColor.Color)
+    else
     if  SVGNode.LocalName='stop' then
       SVGNode.Attribute[dkr + 'stop-color'] := '#'+HexColor(MainData.dlgColor.Color)
     else

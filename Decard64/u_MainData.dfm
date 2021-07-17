@@ -7922,8 +7922,11 @@ object MainData: TMainData
     Top = 264
   end
   object dlgSaveXML: TSaveDialog
-    DefaultExt = 'xml'
-    Filter = 'XML config file|*.xml|Any file|*.*'
+    DefaultExt = 'XML'
+    FileName = 'DeCard.XML'
+    Filter = 
+      'XML-config and all project files|*.xml|Only XML config file|*.xm' +
+      'l'
     Options = [ofHideReadOnly, ofNoChangeDir, ofEnableSizing]
     Title = 'Save DeCard project to projects root'
     Left = 136
