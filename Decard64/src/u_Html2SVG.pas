@@ -319,6 +319,7 @@ var ss,s,z:string;
 
   end;
 
+
 begin
   nod.Attribute['text-anchor'] := ParentStyle(nod,'text-anchor');
   nod.Attribute['font-size'] := ParentStyle(nod,'font-size');
@@ -327,7 +328,6 @@ begin
   nod.Attribute['font-style'] := ParentStyle(nod,'font-style');
   nod.Attribute['letter-spacing'] := ParentStyle(nod,'letter-spacing','0');
   nod.Attribute['font-variant'] := ParentStyle(nod,'normal');
-
 
   Nod.text := StringReplace(Nod.text,'[p]',' [p] ',[rfReplaceAll, rfIgnoreCase]);
   Nod.text := StringReplace(Nod.text,'  ',' ',[rfReplaceAll, rfIgnoreCase]);
@@ -571,6 +571,7 @@ begin
        DoZoom := False;
 
    until not DoZoom;
+
 
    if nod.Attribute['decard-format']<>'' then
    begin
@@ -1249,6 +1250,9 @@ bkg := nil;
   nodx:= StrToIntDef(NOD.Attribute['x'],0);
   nody:= StrToIntDef(NOD.Attribute['y'],0);
 
+  if ParentStyle(NOD, 'decard-baseline','80%')<>'100%' then
+    nody:= nody - round(StrToIntDef(NOD.Attribute['font-size'],0)*0.2);
+
   nod.Attribute['x'] := '0';
   nod.Attribute['y'] := '0';
 //  nod_width := StrToIntDef(NOD.Attribute['width'],0);
@@ -1698,8 +1702,8 @@ bkg := nil;
           and (StrToIntDef(NOD.Attribute['height'],0)+1 < hgh * ZoomValue)
         then begin
           err := round(StrToIntDef(NOD.Attribute['height'],0) * ZoomValue);
-
-          ZoomValue := ZoomValue * Sqrt(StrToIntDef(NOD.Attribute['height'],0) / (hgh * ZoomValue) );
+          ZoomValue := ZoomValue * 0.98;
+//          ZoomValue := ZoomValue * Sqrt(StrToIntDef(NOD.Attribute['height'],0) / (hgh * ZoomValue) );
           DoZoom := err = round(StrToIntDef(NOD.Attribute['height'],0) * ZoomValue);
         end;
 

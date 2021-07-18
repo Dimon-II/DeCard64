@@ -68,7 +68,8 @@ implementation
 
 
 
-uses u_MainData, Vcl.Themes, u_XMLEditForm, u_MainForm, u_ThreadRender;
+uses u_MainData, Vcl.Themes, u_XMLEditForm, u_MainForm, u_ThreadRender,
+  u_Html2SVG ;
 
 
 
@@ -215,7 +216,10 @@ begin
 
    if SVGNode.LocalName='text' then
    begin
-     SVGNode.Attribute['y']:= IntToStr(ARect.Top+(StrToIntDEf(SVGNode.Attribute['font-size'],10)*7) div 8  );
+
+
+     SVGNode.Attribute['y']:= IntToStr(Round(ARect.Top+(StrToIntDEf(SVGNode.Attribute['font-size'],10)*0.8)));
+
      if SVGNode.Attribute['text-anchor']='end' then
         SVGNode.Attribute['x']:= IntToStr(ARect.Right)
      else
@@ -328,6 +332,9 @@ procedure TSvgInspectorFrame.SetSVGNode(const Value: TXML_Nod);
 
     if Aname = 'preserveAspectRatio' then
       en := 'xMidYMid meet,xMinYMid meet,xMaxYMid meet,xMidYMin slice,xMidYMid slice,xMidYMax slice,xMidYMin meet,xMidYMid meet,xMidYMax meet,xMinYMid slice,xMidYMid slice,xMaxYMid slice,none';
+
+    if Aname = 'decard-baseline' then
+      en := '80%,100%';
 
     if nod <> nil then
     begin
@@ -473,6 +480,10 @@ begin
    if (SVGNode.LocalName='foreignObject') then
    begin
       AddAtr('body','', SVGNode.LocalName)
+   end;
+   if (SVGNode.LocalName='svg') then
+   begin
+      AddAtr('decard-baseline','', SVGNode.LocalName);
    end;
 
    for i := 1 to sgAttr.RowCount-1 do

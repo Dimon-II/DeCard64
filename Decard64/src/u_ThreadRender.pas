@@ -135,12 +135,12 @@ var
 
   fit_to: resvg_fit_to;
   tree: ^presvg_render_tree;
-  pth: AnsiString;
+  pth: utf8String;
 
 begin
   fmt := LowerCase(StringReplace(ExtractFileExt(FResultFile), '.', '', []));
   pth :=  ExtractFilePath(FSvgFile);
-  resvg_options_set_resources_dir(opt, PAnsiChar(pth));
+  resvg_options_set_resources_dir(opt, PChar(pth));
   resvg_options_set_dpi(opt, DPI);
 
   resvg_options_set_keep_named_groups(opt, FIdObject <> nil);
@@ -281,6 +281,7 @@ begin
   with fs do
     try
       LoadFromFile(AFontFile);
+//      AddFontResourceEx(PChar(AFontFile),nil, @FontsCount);
       Position := 0;
 //      HFont :=
       AddFontMemResourceEx(Memory, Size, nil, @FontsCount);
@@ -373,7 +374,9 @@ procedure ResetFonts(APath: string);
 var
   sr: TSearchRec;
   s: string;
-  fn: AnsiString;
+  fn: UTF8String;
+  FontsCount: Integer;
+  ll:byte;
 begin
   try
     LocalFonts := '';
@@ -391,11 +394,13 @@ begin
         fn := APath + sr.Name;
         if (LowerCase(ExtractFileExt(sr.Name)) = '.ttf') or
           (LowerCase(ExtractFileExt(sr.Name)) = '.otf') then
-          if resvg_options_load_font_file(opt, PAnsiChar(fn)) = 0 then
           begin
-            s := GetFontName(APath + sr.Name);
-            if Pos(s, LocalFonts) = 0 then
-              LocalFonts := LocalFonts + s + ',';
+            if resvg_options_load_font_file(opt, PChar(fn))=0 then
+            begin
+              s :=   GetFontName(APath + sr.Name);
+              if Pos(s, LocalFonts) = 0 then
+                LocalFonts := LocalFonts + s + ',';
+            end;
           end;
       until FindNext(sr) <> 0;
       FindClose(sr);
@@ -428,7 +433,7 @@ var
   fmt: string;
   b2: TBitmap;
   b3: TJpegDPI;
-  ss: AnsiString;
+  ss: UTF8String;
   s: String;
 begin
   fmt := LowerCase(StringReplace(ExtractFileExt(FResultFile), '.', '', []));
@@ -473,8 +478,8 @@ begin
     for i := 0 to FIdObject.count - 1 do
       try
         ss := FIdObject[i];
-        if resvg_node_exists(Ftree, PAnsiChar(ss)) then
-          if resvg_get_node_bbox(Ftree, PAnsiChar(ss), @bbox) then
+        if resvg_node_exists(Ftree, PChar(ss)) then
+          if resvg_get_node_bbox(Ftree, PChar(ss), @bbox) then
           begin
             bbox.width := Zero(bbox.width);
             bbox.height := Zero(bbox.height);

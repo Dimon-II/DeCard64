@@ -25,7 +25,7 @@ object MainForm: TMainForm
     Top = 0
     Width = 977
     Height = 624
-    ActivePage = tsProject
+    ActivePage = tsDesigner
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -1762,9 +1762,8 @@ object MainForm: TMainForm
             Width = 276
             Height = 312
             OnChange = SvgTreeFrame1treeTemplateChange
-            ExplicitTop = 49
             ExplicitWidth = 276
-            ExplicitHeight = 309
+            ExplicitHeight = 312
           end
           inherited pmFileSVG: TPopupMenu
             inherited File1: TMenuItem
@@ -1791,12 +1790,12 @@ object MainForm: TMainForm
         inherited pcAtrInspector: TPageControl
           Width = 321
           Height = 419
-          ExplicitWidth = 400
+          ExplicitWidth = 321
           ExplicitHeight = 419
           inherited tsAtr: TTabSheet
             AlignWithMargins = True
             ExplicitLeft = 7
-            ExplicitWidth = 386
+            ExplicitWidth = 307
             ExplicitHeight = 385
             inherited splInspector: TSplitter
               Top = 281
@@ -1809,26 +1808,24 @@ object MainForm: TMainForm
               Width = 307
               Height = 245
               ExplicitTop = 36
-              ExplicitWidth = 386
+              ExplicitWidth = 307
               ExplicitHeight = 245
             end
             inherited meHint: TMemo
               Top = 287
               Width = 307
               ExplicitTop = 287
-              ExplicitWidth = 386
+              ExplicitWidth = 307
             end
             inherited ToolBar1: TToolBar
               Width = 307
               Height = 36
               ButtonHeight = 36
               ButtonWidth = 32
-              ExplicitWidth = 386
+              ExplicitWidth = 307
               ExplicitHeight = 36
               inherited cbAtrShow: TComboBox
-                Top = 7
                 Height = 21
-                ExplicitTop = 7
                 ExplicitHeight = 21
               end
               inherited tbResize: TToolButton
@@ -1895,7 +1892,6 @@ object MainForm: TMainForm
         Align = alClient
         Caption = 'Preview'
         TabOrder = 2
-        ExplicitWidth = 279
         object Panel3: TPanel
           Left = 2
           Top = 15
@@ -2043,9 +2039,6 @@ object MainForm: TMainForm
           Height = 355
           Align = alClient
           TabOrder = 1
-          ExplicitTop = 60
-          ExplicitWidth = 275
-          ExplicitHeight = 357
           object shpBkg: TShape
             Left = 0
             Top = 0
@@ -2226,8 +2219,7 @@ object MainForm: TMainForm
           Top = 46
           Height = 550
           OnChange = ClipartFrametreeTemplateChange
-          ExplicitTop = 49
-          ExplicitHeight = 547
+          ExplicitHeight = 550
         end
         inherited pmFileSVG: TPopupMenu
           inherited File1: TMenuItem
@@ -2301,6 +2293,7 @@ object MainForm: TMainForm
               ExplicitWidth = 514
               ExplicitHeight = 36
               inherited cbAtrShow: TComboBox
+                Top = 7
                 Height = 21
                 ExplicitHeight = 21
               end

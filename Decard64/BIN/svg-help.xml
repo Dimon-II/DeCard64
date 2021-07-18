@@ -3,6 +3,7 @@
   <elements>
 	<svg>
 		<documentation>Root XML container.</documentation>
+		<decard-baseline>Added for compatibility with old projects: set to 100% so that the baseline of foreignObject is considered equal to the font-size, in new projects and the default is 80%.</decard-baseline>
 	</svg>
 	<circle>
 		<documentation>Draw circles based on a center point and a radius.</documentation>

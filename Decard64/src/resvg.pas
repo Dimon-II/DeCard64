@@ -97,22 +97,21 @@ Type
  procedure resvg_init_log; cdecl; external resvgdll;
  function resvg_parse_tree_from_data(data:Pchar; len:longword; opt:Presvg_options; tree:Presvg_render_tree):longint; cdecl; external resvgdll;
  function resvg_get_image_viewbox(tree:Presvg_render_tree):resvg_rect; cdecl; external resvgdll;
- function resvg_node_exists(tree:Presvg_render_tree; id:PAnsiChar):boolean; cdecl; external resvgdll;
- function resvg_get_node_bbox(tree:Presvg_render_tree; id:PAnsiChar; bbox:Presvg_rect):boolean; cdecl; external resvgdll;
+ function resvg_node_exists(tree:Presvg_render_tree; id:PChar):boolean; cdecl; external resvgdll;
+ function resvg_get_node_bbox(tree:Presvg_render_tree; id:PChar; bbox:Presvg_rect):boolean; cdecl; external resvgdll;
  procedure resvg_tree_destroy(tree:Presvg_render_tree); cdecl; external resvgdll;
  procedure resvg_render(tree:Presvg_render_tree; fit_to:resvg_fit_to; width, height:integer; Img:Pchar); cdecl; external resvgdll;
 
  procedure resvg_options_load_system_fonts(opt:Presvg_options); cdecl; external resvgdll;
  function resvg_options_create():Presvg_options; cdecl; external resvgdll;
  procedure resvg_options_destroy(opt:Presvg_options); cdecl; external resvgdll;
- procedure resvg_options_set_resources_dir(opt:Presvg_options; file_path:PAnsiChar); cdecl; external resvgdll;
+ procedure resvg_options_set_resources_dir(opt:Presvg_options; file_path:PChar); cdecl; external resvgdll;
  procedure resvg_options_set_dpi(opt:Presvg_options; dpi: double); cdecl; external resvgdll;
  procedure resvg_options_set_keep_named_groups(opt:Presvg_options; keep:boolean);cdecl; external resvgdll;
  procedure resvg_options_set_shape_rendering_mode(opt:Presvg_options;  mode:resvg_shape_rendering );cdecl; external resvgdll;
  procedure resvg_options_set_text_rendering_mode(opt:Presvg_options;  mode:resvg_text_rendering );cdecl; external resvgdll;
  procedure resvg_options_set_image_rendering_mode(opt:Presvg_options;  mode:resvg_image_rendering );cdecl; external resvgdll;
- function resvg_options_load_font_file(opt:Presvg_options; file_path:PAnsiChar):Integer ;cdecl; external resvgdll;
-
+ function resvg_options_load_font_file(opt:Presvg_options; file_path:PChar):Integer ;cdecl; external resvgdll;
 
 implementation
 
