@@ -35,6 +35,9 @@ object SynEditFrame: TSynEditFrame
     SearchEngine = SynEditSearch1
     WordWrap = True
     FontSmoothing = fsmNone
+    ExplicitLeft = 3
+    ExplicitTop = 56
+    ExplicitHeight = 523
     RemovedKeystrokes = <
       item
         Command = ecDeleteLastChar
@@ -50,107 +53,120 @@ object SynEditFrame: TSynEditFrame
       end>
     AddedKeystrokes = <>
   end
-  object tbrEditor: TToolBar
+  object pscrSysEdit: TPageScroller
     Left = 0
     Top = 0
     Width = 667
     Height = 28
-    AutoSize = True
-    ButtonHeight = 28
-    ButtonWidth = 32
-    Caption = 'tbrEditor'
-    Images = MainData.ilEditor
-    ParentShowHint = False
-    ShowHint = True
+    Align = alTop
+    ButtonSize = 16
+    Control = tbrEditor
     TabOrder = 1
-    object tbUndo: TToolButton
+    ExplicitTop = -6
+    object tbrEditor: TToolBar
       Left = 0
       Top = 0
-      Action = actEditUndo
-    end
-    object tbRedo: TToolButton
-      Left = 32
-      Top = 0
-      Action = actEditRedo
-    end
-    object tbSep1: TToolButton
-      Left = 64
-      Top = 0
-      Width = 8
-      Caption = 'tbSep1'
-      Enabled = False
-      ImageIndex = 5
-      Style = tbsSeparator
-    end
-    object tbCut: TToolButton
-      Left = 72
-      Top = 0
-      Action = actEditCut
-    end
-    object tbCopy: TToolButton
-      Left = 104
-      Top = 0
-      Action = actEditCopy
-    end
-    object tbPaste: TToolButton
-      Left = 136
-      Top = 0
-      Action = actEditPaste
-    end
-    object ToolButton1: TToolButton
-      Left = 168
-      Top = 0
-      Width = 8
-      Caption = 'tbSep2'
-      ImageIndex = 14
-      Style = tbsSeparator
-    end
-    object tbSearch: TToolButton
-      Left = 176
-      Top = 0
-      Action = actSearchFind
-    end
-    object tbNext: TToolButton
-      Left = 208
-      Top = 0
-      Action = actSearchFindNext
-    end
-    object tbRepl: TToolButton
-      Left = 240
-      Top = 0
-      Action = actSearchReplace
-    end
-    object ToolButton2: TToolButton
-      Left = 272
-      Top = 0
-      Width = 8
-      Caption = 'ToolButton2'
-      ImageIndex = 14
-      Style = tbsSeparator
-    end
-    object tbSpec: TToolButton
-      Left = 280
-      Top = 0
-      Hint = 'Show special chars'
-      Caption = 'tbSpec'
-      ImageIndex = 51
-      Style = tbsCheck
-      OnClick = tbSpecClick
-    end
-    object tbGlyph: TToolButton
-      Left = 312
-      Top = 0
-      Hint = 'Choose glyph'
-      Caption = 'Glyph'
-      ImageIndex = 10
-      OnClick = tbGlyphClick
-    end
-    object ToolButton3: TToolButton
-      Left = 344
-      Top = 0
-      Caption = 'ToolButton3'
-      ImageIndex = 22
-      Visible = False
+      Width = 376
+      Height = 28
+      Align = alLeft
+      AutoSize = True
+      ButtonHeight = 28
+      ButtonWidth = 32
+      Caption = 'tbrEditor'
+      Images = MainData.ilEditor
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 0
+      ExplicitHeight = 33
+      object tbUndo: TToolButton
+        Left = 0
+        Top = 0
+        Action = actEditUndo
+      end
+      object tbRedo: TToolButton
+        Left = 32
+        Top = 0
+        Action = actEditRedo
+      end
+      object tbSep1: TToolButton
+        Left = 64
+        Top = 0
+        Width = 8
+        Caption = 'tbSep1'
+        Enabled = False
+        ImageIndex = 5
+        Style = tbsSeparator
+      end
+      object tbCut: TToolButton
+        Left = 72
+        Top = 0
+        Action = actEditCut
+      end
+      object tbCopy: TToolButton
+        Left = 104
+        Top = 0
+        Action = actEditCopy
+      end
+      object tbPaste: TToolButton
+        Left = 136
+        Top = 0
+        Action = actEditPaste
+      end
+      object ToolButton1: TToolButton
+        Left = 168
+        Top = 0
+        Width = 8
+        Caption = 'tbSep2'
+        ImageIndex = 14
+        Style = tbsSeparator
+      end
+      object tbSearch: TToolButton
+        Left = 176
+        Top = 0
+        Action = actSearchFind
+      end
+      object tbNext: TToolButton
+        Left = 208
+        Top = 0
+        Action = actSearchFindNext
+      end
+      object tbRepl: TToolButton
+        Left = 240
+        Top = 0
+        Action = actSearchReplace
+      end
+      object ToolButton2: TToolButton
+        Left = 272
+        Top = 0
+        Width = 8
+        Caption = 'ToolButton2'
+        ImageIndex = 14
+        Style = tbsSeparator
+      end
+      object tbSpec: TToolButton
+        Left = 280
+        Top = 0
+        Hint = 'Show special chars'
+        Caption = 'tbSpec'
+        ImageIndex = 51
+        Style = tbsCheck
+        OnClick = tbSpecClick
+      end
+      object tbGlyph: TToolButton
+        Left = 312
+        Top = 0
+        Hint = 'Choose glyph'
+        Caption = 'Glyph'
+        ImageIndex = 10
+        OnClick = tbGlyphClick
+      end
+      object ToolButton3: TToolButton
+        Left = 344
+        Top = 0
+        Caption = 'ToolButton3'
+        ImageIndex = 22
+        Visible = False
+      end
     end
   end
   object actlMain: TActionList

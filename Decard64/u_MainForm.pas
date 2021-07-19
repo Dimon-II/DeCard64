@@ -136,13 +136,6 @@ type
     seGridY: TSpinEdit;
     PaintBox: TPaintBox;
     shpSelection: TShape;
-    tbrCellGrid: TToolBar;
-    ToolButton30: TToolButton;
-    tbCellEdit: TToolButton;
-    tbAutoWidth: TToolButton;
-    ToolButton1: TToolButton;
-    btnPreview: TToolButton;
-    tbFindText: TToolButton;
     Splitter3: TSplitter;
     dlgTextFind: TFindDialog;
     pmFileText: TPopupMenu;
@@ -159,31 +152,14 @@ type
     pnGridDown: TPanel;
     sgText: TStringGrid;
     pnGridRight: TPanel;
-    ToolButton3: TToolButton;
-    tbRenderPrev: TToolButton;
-    tbRenderNext: TToolButton;
-    scrlPreview1: TScrollBox;
     Splitter5: TSplitter;
-    imgRender: TImage;
     alCells: TActionList;
     aShow: TAction;
     aNext: TAction;
     aPrev: TAction;
     aFind: TAction;
-    ToolBar2: TToolBar;
-    tbPreviewOpen: TToolButton;
-    tbPreviewSave: TToolButton;
-    tbPreviewRefresh: TToolButton;
-    ToolButton7: TToolButton;
-    tbRreview100: TToolButton;
-    tbPreview2x: TToolButton;
-    tbPreview05: TToolButton;
-    tbPreviewMM: TToolButton;
-    tbPreviewToScreen: TToolButton;
-    shpPreview: TShape;
     Rendering2: TPanel;
     tmrRender: TTimer;
-    Rendering3: TPanel;
     shpBkg: TShape;
     ImportSVG1: TMenuItem;
     N1: TMenuItem;
@@ -206,6 +182,32 @@ type
     ToolButton10: TToolButton;
     ToolButton11: TToolButton;
     ToolButton12: TToolButton;
+    pscrCellGrid: TPageScroller;
+    tbrCellGrid: TToolBar;
+    ToolButton30: TToolButton;
+    ToolButton1: TToolButton;
+    tbCellEdit: TToolButton;
+    tbAutoWidth: TToolButton;
+    tbFindText: TToolButton;
+    ToolButton3: TToolButton;
+    btnPreview: TToolButton;
+    tbRenderPrev: TToolButton;
+    tbRenderNext: TToolButton;
+    Panel4: TPanel;
+    scrlPreview1: TScrollBox;
+    shpPreview: TShape;
+    imgRender: TImage;
+    ToolBar2: TToolBar;
+    tbPreviewOpen: TToolButton;
+    tbPreviewSave: TToolButton;
+    tbPreviewRefresh: TToolButton;
+    ToolButton7: TToolButton;
+    tbRreview100: TToolButton;
+    tbPreview2x: TToolButton;
+    tbPreview05: TToolButton;
+    tbPreviewToScreen: TToolButton;
+    tbPreviewMM: TToolButton;
+    Rendering3: TPanel;
     procedure sbOpenRootClick(Sender: TObject);
     procedure sbOpenTextClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -295,6 +297,7 @@ type
     procedure Createcontent1Click(Sender: TObject);
     procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;
       WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
+    procedure SVGFrametreeTemplateExit(Sender: TObject);
   private
     { Private declarations }
     FSel:TRect;
@@ -324,6 +327,7 @@ type
     function ResultName(S:string;Cnt,Npp,N:integer):string;
     procedure ShowRendering(AFlag:boolean);
     procedure SaveTable(AFileName:string);
+    procedure ChildDraw(ANod:TXML_Nod);
   end;
 
 
@@ -344,7 +348,7 @@ implementation
 {$R *.dfm}
 
 uses u_MainData, vcl.FileCtrl, u_XMLEditForm, Vcl.Imaging.pngimage, ShellAPI,
-  u_ThreadRender, System.DateUtils, resvg, u_Html2SVG, u_CellEditForm, SynPdf;
+  u_ThreadRender, System.DateUtils, resvg, u_Html2SVG, u_CellEditForm, SynPdf, u_CalcSVG;
 
 function Zero(AEdit: TSpinEdit): integer;
 begin
@@ -1367,6 +1371,46 @@ begin
 end;
 
 
+procedure TMainForm.ChildDraw(ANod: TXML_Nod);
+var i:integer;
+   r:TTetra;
+begin
+  if ANod.LocalName='svg' then exit;
+  FontCanvas := PaintBox.Canvas;
+
+
+  r:= NodeRect(ANod);
+  for i:=0 to 3 do
+  begin
+    dec(r[i].X, Zero(seFrame));
+    dec(r[i].Y, Zero(seFrame));
+  end;
+
+  PaintBox.Canvas.Pen.Color := rgb(0,204,255);
+  if SVGFrame.treeTemplate.Focused then
+  begin
+    PaintBox.Canvas.Brush.Style := bsFDiagonal;
+    PaintBox.Canvas.Brush.Color := clWhite;
+  end
+  else
+  begin
+    PaintBox.Canvas.Brush.Style := bsClear;
+  end;
+
+  for i:=0 to 3 do
+  begin
+    r[i].X := round(r[i].X * ZoomFactor);
+    r[i].Y := round(r[i].Y * ZoomFactor);
+  end;
+
+
+  PaintBox.Canvas.Polygon([r[0],r[1],r[2],r[3]]);
+
+  if (ANod.LocalName='g')or(ANod.LocalName='symbol')or(ANod.LocalName='mask')or(ANod.LocalName='clipPath') then
+    for i:=0 to ANod.Nodes.Count-1 do
+      ChildDraw(ANod.Nodes[i])
+end;
+
 procedure TMainForm.ClipartFrameSave1Click(Sender: TObject);
 begin
   MainData.dlgSaveSVG.Title := 'Save SVG-clipart';
@@ -1542,7 +1586,7 @@ var i:integer;
    var
      s1,s2:string;
    begin
-     if frMatchCase in dlgTextFind.Options then
+     if not (frMatchCase in dlgTextFind.Options) then
      begin
        s1 := dlgTextFind.FindText;
        s2 := txt;
@@ -1867,10 +1911,17 @@ begin
   if FSel.Top < seFrame.Value then
     FSel.Top := seFrame.Value;
 
-  if FSel.Right > imgPreview.Picture.Width-seFrame.Value then
+
+
+
+  if (FSel.Right > imgPreview.Picture.Width-seFrame.Value)
+    or (FSelCel.Right+1= seGridX.Value)
+  then
      FSel.Right := imgPreview.Picture.Width-seFrame.Value;
 
-  if FSel.Bottom > imgPreview.Picture.Height-seFrame.Value then
+  if (FSel.Bottom > imgPreview.Picture.Height-seFrame.Value)
+    or (FSelCel.Bottom+1= seGridY.Value)
+  then
      FSel.Bottom := imgPreview.Picture.Height-seFrame.Value;
 
   shpSelection.Left :=  imgPreview.Left + Round(FSel.Left * ZoomFactor);
@@ -1908,10 +1959,14 @@ begin
   if FSel.Top < seFrame.Value then
     FSel.Top := seFrame.Value;
 
-  if FSel.Right > imgPreview.Picture.Width-seFrame.Value then
+  if (FSel.Right > imgPreview.Picture.Width-seFrame.Value)
+    or (FSelCel.Right+1= seGridX.Value)
+  then
      FSel.Right := imgPreview.Picture.Width-seFrame.Value;
 
-  if FSel.Bottom > imgPreview.Picture.Height-seFrame.Value then
+  if (FSel.Bottom > imgPreview.Picture.Height-seFrame.Value)
+    or (FSelCel.Bottom+1= seGridY.Value)
+  then
      FSel.Bottom := imgPreview.Picture.Height-seFrame.Value;
 
   if FSel.Right < seFrame.Value then
@@ -1995,6 +2050,7 @@ begin
 
       end;
   end;
+  ChildDraw(SVGFrame.SVGNode);
 
 end;
 
@@ -2003,13 +2059,13 @@ begin
   if pcMain.ActivePageIndex=1 then
   begin
     sgText.SetParentComponent(pnGridDown);
-    tbrCellGrid.SetParentComponent(gbTemplate);
-    tbrCellGrid.Align := alBottom;
+    pscrCellGrid.SetParentComponent(gbTemplate);
+    pscrCellGrid.Align := alBottom;
   end;
   if pcMain.ActivePageIndex=3 then
   begin
-    tbrCellGrid.SetParentComponent(pnGridRight);
-    tbrCellGrid.Align := alTop;
+    pscrCellGrid.SetParentComponent(pnGridRight);
+    pscrCellGrid.Align := alTop;
     sgText.SetParentComponent(pnGridRight);
   end;
 
@@ -2473,6 +2529,11 @@ begin
   end;
 end;
 
+procedure TMainForm.SVGFrametreeTemplateExit(Sender: TObject);
+begin
+  PaintBox.Visible := False;
+end;
+
 procedure TMainForm.SvgTreeFrame1treeTemplateChange(Sender: TObject;
   Node: TTreeNode);
 begin
@@ -2481,7 +2542,8 @@ begin
   InspectorFrame.SVGNode := Node.Data;
   if CellEditForm.Visible then
     CellEditForm.PrepareMacro(SVGFrame.SVGNode);
-
+  PaintBox.Visible := True;
+  PaintBox.Invalidate;
 end;
 
 procedure TMainForm.ThreadRender(AImage: TImage; ASvgFile, ASvg,

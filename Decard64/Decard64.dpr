@@ -14,7 +14,9 @@ uses
   u_CellEditForm in 'u_CellEditForm.pas' {CellEditForm},
   u_XMLEditForm in 'u_XMLEditForm.pas' {XMLEditForm},
   SynPdf in 'SynPDF\SynPdf.pas',
-  frmGlyph in 'Frames\frmGlyph.pas' {formGlyph};
+  frmGlyph in 'Frames\frmGlyph.pas' {formGlyph},
+  u_CalcSVG in 'src\u_CalcSVG.pas',
+  UMatrix in 'src\UMatrix.pas';
 
 {$R *.res}
 

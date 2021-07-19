@@ -18,17 +18,18 @@ type
     meHint: TMemo;
     tsReplace: TTabSheet;
     ReplaceFrame: TSynEditFrame;
-    ToolBar1: TToolBar;
+    alInspector: TActionList;
+    aEdit: TAction;
+    pscrInspector: TPageScroller;
+    tbrInspector: TToolBar;
     cbAtrShow: TComboBox;
     tbResize: TToolButton;
+    tbEdit: TToolButton;
     ToolButton16: TToolButton;
     tbSetColor: TToolButton;
     tbFont: TToolButton;
     tbFileXlink: TToolButton;
     ToolButton28: TToolButton;
-    tbEdit: TToolButton;
-    alInspector: TActionList;
-    aEdit: TAction;
     procedure sgAttrSelectCell(Sender: TObject; ACol, ARow: Integer;
       var CanSelect: Boolean);
     procedure cbAtrShowClick(Sender: TObject);
@@ -534,6 +535,7 @@ begin
   begin
     Canvas.Brush.Style := bsClear;
     Canvas.Pen.Color := clBlue;
+    Canvas.Pen.Width := 2;
     Canvas.Rectangle(sgAttr.CellRect(Acol,Arow));
 //    Canvas.Rectangle(Rect.Left-5, Rect.Top, Rect.Right+1, Rect.Bottom);
   end;
@@ -605,7 +607,7 @@ begin
   else
     dkr:='';
 
-  if SVGNode.LocalName='feFlood' then
+  if (SVGNode.LocalName='feFlood')or(sgAttr.Cells[0,sgAttr.Row]='flood-color') then
     MainData.dlgColor.Color := ColorHex(SVGNode.Attribute[dkr + 'flood-color'])
   else
   if SVGNode.LocalName='stop' then
@@ -619,7 +621,7 @@ begin
 
   if MainData.dlgColor.Execute then
   begin
-    if  SVGNode.LocalName='feFlood' then
+    if (SVGNode.LocalName='feFlood')or(sgAttr.Cells[0,sgAttr.Row]='flood-color') then
       SVGNode.Attribute[dkr + 'flood-color'] := '#'+HexColor(MainData.dlgColor.Color)
     else
     if  SVGNode.LocalName='stop' then
@@ -709,6 +711,7 @@ function THackStringGrid.CreateEditor: TInplaceEdit;
 begin
   Result := THackInplaceEditList.Create(Self);
   THackInplaceEditList(Result).OnEditButtonClick := OnDblClick;
+  Result.Brush.Color := rgb(200,220,255);
 end;
 
 
@@ -726,7 +729,6 @@ begin
     THackInplaceEditList(InplaceEditor).ReadOnly := (ACol<2) or
       ((Cells[0, ARow]='id')and(ACol<>2)) or
       ((Cells[0, ARow]='body')and(ACol<>3));
-
 end;
 
 { THackInplaceEditList }

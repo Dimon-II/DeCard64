@@ -4,104 +4,116 @@ object SvgTreeFrame: TSvgTreeFrame
   Width = 444
   Height = 420
   TabOrder = 0
-  object tbrTemplate: TToolBar
-    Left = 0
-    Top = 0
-    Width = 444
-    Height = 46
-    AutoSize = True
-    ButtonHeight = 44
-    ButtonWidth = 32
-    Caption = 'tbrTemplate'
-    EdgeBorders = [ebBottom]
-    Images = MainData.ilDecard
-    ShowCaptions = True
-    TabOrder = 0
-    object ToolButton37: TToolButton
-      Left = 0
-      Top = 0
-      Hint = 'File operations'
-      Caption = 'File'
-      ImageIndex = 34
-      MenuItem = File1
-    end
-    object ToolButton3: TToolButton
-      Left = 32
-      Top = 0
-      Width = 8
-      Caption = 'ToolButton3'
-      ImageIndex = 15
-      Style = tbsSeparator
-    end
-    object btnNewObject: TToolButton
-      Left = 40
-      Top = 0
-      Hint = 'Add new object'
-      Caption = ' Add '
-      DropdownMenu = pmAddTag
-      ImageIndex = 42
-    end
-    object tbCopyTag: TToolButton
-      Left = 72
-      Top = 0
-      Hint = 'Remember selected object'
-      Caption = 'Copy'
-      ImageIndex = 46
-      OnClick = tbCopyTagClick
-    end
-    object btn10: TToolButton
-      Left = 104
-      Top = 0
-      Hint = 'Delete object'
-      Caption = 'Del'
-      ImageIndex = 41
-      OnClick = btn10Click
-    end
-    object btnUp: TToolButton
-      Left = 136
-      Top = 0
-      Hint = 'Move up (Z-order)'
-      Caption = 'Up'
-      ImageIndex = 43
-      OnClick = btnUpClick
-    end
-    object btnDown: TToolButton
-      Left = 168
-      Top = 0
-      Hint = 'Move down (Z-order)'
-      Caption = 'Dn'
-      ImageIndex = 44
-      OnClick = btnDownClick
-    end
-    object btnSearch1: TToolButton
-      Left = 200
-      Top = 0
-      Hint = 'Search element'
-      Caption = 'Find'
-      ImageIndex = 47
-      OnClick = btnSearch1Click
-    end
-    object tbXML: TToolButton
-      Left = 232
-      Top = 0
-      Hint = 'XML-SVG editor'
-      Caption = 'XML'
-      ImageIndex = 27
-      OnClick = tbXMLClick
-    end
-  end
   object treeTemplate: TTreeView
     Left = 0
-    Top = 46
+    Top = 44
     Width = 444
-    Height = 374
+    Height = 376
     Align = alClient
     HideSelection = False
     Indent = 14
     ReadOnly = True
     ShowRoot = False
-    TabOrder = 1
+    TabOrder = 0
     OnCollapsing = treeTemplateCollapsing
+  end
+  object pscrTemplate: TPageScroller
+    Left = 0
+    Top = 0
+    Width = 444
+    Height = 44
+    Align = alTop
+    ButtonSize = 16
+    Control = tbrTemplate
+    TabOrder = 1
+    object tbrTemplate: TToolBar
+      Left = 0
+      Top = 0
+      Width = 264
+      Height = 46
+      Align = alNone
+      AutoSize = True
+      ButtonHeight = 44
+      ButtonWidth = 32
+      Caption = 'tbrTemplate'
+      EdgeBorders = [ebBottom]
+      Images = MainData.ilDecard
+      ShowCaptions = True
+      TabOrder = 0
+      Wrapable = False
+      object ToolButton37: TToolButton
+        Left = 0
+        Top = 0
+        Hint = 'File operations'
+        Caption = 'File'
+        ImageIndex = 34
+        MenuItem = File1
+      end
+      object ToolButton3: TToolButton
+        Left = 32
+        Top = 0
+        Width = 8
+        Caption = 'ToolButton3'
+        ImageIndex = 15
+        Style = tbsSeparator
+      end
+      object btnNewObject: TToolButton
+        Left = 40
+        Top = 0
+        Hint = 'Add new object'
+        Caption = ' Add '
+        DropdownMenu = pmAddTag
+        ImageIndex = 42
+      end
+      object tbCopyTag: TToolButton
+        Left = 72
+        Top = 0
+        Hint = 'Remember selected object'
+        Caption = 'Copy'
+        ImageIndex = 46
+        OnClick = tbCopyTagClick
+      end
+      object btn10: TToolButton
+        Left = 104
+        Top = 0
+        Hint = 'Delete object'
+        Caption = 'Del'
+        ImageIndex = 41
+        OnClick = btn10Click
+      end
+      object btnUp: TToolButton
+        Left = 136
+        Top = 0
+        Hint = 'Move up (Z-order)'
+        Caption = 'Up'
+        ImageIndex = 43
+        OnClick = btnUpClick
+      end
+      object btnDown: TToolButton
+        Left = 168
+        Top = 0
+        Hint = 'Move down (Z-order)'
+        Caption = 'Dn'
+        ImageIndex = 44
+        OnClick = btnDownClick
+      end
+      object btnSearch1: TToolButton
+        Left = 200
+        Top = 0
+        Hint = 'Search element'
+        Caption = 'Find'
+        ImageIndex = 47
+        OnClick = btnSearch1Click
+      end
+      object tbXML: TToolButton
+        Left = 232
+        Top = 0
+        Hint = 'XML-SVG editor'
+        Caption = 'XML'
+        ImageIndex = 27
+        OnClick = tbXMLClick
+      end
+    end
   end
   object pmAddTag: TPopupMenu
     Images = MainData.ilTags

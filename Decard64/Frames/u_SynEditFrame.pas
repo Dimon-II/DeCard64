@@ -7,7 +7,7 @@ uses
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SynEditHighlighter,
   SynHighlighterXML, System.Actions, Vcl.ActnList, SynEditMiscClasses,
   SynEditSearch, Vcl.Menus, Vcl.ComCtrls, Vcl.ToolWin, SynEdit,  SynHighlighterIni, ProfixXML,
-  SynEditCodeFolding;
+  SynEditCodeFolding, Vcl.ExtCtrls;
 type
   TSynEditFrame = class(TFrame)
     actlMain: TActionList;
@@ -24,19 +24,6 @@ type
     actSearchReplace: TAction;
     SynEditor: TSynEdit;
     SynXMLSyn1: TSynXMLSyn;
-    tbrEditor: TToolBar;
-    tbUndo: TToolButton;
-    tbRedo: TToolButton;
-    tbSep1: TToolButton;
-    tbCut: TToolButton;
-    tbCopy: TToolButton;
-    tbPaste: TToolButton;
-    ToolButton1: TToolButton;
-    tbSearch: TToolButton;
-    tbNext: TToolButton;
-    tbRepl: TToolButton;
-    ToolButton2: TToolButton;
-    tbSpec: TToolButton;
     pmnuEditor: TPopupMenu;
     lmiEditUndo: TMenuItem;
     lmiEditRedo: TMenuItem;
@@ -50,6 +37,20 @@ type
     SynEditSearch1: TSynEditSearch;
     ReplaceDialog: TReplaceDialog;
     FindDialog: TFindDialog;
+    pscrSysEdit: TPageScroller;
+    tbrEditor: TToolBar;
+    tbUndo: TToolButton;
+    tbRedo: TToolButton;
+    tbSep1: TToolButton;
+    tbCut: TToolButton;
+    tbCopy: TToolButton;
+    tbPaste: TToolButton;
+    ToolButton1: TToolButton;
+    tbSearch: TToolButton;
+    tbNext: TToolButton;
+    tbRepl: TToolButton;
+    ToolButton2: TToolButton;
+    tbSpec: TToolButton;
     tbGlyph: TToolButton;
     ToolButton3: TToolButton;
     procedure actEditCutExecute(Sender: TObject);

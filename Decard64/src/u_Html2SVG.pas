@@ -1704,7 +1704,7 @@ bkg := nil;
           err := round(StrToIntDef(NOD.Attribute['height'],0) * ZoomValue);
           ZoomValue := ZoomValue * 0.98;
 //          ZoomValue := ZoomValue * Sqrt(StrToIntDef(NOD.Attribute['height'],0) / (hgh * ZoomValue) );
-          DoZoom := err = round(StrToIntDef(NOD.Attribute['height'],0) * ZoomValue);
+          DoZoom := err*100 = round(StrToIntDef(NOD.Attribute['height'],0) * ZoomValue*100);
         end;
 
       end;

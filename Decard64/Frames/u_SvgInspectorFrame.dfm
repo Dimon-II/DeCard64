@@ -18,7 +18,7 @@ object SvgInspectorFrame: TSvgInspectorFrame
       OnResize = tsAtrResize
       object splInspector: TSplitter
         Left = 0
-        Top = 426
+        Top = 429
         Width = 610
         Height = 6
         Cursor = crVSplit
@@ -28,9 +28,9 @@ object SvgInspectorFrame: TSvgInspectorFrame
       end
       object sgAttr: TStringGrid
         Left = 0
-        Top = 39
+        Top = 36
         Width = 610
-        Height = 387
+        Height = 393
         Align = alClient
         BevelInner = bvNone
         ColCount = 4
@@ -50,7 +50,7 @@ object SvgInspectorFrame: TSvgInspectorFrame
       end
       object meHint: TMemo
         Left = 0
-        Top = 432
+        Top = 435
         Width = 610
         Height = 98
         Align = alBottom
@@ -70,78 +70,89 @@ object SvgInspectorFrame: TSvgInspectorFrame
         ScrollBars = ssVertical
         TabOrder = 1
       end
-      object ToolBar1: TToolBar
+      object pscrInspector: TPageScroller
         Left = 0
         Top = 0
         Width = 610
-        Height = 39
-        AutoSize = True
-        ButtonHeight = 39
-        ButtonWidth = 37
-        Caption = 'ToolBar1'
-        Images = MainData.ilHelper
-        ShowCaptions = True
+        Height = 36
+        Align = alTop
+        Control = tbrInspector
         TabOrder = 2
-        object cbAtrShow: TComboBox
+        object tbrInspector: TToolBar
           Left = 0
           Top = 0
-          Width = 80
-          Height = 24
-          Style = csDropDownList
-          ItemIndex = 0
+          Width = 280
+          Height = 36
+          Align = alNone
+          AutoSize = True
+          ButtonHeight = 36
+          ButtonWidth = 32
+          Caption = 'tbrInspector'
+          Images = MainData.ilHelper
+          ShowCaptions = True
           TabOrder = 0
-          Text = 'All'
-          OnClick = cbAtrShowClick
-          Items.Strings = (
-            'All'
-            'Non empty')
-        end
-        object tbResize: TToolButton
-          Left = 80
-          Top = 0
-          Caption = 'Size'
-          ImageIndex = 22
-        end
-        object tbEdit: TToolButton
-          Left = 117
-          Top = 0
-          Action = aEdit
-        end
-        object ToolButton16: TToolButton
-          Left = 154
-          Top = 0
-          Width = 8
-          Caption = 'ToolButton16'
-          ImageIndex = 11
-          Style = tbsSeparator
-        end
-        object tbSetColor: TToolButton
-          Left = 162
-          Top = 0
-          Caption = 'Color'
-          ImageIndex = 12
-          OnClick = tbSetColorClick
-        end
-        object tbFont: TToolButton
-          Left = 199
-          Top = 0
-          Caption = 'Font'
-          ImageIndex = 19
-          OnClick = tbFontClick
-        end
-        object tbFileXlink: TToolButton
-          Left = 236
-          Top = 0
-          Caption = 'File'
-          ImageIndex = 18
-          OnClick = tbFileXlinkClick
-        end
-        object ToolButton28: TToolButton
-          Left = 273
-          Top = 0
-          Caption = 'Defs'
-          ImageIndex = 21
-          Visible = False
+          Wrapable = False
+          object cbAtrShow: TComboBox
+            Left = 0
+            Top = 0
+            Width = 80
+            Height = 21
+            Style = csDropDownList
+            ItemIndex = 0
+            TabOrder = 0
+            Text = 'All'
+            OnClick = cbAtrShowClick
+            Items.Strings = (
+              'All'
+              'Non empty')
+          end
+          object tbResize: TToolButton
+            Left = 80
+            Top = 0
+            Caption = 'Size'
+            ImageIndex = 22
+          end
+          object tbEdit: TToolButton
+            Left = 112
+            Top = 0
+            Action = aEdit
+          end
+          object ToolButton16: TToolButton
+            Left = 144
+            Top = 0
+            Width = 8
+            Caption = 'ToolButton16'
+            ImageIndex = 11
+            Style = tbsSeparator
+          end
+          object tbSetColor: TToolButton
+            Left = 152
+            Top = 0
+            Caption = 'Color'
+            ImageIndex = 12
+            OnClick = tbSetColorClick
+          end
+          object tbFont: TToolButton
+            Left = 184
+            Top = 0
+            Caption = 'Font'
+            ImageIndex = 19
+            OnClick = tbFontClick
+          end
+          object tbFileXlink: TToolButton
+            Left = 216
+            Top = 0
+            Caption = 'File'
+            ImageIndex = 18
+            OnClick = tbFileXlinkClick
+          end
+          object ToolButton28: TToolButton
+            Left = 248
+            Top = 0
+            Caption = 'Defs'
+            ImageIndex = 21
+            Visible = False
+          end
         end
       end
     end
@@ -152,19 +163,21 @@ object SvgInspectorFrame: TSvgInspectorFrame
         Left = 0
         Top = 0
         Width = 610
-        Height = 530
+        Height = 533
         Align = alClient
         TabOrder = 0
         ExplicitWidth = 610
-        ExplicitHeight = 530
+        ExplicitHeight = 533
         inherited SynEditor: TSynEdit
           Width = 610
-          Height = 502
+          Height = 505
           WordWrap = False
+          ExplicitLeft = 0
+          ExplicitTop = 28
           ExplicitWidth = 610
           ExplicitHeight = 505
         end
-        inherited tbrEditor: TToolBar
+        inherited pscrSysEdit: TPageScroller
           Width = 610
           ExplicitWidth = 610
         end

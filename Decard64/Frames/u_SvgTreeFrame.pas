@@ -42,6 +42,10 @@ type
     Load1: TMenuItem;
     Save1: TMenuItem;
     Clear1: TMenuItem;
+    treeTemplate: TTreeView;
+    svgFindDialog: TFindDialog;
+    miPattert: TMenuItem;
+    pscrTemplate: TPageScroller;
     tbrTemplate: TToolBar;
     ToolButton37: TToolButton;
     ToolButton3: TToolButton;
@@ -51,10 +55,7 @@ type
     btnUp: TToolButton;
     btnDown: TToolButton;
     btnSearch1: TToolButton;
-    treeTemplate: TTreeView;
     tbXML: TToolButton;
-    svgFindDialog: TFindDialog;
-    miPattert: TMenuItem;
     procedure treeTemplateCollapsing(Sender: TObject; Node: TTreeNode;
       var AllowCollapse: Boolean);
     procedure tbXMLClick(Sender: TObject);
@@ -577,7 +578,7 @@ var
    var
      s1,s2:string;
    begin
-     if frMatchCase in svgFindDialog.Options then
+     if not (frMatchCase in svgFindDialog.Options) then
      begin
        s1 := svgFindDialog.FindText;
        s2 := txt;
