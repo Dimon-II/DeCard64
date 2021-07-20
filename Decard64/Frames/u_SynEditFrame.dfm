@@ -35,9 +35,6 @@ object SynEditFrame: TSynEditFrame
     SearchEngine = SynEditSearch1
     WordWrap = True
     FontSmoothing = fsmNone
-    ExplicitLeft = 3
-    ExplicitTop = 56
-    ExplicitHeight = 523
     RemovedKeystrokes = <
       item
         Command = ecDeleteLastChar
@@ -62,7 +59,6 @@ object SynEditFrame: TSynEditFrame
     ButtonSize = 16
     Control = tbrEditor
     TabOrder = 1
-    ExplicitTop = -6
     object tbrEditor: TToolBar
       Left = 0
       Top = 0
@@ -77,7 +73,6 @@ object SynEditFrame: TSynEditFrame
       ParentShowHint = False
       ShowHint = True
       TabOrder = 0
-      ExplicitHeight = 33
       object tbUndo: TToolButton
         Left = 0
         Top = 0

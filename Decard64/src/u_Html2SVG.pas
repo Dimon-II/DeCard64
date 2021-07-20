@@ -1250,8 +1250,6 @@ bkg := nil;
   nodx:= StrToIntDef(NOD.Attribute['x'],0);
   nody:= StrToIntDef(NOD.Attribute['y'],0);
 
-  if ParentStyle(NOD, 'decard-baseline','80%')<>'100%' then
-    nody:= nody - round(StrToIntDef(NOD.Attribute['font-size'],0)*0.2);
 
   nod.Attribute['x'] := '0';
   nod.Attribute['y'] := '0';
@@ -1714,6 +1712,10 @@ bkg := nil;
 
     if (bkg<>nil) and (ZoomValue<>1)and (ZoomValue<>0) then
         Bkg.Attribute['width'] := IntToStr(Round(StrToIntDef(Bkg.Attribute['width'],0)/ZoomValue ));
+
+  if ParentStyle(NOD, 'decard-baseline','80%')<>'100%' then
+    nody:= nody - round(StrToIntDef(NOD.Attribute['font-size'],0)*0.2*ZoomValue);
+
 
     if pos('valign:',nod.Attribute['decard-format'])>0 then
     begin

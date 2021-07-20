@@ -247,7 +247,7 @@ begin
   if ABackwards then
     Include(Options, ssoBackwards);
 
-  if frMatchCase in DlgOptions then
+  if  (frMatchCase in DlgOptions) then
     Include(Options, ssoMatchCase);
 
   if frWholeWord in DlgOptions then

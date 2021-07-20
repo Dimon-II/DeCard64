@@ -25,7 +25,7 @@ object MainForm: TMainForm
     Top = 0
     Width = 977
     Height = 624
-    ActivePage = tsDesigner
+    ActivePage = tsProject
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -1634,6 +1634,7 @@ object MainForm: TMainForm
           end
           inherited pscrTemplate: TPageScroller
             Width = 276
+            ExplicitWidth = 276
           end
           inherited pmFileSVG: TPopupMenu
             inherited File1: TMenuItem
@@ -1654,7 +1655,6 @@ object MainForm: TMainForm
           Align = alBottom
           Control = tbrCellGrid
           TabOrder = 1
-          ExplicitTop = 372
           object tbrCellGrid: TToolBar
             Left = 0
             Top = 0
@@ -1783,6 +1783,12 @@ object MainForm: TMainForm
                 end
               end
             end
+          end
+          inherited tsReplace: TTabSheet
+            ExplicitLeft = 4
+            ExplicitTop = 24
+            ExplicitWidth = 610
+            ExplicitHeight = 533
           end
         end
       end
@@ -2109,6 +2115,8 @@ object MainForm: TMainForm
           ExplicitWidth = 522
           ExplicitHeight = 596
           inherited tsAtr: TTabSheet
+            ExplicitLeft = 4
+            ExplicitTop = 24
             ExplicitWidth = 514
             ExplicitHeight = 568
             inherited splInspector: TSplitter
@@ -2138,6 +2146,12 @@ object MainForm: TMainForm
                 end
               end
             end
+          end
+          inherited tsReplace: TTabSheet
+            ExplicitLeft = 4
+            ExplicitTop = 24
+            ExplicitWidth = 610
+            ExplicitHeight = 533
           end
         end
       end
@@ -2263,8 +2277,6 @@ object MainForm: TMainForm
         Ctl3D = True
         ParentCtl3D = False
         TabOrder = 0
-        ExplicitTop = 29
-        ExplicitHeight = 567
       end
       object Panel4: TPanel
         Left = 0
@@ -2277,10 +2289,6 @@ object MainForm: TMainForm
         Color = clWindow
         ParentBackground = False
         TabOrder = 1
-        ExplicitLeft = 136
-        ExplicitTop = 232
-        ExplicitWidth = 185
-        ExplicitHeight = 41
         object scrlPreview1: TScrollBox
           Left = 0
           Top = 29

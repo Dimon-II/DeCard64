@@ -1586,7 +1586,7 @@ var i:integer;
    var
      s1,s2:string;
    begin
-     if not (frMatchCase in dlgTextFind.Options) then
+     if  (frMatchCase in dlgTextFind.Options) then
      begin
        s1 := dlgTextFind.FindText;
        s2 := txt;

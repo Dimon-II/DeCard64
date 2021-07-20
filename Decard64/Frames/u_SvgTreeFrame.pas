@@ -578,7 +578,7 @@ var
    var
      s1,s2:string;
    begin
-     if not (frMatchCase in svgFindDialog.Options) then
+     if (frMatchCase in svgFindDialog.Options) then
      begin
        s1 := svgFindDialog.FindText;
        s2 := txt;
