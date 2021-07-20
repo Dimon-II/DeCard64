@@ -1413,7 +1413,7 @@ bkg := nil;
             +' font-weight="'+ ParentStyle(xn,'font-weight')+'"'
             +' font-style="'+ ParentStyle(xn,'font-style')+'"'
             +' letter-spacing="'+ ParentStyle(xn,'letter-spacing','0')+'"'
-            +' text-decoration="'+ ParentStyle(xn,'text-decoration')+'">. '+ (xn.text) +'</text>');
+            +' text-decoration="'+ ParentStyle(xn,'text-decoration')+'">'+(xn.text)+ ' ' + (xn.text) +'</text>');
           zz := zz  + xn.attribute['id']+'Z,';
       end;
       xn := xn.Next
@@ -1500,7 +1500,7 @@ bkg := nil;
 
            w1 := SizeParse(xn.Attribute['id']).Right+SizeParse(xn.Attribute['id']).Left;;
            w2 := SizeParse(xn.Attribute['id']+'Z').Right+SizeParse(xn.Attribute['id']+'Z').Left;
-           w2 := round(w2 + (w2-w1)* WordSpacing);
+           w2 := round(w2 + (w2-2*w1)* WordSpacing);
 
            if {(n1.Attribute['width'] = '0') and} (w1 > (StrToIntDef(RST.Attribute['width'],0)/ZoomValue)) then
               addzoom := min(addzoom,StrToIntDef(RST.Attribute['width'],0)/ZoomValue / w1);
@@ -1545,7 +1545,7 @@ bkg := nil;
            n1.Attribute['width'] := IntToStr(StrToIntDef(n1.Attribute['width'],0) + w5 + w1);
            n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),StrToIntDef(n2.Attribute['height'],0)) );
 
-           w3 := w2-w1;
+           w3 := w2-2*w1;
            w5 := 0;
         end;
 
