@@ -979,7 +979,7 @@ begin
       inc(n);
       if (n =  seCountX.value * seCountY.value)
         or ((i=sgText.RowCount-1)and (j=cnt))
-        or( chbRange.Checked and (i+1 = seTo.Value) and (j=cnt) ) then
+        or( chbRange.Checked and (i = seTo.Value) and (j=cnt) ) then
       begin
 
 //      XML.Node[1].Attribute['dekart:background']
@@ -2248,10 +2248,10 @@ begin
   if  MainData.dlgSaveContent.Execute then
   begin
     if MainData.dlgSaveContent.FilterIndex=1 then
-      MainData.dlgSaveContent.FileName := ChangeFileExt(MainData.dlgSaveContent.FileName, 'TSV')
+      MainData.dlgSaveContent.FileName := ChangeFileExt(MainData.dlgSaveContent.FileName, '.TSV')
     else
     if MainData.dlgSaveContent.FilterIndex=2 then
-      MainData.dlgSaveContent.FileName := ChangeFileExt(MainData.dlgSaveContent.FileName, 'TXT');
+      MainData.dlgSaveContent.FileName := ChangeFileExt(MainData.dlgSaveContent.FileName, '.TXT');
 
 
     if MainData.dlgSaveContent.Encodings[MainData.dlgSaveContent.EncodingIndex]='default' then

@@ -25,7 +25,7 @@ object MainForm: TMainForm
     Top = 0
     Width = 977
     Height = 624
-    ActivePage = tsDesigner
+    ActivePage = tsProject
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -1779,6 +1779,7 @@ object MainForm: TMainForm
               ExplicitWidth = 307
               inherited tbrInspector: TToolBar
                 Width = 280
+                ExplicitWidth = 280
                 inherited tbResize: TToolButton
                   OnClick = InspectorFrametbResizeClick
                 end
@@ -2143,6 +2144,7 @@ object MainForm: TMainForm
               ExplicitWidth = 514
               inherited tbrInspector: TToolBar
                 Width = 280
+                ExplicitWidth = 280
                 inherited tbResize: TToolButton
                   Visible = False
                 end

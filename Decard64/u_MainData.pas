@@ -41,13 +41,15 @@ implementation
 
 {$R *.dfm}
 
+
 procedure TMainData.DataModuleCreate(Sender: TObject);
 begin
   XSD:=TXML_Doc.Create;
-  XSD.LoadFromFile('SVG.xsd');
+
+  XSD.LoadFromFile( ExtractFilePath(paramstr(0))+'SVG.xsd');
 
   HLP:=TXML_Doc.Create;
-  HLP.LoadFromFile('svg-help.xml');
+  HLP.LoadFromFile(ExtractFilePath(paramstr(0))+'svg-help.xml');
 end;
 
 procedure TMainData.DataModuleDestroy(Sender: TObject);
