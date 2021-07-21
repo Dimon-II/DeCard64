@@ -319,6 +319,8 @@ end;
 procedure TXML_Atr.Setvalue(const Value: string);
 begin
   Fvalue:=SpecialEntities(Value,true);
+  if (Value='') then Destroy;
+
 end;
 
 function TXML_Atr.Getvalue: string;

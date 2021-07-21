@@ -208,6 +208,7 @@ type
     tbPreviewToScreen: TToolButton;
     tbPreviewMM: TToolButton;
     Rendering3: TPanel;
+    miTableHead: TMenuItem;
     procedure sbOpenRootClick(Sender: TObject);
     procedure sbOpenTextClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -298,6 +299,7 @@ type
     procedure FormMouseWheel(Sender: TObject; Shift: TShiftState;
       WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
     procedure SVGFrametreeTemplateExit(Sender: TObject);
+    procedure miTableHeadClick(Sender: TObject);
   private
     { Private declarations }
     FSel:TRect;
@@ -1861,6 +1863,19 @@ begin
   InspectorFrame.SetSize(FSel);
 end;
 
+procedure TMainForm.miTableHeadClick(Sender: TObject);
+begin
+  XMLEditForm.XML := sgText.Rows[0].Text;
+  XMLEditForm.seTags.Visible := False;
+  XMLEditForm.splTags.Visible := False;
+  XMLEditForm.SynEditFrame.SynEditor.Lines.Delete(0);
+  if XMLEditForm.ShowModal=mrOk then
+  begin
+    sgText.Rows[0].Text := Trim('¹'^M+XMLEditForm.SynEditFrame.SynEditor.Text);
+  end;
+
+end;
+
 procedure TMainForm.PaintBoxMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
@@ -2128,6 +2143,28 @@ var sl:TStringList;
     seTo.Value := sl.Count;
     sgText.RowCount:=2;
     sgText.ColCount:=2;
+    if copy(sl[0],1,3)='[1]' then
+    begin
+      j:=0;
+      s:=sl[0];
+      while s<>'' do
+      begin
+        inc(j);
+        if sgText.ColCount < j+1 then
+        begin
+          sgText.ColCount := j+1;
+          sgText.Cells[sgText.ColCount-1,0] := '['+IntToStr(J)+']'
+        end;
+        ws:=Copy(s,1,Pos(#9,s+#9)-1);
+        if pos('['+IntToStr(J)+']',ws)<>1 then
+          sgText.Cells[j,0]:='['+IntToStr(J)+']' + ws
+        else
+          sgText.Cells[j,0]:= ws;
+        delete(s,1,Pos(#9,s+#9));
+      end;
+
+      sl.Delete(0);
+    end;
     sgText.RowCount := sl.Count+1;
     sgText.Cells[0,0] := '¹';
 
@@ -2210,18 +2247,22 @@ begin
 
   if  MainData.dlgSaveContent.Execute then
   begin
+    if MainData.dlgSaveContent.FilterIndex=1 then
+      MainData.dlgSaveContent.FileName := ChangeFileExt(MainData.dlgSaveContent.FileName, 'TSV')
+    else
+    if MainData.dlgSaveContent.FilterIndex=2 then
+      MainData.dlgSaveContent.FileName := ChangeFileExt(MainData.dlgSaveContent.FileName, 'TXT');
 
-    if MainData.dlgSaveContent.Encodings[MainData.dlgOpenText.EncodingIndex]='default' then
+
+    if MainData.dlgSaveContent.Encodings[MainData.dlgSaveContent.EncodingIndex]='default' then
     begin
       if  UpperCase(ExtractFileExt(MainData.dlgSaveContent.FileName))='.TXT' then
         lblEncoding.Caption := 'ANSI'
       else
         lblEncoding.Caption := 'UTF-8'
-
     end
     else
       lblEncoding.Caption := MainData.dlgSaveContent.Encodings[MainData.dlgSaveContent.EncodingIndex];
-
 
     edCfgCardsFile.Text := ExtractRelativePath(edCfgRoot.Text, MainData.dlgSaveContent.FileName);
 
@@ -2235,7 +2276,7 @@ var i,j:Integer;
 begin
   with TStringList.Create do
   try
-    for i := 1 to sgText.RowCount-1 do
+    for i := 0 to sgText.RowCount-1 do
     begin
       s:=sgText.cells[1,i];
       for j := 2 to sgText.ColCount-1 do

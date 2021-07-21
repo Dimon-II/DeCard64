@@ -25,7 +25,7 @@ object MainForm: TMainForm
     Top = 0
     Width = 977
     Height = 624
-    ActivePage = tsProject
+    ActivePage = tsDesigner
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -1778,6 +1778,7 @@ object MainForm: TMainForm
               Width = 307
               ExplicitWidth = 307
               inherited tbrInspector: TToolBar
+                Width = 280
                 inherited tbResize: TToolButton
                   OnClick = InspectorFrametbResizeClick
                 end
@@ -2141,6 +2142,7 @@ object MainForm: TMainForm
               Width = 514
               ExplicitWidth = 514
               inherited tbrInspector: TToolBar
+                Width = 280
                 inherited tbResize: TToolButton
                   Visible = False
                 end
@@ -2471,6 +2473,11 @@ object MainForm: TMainForm
         Caption = 'Create content'
         ImageIndex = 24
         OnClick = Createcontent1Click
+      end
+      object miTableHead: TMenuItem
+        Caption = 'Table header'
+        ImageIndex = 55
+        OnClick = miTableHeadClick
       end
     end
   end
