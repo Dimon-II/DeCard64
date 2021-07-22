@@ -44,6 +44,7 @@ type
     procedure aEditExecute(Sender: TObject);
     procedure tsAtrResize(Sender: TObject);
     procedure sgAttrTopLeftChanged(Sender: TObject);
+    procedure sgAttrKeyPress(Sender: TObject; var Key: Char);
   private
     FSVGNode: TXML_Nod;
     FEditNode: TXML_Nod;
@@ -138,11 +139,13 @@ begin
     XMLEditForm.splTags.Visible := False;
   end;
 
-  XMLEditForm.XML := sgAttr.Cells[sgAttr.Col,sgAttr.Row];
+  XMLEditForm.SynEditFrame.SynEditor.Text := sgAttr.Cells[sgAttr.Col,sgAttr.Row];
   XMLEditForm.Caption := '<'+SVGNode.LocalName+'>.'+s;
   if XMLEditForm.ShowModal=mrOk then
   begin
-    sgAttr.Cells[sgAttr.Col,sgAttr.Row] := StringReplace(XMLEditForm.XML,^M,' ',[rfReplaceAll]);
+//    sgAttr.Cells[sgAttr.Col,sgAttr.Row] := XMLEditForm.GetText;
+
+    sgAttr.Cells[sgAttr.Col,sgAttr.Row] := StringReplace(XMLEditForm.XML,#13#10,'',[rfReplaceAll]);
     sgAttrSetEditText(sgAttr,sgAttr.Col, sgAttr.Row,sgAttr.Cells[sgAttr.Col,sgAttr.Row] );
   end;
 end;
@@ -169,6 +172,7 @@ begin
   sgAttr.Destroy;
 
   sgAttr := THackStringGrid.Create(self);
+
   with sgAttr do
   begin
     SetParentComponent(tsAtr);
@@ -181,13 +185,14 @@ begin
     FixedCols := 1;
     RowCount := 2;
     Ctl3d:=false;
-//    goFixedHorzLine, goFixedVertLine,
-    Options := [ goVertLine, goHorzLine, goDrawFocusSelected, goColSizing, goEditing, {goFixedColClick,} goAlwaysShowEditor]; //goAlwaysShowEditor,
+    Options := [ goVertLine, goHorzLine, goDrawFocusSelected, goColSizing, goEditing,  goAlwaysShowEditor];
     OnDrawCell := sgAttrDrawCell;
     OnSelectCell := sgAttrSelectCell;
     OnSetEditText := sgAttrSetEditText;
     OnDblClick := aEditExecute;
     OnTopLeftChanged := sgAttrTopLeftChanged;
+    OnKeyPress :=sgAttrKeyPress;
+
   end;
 
   sgAttr.Rows[0].CommaText := '"  NAME","  PARENT","  VALUE","  OVERRIDE"';
@@ -207,7 +212,7 @@ end;
 procedure TSvgInspectorFrame.pcAtrInspectorChange(Sender: TObject);
 begin
 //    tsReplace.SetText(SVGNode.Attribute['dekart:replace'], False);
-
+  ReplaceFrame.SynEditor.ReadOnly := pcAtrInspector.ActivePage<>tsReplace;
 end;
 
 
@@ -539,6 +544,17 @@ begin
     Canvas.Rectangle(sgAttr.CellRect(Acol,Arow));
 //    Canvas.Rectangle(Rect.Left-5, Rect.Top, Rect.Right+1, Rect.Bottom);
   end;
+end;
+
+procedure TSvgInspectorFrame.sgAttrKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key=#13 then
+    if NOT assigned(THackStringGrid(sgAttr).InplaceEditor)
+     or not (THackInplaceEditList(THackStringGrid(sgAttr).InplaceEditor).EditStyle=esPickList) then
+    begin
+      aEdit.Execute;
+      Key :=#0
+    end;
 end;
 
 procedure TSvgInspectorFrame.sgAttrSelectCell(Sender: TObject; ACol,

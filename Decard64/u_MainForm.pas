@@ -300,6 +300,7 @@ type
       WheelDelta: Integer; MousePos: TPoint; var Handled: Boolean);
     procedure SVGFrametreeTemplateExit(Sender: TObject);
     procedure miTableHeadClick(Sender: TObject);
+    procedure sgTextKeyPress(Sender: TObject; var Key: Char);
   private
     { Private declarations }
     FSel:TRect;
@@ -2437,6 +2438,15 @@ begin
 
 end;
 
+procedure TMainForm.sgTextKeyPress(Sender: TObject; var Key: Char);
+begin
+  if key=#13 then
+  begin
+    tbCellEditClick(self);
+    key:=#0;
+  end;
+end;
+
 procedure TMainForm.sgTextSelectCell(Sender: TObject; ACol, ARow: Integer;
   var CanSelect: Boolean);
 begin
@@ -3115,7 +3125,7 @@ begin
         SVG.SaveToFile(edCfgRoot.Text+edCfgPropotype.text);
 
       Clipart.Node['svg'].Attribute['xmlns:dekart']:='http://127.0.0.1';
-      if Clipart.Node['svg'].Nodes.Count>0 then
+      if (Clipart.Node['svg'].Nodes.Count>0) and (edCfgClipart.text<>'') then
         Clipart.SaveToFile(edCfgRoot.Text+edCfgClipart.text);
     end;
   end;

@@ -44,6 +44,7 @@ object SvgInspectorFrame: TSvgInspectorFrame
         ParentCtl3D = False
         TabOrder = 0
         OnDrawCell = sgAttrDrawCell
+        OnKeyPress = sgAttrKeyPress
         OnSelectCell = sgAttrSelectCell
         OnSetEditText = sgAttrSetEditText
         OnTopLeftChanged = sgAttrTopLeftChanged
@@ -171,9 +172,8 @@ object SvgInspectorFrame: TSvgInspectorFrame
         inherited SynEditor: TSynEdit
           Width = 610
           Height = 505
+          ReadOnly = True
           WordWrap = False
-          ExplicitLeft = 0
-          ExplicitTop = 28
           ExplicitWidth = 610
           ExplicitHeight = 505
         end
@@ -191,7 +191,6 @@ object SvgInspectorFrame: TSvgInspectorFrame
     object aEdit: TAction
       Caption = 'Edit'
       ImageIndex = 15
-      ShortCut = 16397
       OnExecute = aEditExecute
     end
   end

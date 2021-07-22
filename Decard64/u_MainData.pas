@@ -46,7 +46,7 @@ procedure TMainData.DataModuleCreate(Sender: TObject);
 begin
   XSD:=TXML_Doc.Create;
 
-  XSD.LoadFromFile( ExtractFilePath(paramstr(0))+'SVG.xsd');
+  XSD.LoadFromFile(ExtractFilePath(paramstr(0))+'SVG.xsd');
 
   HLP:=TXML_Doc.Create;
   HLP.LoadFromFile(ExtractFilePath(paramstr(0))+'svg-help.xml');

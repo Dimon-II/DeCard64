@@ -82,9 +82,12 @@ object XMLEditForm: TXMLEditForm
         ExplicitWidth = 622
         ExplicitHeight = 215
       end
-      inherited tbrEditor: TToolBar
+      inherited pscrSysEdit: TPageScroller
         Width = 622
-        ExplicitWidth = 622
+        inherited tbrEditor: TToolBar
+          Width = 622
+          ExplicitWidth = 622
+        end
       end
     end
     object seTags: TSynMemo

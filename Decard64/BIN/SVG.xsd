@@ -542,6 +542,7 @@
           <enumeration value="normal"/>
           <enumeration value="small"/>
           <enumeration value="caps"/>
+          <enumeration value="first"/>
         </restriction>
       </simpleType>
     </attribute>

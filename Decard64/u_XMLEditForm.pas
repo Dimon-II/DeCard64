@@ -37,7 +37,6 @@ implementation
 function TXMLEditForm.GetXML: string;
 begin
   result := trim(SynEditFrame.SynEditor.Text);
-
 end;
 
 procedure TXMLEditForm.SetXML(const Value: string);
