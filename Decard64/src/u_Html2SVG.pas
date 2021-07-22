@@ -175,7 +175,7 @@ var
 function DoReplace(txt:string;Nod:TXML_Nod):string;
 var i:integer;
   s,n:string;
-  sl,sn, idx:TStringList;
+  sn, idx:TStringList;
   Prnt:TXML_Nod;
 begin
 

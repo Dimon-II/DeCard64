@@ -1386,11 +1386,6 @@ begin
 
 
   r:= NodeRect(ANod);
-  for i:=0 to 3 do
-  begin
-//    dec(r[i].X, Zero(seFrame));
-//    dec(r[i].Y, Zero(seFrame));
-  end;
 
   PaintBox.Canvas.Pen.Color := rgb(0,204,255);
   if SVGFrame.treeTemplate.Focused then
@@ -1868,6 +1863,7 @@ begin
 end;
 
 procedure TMainForm.miTableHeadClick(Sender: TObject);
+var i:integer;
 begin
   XMLEditForm.XML := sgText.Rows[0].Text;
   XMLEditForm.seTags.Visible := False;
@@ -1876,6 +1872,14 @@ begin
   if XMLEditForm.ShowModal=mrOk then
   begin
     sgText.Rows[0].Text := Trim('¹'^M+XMLEditForm.SynEditFrame.SynEditor.Text);
+    for i := 1 to sgText.ColCount-1 do
+    begin
+      if (pos('[', sgText.Cells[i,0])=1) and (pos(']', sgText.Cells[i,0])<6) then
+         sgText.Cells[i,0] := copy(sgText.Cells[i,0], pos(']', sgText.Cells[i,0])+1, Length(sgText.Cells[i,0]));
+      sgText.Cells[i,0] := '['+IntToStr(i)+'] ' + Trim(sgText.Cells[i,0]);
+    end;
+
+
   end;
 
 end;
@@ -2048,17 +2052,17 @@ begin
   PaintBox.Canvas.Brush.Style := bsClear;
   PaintBox.Canvas.Pen.Color := clLime;
 
+
+//  PaintBox.Canvas.Rectangle();
+
+  if (seGridX.Value=0) and (seGridY.Value=0) then
+  begin
   if Not SVGFrame.treeTemplate.Focused or GridMouse then
   PaintBox.Canvas.Rectangle(
     Round(seFrame.Value * ZoomFactor),
     Round(seFrame.Value * ZoomFactor),
     Round((imgPreview.Picture.Width-seFrame.Value*1) * ZoomFactor),
     Round((imgPreview.Picture.Height-seFrame.Value*1) * ZoomFactor));
-
-//  PaintBox.Canvas.Rectangle();
-
-  if (seGridX.Value=0) and (seGridY.Value=0) then
-  begin
   end
   else
   begin
@@ -2075,15 +2079,33 @@ begin
       Cell.Y := Cell.X;
 
     if Not SVGFrame.treeTemplate.Focused or GridMouse then
-    for I := 0 to round((imgPreview.Picture.Width-seFrame.Value*2)/Cell.X) do
+    begin
+      for I := 0 to round((imgPreview.Picture.Width-seFrame.Value*2)/Cell.X)+1 do
+      begin
+        PaintBox.Canvas.MoveTo(Round(Min((seFrame.Value + i * Cell.X),imgPreview.Picture.Width-seFrame.Value)*ZoomFactor),
+          round(seFrame.Value*ZoomFactor) );
+        PaintBox.Canvas.LineTo(Round(Min((seFrame.Value + i * Cell.X),imgPreview.Picture.Width-seFrame.Value)*ZoomFactor),
+           round((imgPreview.Picture.Height - seFrame.Value)*ZoomFactor) );
+      end;
+      for j := 0 to round((imgPreview.Picture.Height-seFrame.Value*2)/Cell.Y)+1 do
+      begin
+        PaintBox.Canvas.MoveTo(round(seFrame.Value*ZoomFactor) ,
+          Round(Min((seFrame.Value + j * Cell.Y),imgPreview.Picture.Height-seFrame.Value)*ZoomFactor));
+        PaintBox.Canvas.LineTo(round((imgPreview.Picture.Width - seFrame.Value)*ZoomFactor),
+          Round(Min((seFrame.Value + j * Cell.Y),imgPreview.Picture.Height-seFrame.Value)*ZoomFactor));
+      end;
+
+{
       for j := 0 to round((imgPreview.Picture.Height-seFrame.Value*2)/Cell.Y) do
       begin
         PaintBox.Canvas.Rectangle(
          Round(Min((seFrame.Value + i * Cell.X),imgPreview.Picture.Width-seFrame.Value)*ZoomFactor),
          Round(Min((seFrame.Value + j * Cell.Y),imgPreview.Picture.Height-seFrame.Value)*ZoomFactor),
-         Round(Min((seFrame.Value + (i+1)* Cell.X), imgPreview.Picture.Width-seFrame.Value) * ZoomFactor),
-         Round(Min((seFrame.Value + (j+1)* Cell.Y), imgPreview.Picture.Height-seFrame.Value) * ZoomFactor));
+         Round(Min((seFrame.Value + (i+1)* Cell.X), imgPreview.Picture.Width-seFrame.Value) * ZoomFactor+1),
+         Round(Min((seFrame.Value + (j+1)* Cell.Y), imgPreview.Picture.Height-seFrame.Value) * ZoomFactor)+1);
       end;
+}
+    end
   end;
 
   ChildDraw(SVGFrame.SVGNode);
@@ -2363,6 +2385,8 @@ begin
   PaintBox.Height := Round(ZoomFactor * (imgPreview.Picture.Height));
   SVGFrame.FrameSize := seFrame.Value;
   lblCellSize.Caption := IntToStr(Round(Cell.X))+' : '+IntToStr(Round(Cell.Y));
+  PaintBox.Invalidate;
+
 end;
 
 procedure TMainForm.seFrameEnter(Sender: TObject);

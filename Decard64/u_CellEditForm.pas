@@ -164,11 +164,11 @@ function TCellEditForm.GetText: string;
 begin
   Result := StringReplace(CellEditFrame.SynEditor.Text, #13#10,'',[rfReplaceAll]);
   Result := StringReplace(Result, '  ',' ',[rfReplaceAll]) ;
-  Result := StringReplace(Result, '/>','\>',[rfReplaceAll]) ;
+{  Result := StringReplace(Result, '/>','\>',[rfReplaceAll]) ;
   Result := StringReplace(Result, '</','<\',[rfReplaceAll]) ;
   Result := StringReplace(Result, '/','&#47;',[rfReplaceAll]) ;
   Result := StringReplace(Result, '\>','/>',[rfReplaceAll]) ;
-  Result := StringReplace(Result, '<\','</',[rfReplaceAll]) ;
+  Result := StringReplace(Result, '<\','</',[rfReplaceAll]) ;}
 end;
 
 procedure TCellEditForm.lbCommonDblClick(Sender: TObject);

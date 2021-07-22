@@ -281,7 +281,7 @@ begin
   begin
     try
     if prnt.Attribute['transform']<> '' then
-         trn := MulMx(trn,SVGParseTransform(prnt.Attribute['transform']));
+         trn := MulMx(SVGParseTransform(prnt.Attribute['transform']),trn);
     except
     end;
     prnt := prnt.parent;
