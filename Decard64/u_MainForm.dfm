@@ -1778,6 +1778,7 @@ object MainForm: TMainForm
               Width = 307
               ExplicitWidth = 307
               inherited tbrInspector: TToolBar
+                Width = 280
                 inherited tbResize: TToolButton
                   OnClick = InspectorFrametbResizeClick
                 end
@@ -1785,20 +1786,10 @@ object MainForm: TMainForm
             end
           end
           inherited tsReplace: TTabSheet
-            inherited ReplaceFrame: TSynEditFrame
-              Width = 313
-              Height = 391
-              inherited SynEditor: TSynEdit
-                Width = 313
-                Height = 363
-                ExplicitWidth = 313
-                ExplicitHeight = 363
-              end
-              inherited pscrSysEdit: TPageScroller
-                Width = 313
-                ExplicitWidth = 313
-              end
-            end
+            ExplicitLeft = 4
+            ExplicitTop = 24
+            ExplicitWidth = 610
+            ExplicitHeight = 533
           end
         end
       end
@@ -2058,8 +2049,6 @@ object MainForm: TMainForm
           OnDrawCell = sgTextDrawCell
           OnKeyPress = sgTextKeyPress
           OnSelectCell = sgTextSelectCell
-          ExplicitLeft = 2
-          ExplicitTop = 1
         end
       end
     end
@@ -2128,6 +2117,8 @@ object MainForm: TMainForm
           ExplicitWidth = 522
           ExplicitHeight = 596
           inherited tsAtr: TTabSheet
+            ExplicitLeft = 4
+            ExplicitTop = 24
             ExplicitWidth = 514
             ExplicitHeight = 568
             inherited splInspector: TSplitter
@@ -2152,6 +2143,7 @@ object MainForm: TMainForm
               Width = 514
               ExplicitWidth = 514
               inherited tbrInspector: TToolBar
+                Width = 280
                 inherited tbResize: TToolButton
                   Visible = False
                 end
@@ -2159,20 +2151,10 @@ object MainForm: TMainForm
             end
           end
           inherited tsReplace: TTabSheet
-            inherited ReplaceFrame: TSynEditFrame
-              Width = 514
-              Height = 568
-              inherited SynEditor: TSynEdit
-                Width = 514
-                Height = 540
-                ExplicitWidth = 514
-                ExplicitHeight = 540
-              end
-              inherited pscrSysEdit: TPageScroller
-                Width = 514
-                ExplicitWidth = 514
-              end
-            end
+            ExplicitLeft = 4
+            ExplicitTop = 24
+            ExplicitWidth = 610
+            ExplicitHeight = 533
           end
         end
       end

@@ -322,6 +322,7 @@ type
     fProtoFile:string;
     RenderReq:integer;
     FStartRender:TDateTime;
+    GridMouse:boolean;
     procedure PrepareAtr(ANod: TXML_Nod);
     procedure ReadGrid(AFilename:string);
     procedure DrawSheet;
@@ -1335,8 +1336,10 @@ begin
   imgPreview.Width := round(imgPreview.Picture.Width * ZoomFactor) ;
   imgPreview.Height := round(imgPreview.Picture.Height * ZoomFactor);
 
-  PaintBox.Width := round((imgPreview.Picture.Width - seFrame.Value ) * ZoomFactor) ;
-  PaintBox.Height := round((imgPreview.Picture.Height - seFrame.Value) * ZoomFactor);
+//  PaintBox.Width := round((imgPreview.Picture.Width - seFrame.Value ) * ZoomFactor) ;
+//  PaintBox.Height := round((imgPreview.Picture.Height - seFrame.Value) * ZoomFactor);
+  PaintBox.Width := round((imgPreview.Picture.Width  ) * ZoomFactor) ;
+  PaintBox.Height := round((imgPreview.Picture.Height ) * ZoomFactor);
 
   shpSelection.Left :=  imgPreview.Left + Round(FSel.Left * ZoomFactor);
   shpSelection.Top :=  imgPreview.top +  Round(FSel.Top * ZoomFactor);
@@ -1385,8 +1388,8 @@ begin
   r:= NodeRect(ANod);
   for i:=0 to 3 do
   begin
-    dec(r[i].X, Zero(seFrame));
-    dec(r[i].Y, Zero(seFrame));
+//    dec(r[i].X, Zero(seFrame));
+//    dec(r[i].Y, Zero(seFrame));
   end;
 
   PaintBox.Canvas.Pen.Color := rgb(0,204,255);
@@ -1881,6 +1884,7 @@ procedure TMainForm.PaintBoxMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
   PaintBox.Visible := True;
+  GridMouse := True;
 
   shpSelection.Visible := (ssLeft in Shift);
 
@@ -2010,19 +2014,41 @@ end;
 procedure TMainForm.PaintBoxMouseUp(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
+    GridMouse := False;
     PaintBox.Visible := False;
 end;
 
 procedure TMainForm.PaintBoxPaint(Sender: TObject);
 var
   i,j:integer;
+
+Function ButtonIsDown(Button:TMousebutton):Boolean;
+var Swap :Boolean;
+    State:short;
+begin
+State:=0;
+Swap:= GetSystemMetrics(SM_SWAPBUTTON)<>0;
+if Swap then
+   case button of
+   mbLeft :State:=getAsyncKeystate(VK_RBUTTON);
+   mbRight:State:=getAsyncKeystate(VK_LBUTTON);
+   end
+else
+   case button of
+   mbLeft :State:=getAsyncKeystate(VK_LBUTTON);
+   mbRight:State:=getAsyncKeystate(VK_RBUTTON);
+   end;
+Result:= (State < 0);
+end;
 begin
   Cell.X := imgPreview.Picture.Width-seFrame.Value*2;
   Cell.Y := imgPreview.Picture.Height-seFrame.Value*2;
 
+
   PaintBox.Canvas.Brush.Style := bsClear;
   PaintBox.Canvas.Pen.Color := clLime;
 
+  if Not SVGFrame.treeTemplate.Focused or GridMouse then
   PaintBox.Canvas.Rectangle(
     Round(seFrame.Value * ZoomFactor),
     Round(seFrame.Value * ZoomFactor),
@@ -2048,24 +2074,18 @@ begin
     if  (seGridY.Value=0) then
       Cell.Y := Cell.X;
 
+    if Not SVGFrame.treeTemplate.Focused or GridMouse then
     for I := 0 to round((imgPreview.Picture.Width-seFrame.Value*2)/Cell.X) do
       for j := 0 to round((imgPreview.Picture.Height-seFrame.Value*2)/Cell.Y) do
       begin
-        if ((i+j) mod 2) = 1 then
-{
-          PaintBox.Canvas.Brush.Style := bsFDiagonal
-        else
-          PaintBox.Canvas.Brush.Style := bsBDiagonal;
-          PaintBox.Canvas.Brush.Color := cllime;
-}
         PaintBox.Canvas.Rectangle(
-         Round((seFrame.Value + i * Cell.X)*ZoomFactor),
-         Round((seFrame.Value + j * Cell.Y)*ZoomFactor),
-         Round((seFrame.Value + (i+1)* Cell.X)*ZoomFactor),
-         Round((seFrame.Value +(j+1)* Cell.Y)*ZoomFactor));
-
+         Round(Min((seFrame.Value + i * Cell.X),imgPreview.Picture.Width-seFrame.Value)*ZoomFactor),
+         Round(Min((seFrame.Value + j * Cell.Y),imgPreview.Picture.Height-seFrame.Value)*ZoomFactor),
+         Round(Min((seFrame.Value + (i+1)* Cell.X), imgPreview.Picture.Width-seFrame.Value) * ZoomFactor),
+         Round(Min((seFrame.Value + (j+1)* Cell.Y), imgPreview.Picture.Height-seFrame.Value) * ZoomFactor));
       end;
   end;
+
   ChildDraw(SVGFrame.SVGNode);
 
 end;
@@ -2339,8 +2359,8 @@ end;
 
 procedure TMainForm.seFrameChange(Sender: TObject);
 begin
-  PaintBox.Width :=  Round(ZoomFactor * (imgPreview.Picture.Width-seFrame.Value));
-  PaintBox.Height := Round(ZoomFactor * (imgPreview.Picture.Height-seFrame.Value));
+  PaintBox.Width :=  Round(ZoomFactor * (imgPreview.Picture.Width));
+  PaintBox.Height := Round(ZoomFactor * (imgPreview.Picture.Height));
   SVGFrame.FrameSize := seFrame.Value;
   lblCellSize.Caption := IntToStr(Round(Cell.X))+' : '+IntToStr(Round(Cell.Y));
 end;
