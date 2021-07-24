@@ -1640,30 +1640,39 @@ object MainForm: TMainForm
               Height = 46
               ButtonHeight = 44
               ButtonWidth = 32
+              ExplicitWidth = 264
               ExplicitHeight = 46
               inherited ToolButton3: TToolButton
                 Left = 32
+                ExplicitLeft = 32
               end
               inherited btnNewObject: TToolButton
                 Left = 40
+                ExplicitLeft = 40
               end
               inherited tbCopyTag: TToolButton
                 Left = 72
+                ExplicitLeft = 72
               end
               inherited btn10: TToolButton
                 Left = 104
+                ExplicitLeft = 104
               end
               inherited btnUp: TToolButton
                 Left = 136
+                ExplicitLeft = 136
               end
               inherited btnDown: TToolButton
                 Left = 168
+                ExplicitLeft = 168
               end
               inherited btnSearch1: TToolButton
                 Left = 200
+                ExplicitLeft = 200
               end
               inherited tbXML: TToolButton
                 Left = 232
+                ExplicitLeft = 232
               end
             end
           end

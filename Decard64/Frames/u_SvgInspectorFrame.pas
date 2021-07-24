@@ -44,7 +44,7 @@ type
     procedure aEditExecute(Sender: TObject);
     procedure tsAtrResize(Sender: TObject);
     procedure sgAttrTopLeftChanged(Sender: TObject);
-    procedure sgAttrKeyPress(Sender: TObject; var Key: Char);
+    procedure sgAttrKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     FSVGNode: TXML_Nod;
     FEditNode: TXML_Nod;
@@ -191,7 +191,7 @@ begin
     OnSetEditText := sgAttrSetEditText;
     OnDblClick := aEditExecute;
     OnTopLeftChanged := sgAttrTopLeftChanged;
-    OnKeyPress :=sgAttrKeyPress;
+    OnKeyDown :=sgAttrKeyDown;
 
   end;
 
@@ -546,14 +546,15 @@ begin
   end;
 end;
 
-procedure TSvgInspectorFrame.sgAttrKeyPress(Sender: TObject; var Key: Char);
+procedure TSvgInspectorFrame.sgAttrKeyDown(Sender: TObject; var Key: Word;
+  Shift: TShiftState);
 begin
-  if Key=#13 then
+  if (Key=13)and(ssCtrl in Shift) then
     if NOT assigned(THackStringGrid(sgAttr).InplaceEditor)
      or not (THackInplaceEditList(THackStringGrid(sgAttr).InplaceEditor).EditStyle=esPickList) then
     begin
       aEdit.Execute;
-      Key :=#0
+      Key :=0
     end;
 end;
 

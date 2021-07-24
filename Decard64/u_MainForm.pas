@@ -1594,8 +1594,8 @@ var i:integer;
      end
      else
      begin
-       s1 := UpperCase(dlgTextFind.FindText);
-       s2 := UpperCase(txt);
+       s1 := WideUpperCase(dlgTextFind.FindText);
+       s2 := WideUpperCase(txt);
      end;
      if frWholeWord in dlgTextFind.Options then
        result := s1 = s2

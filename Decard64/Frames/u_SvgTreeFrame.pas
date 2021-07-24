@@ -585,8 +585,8 @@ var
      end
      else
      begin
-       s1 := UpperCase(svgFindDialog.FindText);
-       s2 := UpperCase(txt);
+       s1 := WideUpperCase(svgFindDialog.FindText);
+       s2 := WideUpperCase(txt);
      end;
      if frWholeWord in svgFindDialog.Options then
        result := s1 = s2

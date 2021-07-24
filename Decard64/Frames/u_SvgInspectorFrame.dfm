@@ -18,7 +18,7 @@ object SvgInspectorFrame: TSvgInspectorFrame
       OnResize = tsAtrResize
       object splInspector: TSplitter
         Left = 0
-        Top = 429
+        Top = 426
         Width = 610
         Height = 6
         Cursor = crVSplit
@@ -30,7 +30,7 @@ object SvgInspectorFrame: TSvgInspectorFrame
         Left = 0
         Top = 36
         Width = 610
-        Height = 393
+        Height = 390
         Align = alClient
         BevelInner = bvNone
         ColCount = 4
@@ -44,14 +44,14 @@ object SvgInspectorFrame: TSvgInspectorFrame
         ParentCtl3D = False
         TabOrder = 0
         OnDrawCell = sgAttrDrawCell
-        OnKeyPress = sgAttrKeyPress
+        OnKeyDown = sgAttrKeyDown
         OnSelectCell = sgAttrSelectCell
         OnSetEditText = sgAttrSetEditText
         OnTopLeftChanged = sgAttrTopLeftChanged
       end
       object meHint: TMemo
         Left = 0
-        Top = 435
+        Top = 432
         Width = 610
         Height = 98
         Align = alBottom
@@ -82,12 +82,12 @@ object SvgInspectorFrame: TSvgInspectorFrame
         object tbrInspector: TToolBar
           Left = 0
           Top = 0
-          Width = 280
-          Height = 36
+          Width = 310
+          Height = 39
           Align = alNone
           AutoSize = True
-          ButtonHeight = 36
-          ButtonWidth = 32
+          ButtonHeight = 39
+          ButtonWidth = 37
           Caption = 'tbrInspector'
           Images = MainData.ilHelper
           ShowCaptions = True
@@ -97,7 +97,7 @@ object SvgInspectorFrame: TSvgInspectorFrame
             Left = 0
             Top = 0
             Width = 80
-            Height = 21
+            Height = 24
             Style = csDropDownList
             ItemIndex = 0
             TabOrder = 0
@@ -114,12 +114,12 @@ object SvgInspectorFrame: TSvgInspectorFrame
             ImageIndex = 22
           end
           object tbEdit: TToolButton
-            Left = 112
+            Left = 117
             Top = 0
             Action = aEdit
           end
           object ToolButton16: TToolButton
-            Left = 144
+            Left = 154
             Top = 0
             Width = 8
             Caption = 'ToolButton16'
@@ -127,28 +127,28 @@ object SvgInspectorFrame: TSvgInspectorFrame
             Style = tbsSeparator
           end
           object tbSetColor: TToolButton
-            Left = 152
+            Left = 162
             Top = 0
             Caption = 'Color'
             ImageIndex = 12
             OnClick = tbSetColorClick
           end
           object tbFont: TToolButton
-            Left = 184
+            Left = 199
             Top = 0
             Caption = 'Font'
             ImageIndex = 19
             OnClick = tbFontClick
           end
           object tbFileXlink: TToolButton
-            Left = 216
+            Left = 236
             Top = 0
             Caption = 'File'
             ImageIndex = 18
             OnClick = tbFileXlinkClick
           end
           object ToolButton28: TToolButton
-            Left = 248
+            Left = 273
             Top = 0
             Caption = 'Defs'
             ImageIndex = 21
@@ -164,18 +164,18 @@ object SvgInspectorFrame: TSvgInspectorFrame
         Left = 0
         Top = 0
         Width = 610
-        Height = 533
+        Height = 530
         Align = alClient
         TabOrder = 0
         ExplicitWidth = 610
-        ExplicitHeight = 533
+        ExplicitHeight = 530
         inherited SynEditor: TSynEdit
           Width = 610
-          Height = 505
+          Height = 502
           ReadOnly = True
           WordWrap = False
           ExplicitWidth = 610
-          ExplicitHeight = 505
+          ExplicitHeight = 502
         end
         inherited pscrSysEdit: TPageScroller
           Width = 610

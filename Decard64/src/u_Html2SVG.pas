@@ -327,7 +327,7 @@ begin
   nod.Attribute['font-weight'] := ParentStyle(nod,'font-weight');
   nod.Attribute['font-style'] := ParentStyle(nod,'font-style');
   nod.Attribute['letter-spacing'] := ParentStyle(nod,'letter-spacing','0');
-  nod.Attribute['font-variant'] := ParentStyle(nod,'normal');
+  nod.Attribute['font-variant'] := ParentStyle(nod,'font-variant');
 
   Nod.text := StringReplace(Nod.text,'[p]',' [p] ',[rfReplaceAll, rfIgnoreCase]);
   Nod.text := StringReplace(Nod.text,'  ',' ',[rfReplaceAll, rfIgnoreCase]);
@@ -895,9 +895,11 @@ begin
     NOD.xml := DoReplace(NOD.Attribute['dekart:body'], NOD);
   end
   else
-  if (nod.LocalName='text')and Assigned(nod.Nodes.ByName('rect'))
+  if (nod.LocalName='text')
+//  and Assigned(nod.Nodes.ByName('rect'))
   then begin
-    level(nod.Nodes.ByName('rect'));
+    if Assigned(nod.Nodes.ByName('rect')) then
+      level(nod.Nodes.ByName('rect'));
     if nod.text <> '' then
       FormatText(nod);
   end
