@@ -8,7 +8,7 @@ uses
   Vcl.StdCtrls, Vcl.Samples.Spin, Vcl.Buttons, ProfixXML, u_SvgTreeFrame,
   SynEdit, SynEditHighlighter, SynHighlighterXML, Vcl.Grids, Vcl.Menus,
   u_SvgInspectorFrame, System.Math, Vcl.Imaging.jpeg, System.Actions, Vcl.ActnList,
-  Vcl.ColorGrd, System.UITypes, System.Types;
+  Vcl.ColorGrd, System.UITypes, System.Types, StrUtils;
 
 type
   TMainForm = class(TForm)
@@ -301,6 +301,7 @@ type
     procedure SVGFrametreeTemplateExit(Sender: TObject);
     procedure miTableHeadClick(Sender: TObject);
     procedure sgTextKeyPress(Sender: TObject; var Key: Char);
+    procedure sgTextFixedCellClick(Sender: TObject; ACol, ARow: Integer);
   private
     { Private declarations }
     FSel:TRect;
@@ -353,6 +354,10 @@ implementation
 
 uses u_MainData, vcl.FileCtrl, u_XMLEditForm, Vcl.Imaging.pngimage, ShellAPI,
   u_ThreadRender, System.DateUtils, resvg, u_Html2SVG, u_CellEditForm, SynPdf, u_CalcSVG;
+
+type
+  THackGrid=class(TStringGrid);
+
 
 function Zero(AEdit: TSpinEdit): integer;
 begin
@@ -1583,6 +1588,8 @@ end;
 procedure TMainForm.dlgTextFindFind(Sender: TObject);
 var i:integer;
 
+
+
    function Compare(txt:string):Boolean;
    var
      s1,s2:string;
@@ -1865,6 +1872,12 @@ end;
 procedure TMainForm.miTableHeadClick(Sender: TObject);
 var i:integer;
 begin
+  for I := 0 to sgText.ColCount-1 do
+  begin
+    sgText.Cells[i,0]:=Stringreplace(sgText.Cells[i,0], '^[','[',[rfReplaceAll]);
+    sgText.Cells[i,0]:=Stringreplace(sgText.Cells[i,0], 'v[','[',[rfReplaceAll]);
+  end;
+
   XMLEditForm.XML := sgText.Rows[0].Text;
   XMLEditForm.seTags.Visible := False;
   XMLEditForm.splTags.Visible := False;
@@ -2210,10 +2223,12 @@ var sl:TStringList;
     end;
     sgText.RowCount := sl.Count+1;
     sgText.Cells[0,0] := '¹';
+    sgText.Cells[0,1] := '1';
 
     for i:=1 to sl.Count do
     begin
-      sgText.Cells[0,i+1]:=IntToStr(I+1);
+//      sgText.Cells[0,i+1]:=IntToStr(I+1);
+      sgText.Rows[i+1].Text:=IntToStr(I+1);
       s:=sl[i-1];
       j:=0;
       while s<>'' do
@@ -2317,6 +2332,7 @@ procedure TMainForm.SaveTable(AFileName: string);
 var i,j:Integer;
   s: string;
 begin
+  sgTextFixedCellClick(nil,0,-1);
   with TStringList.Create do
   try
     for i := 0 to sgText.RowCount-1 do
@@ -2472,14 +2488,94 @@ end;
 procedure TMainForm.sgTextDrawCell(Sender: TObject; ACol, ARow: Integer;
   Rect: TRect; State: TGridDrawState);
 begin
+  if (ACol=0)and (Arow>0) then
+    sgText.Canvas.TextRect(Rect,Rect.Left,Rect.Top, IntToStr(Arow));
+
   if ARow=sgText.Row then
   begin
+
+
     sgText.Canvas.Brush.Style := bsClear;
     sgText.Canvas.Pen.Color := clBlue;
-    sgText.Canvas.Rectangle(sgText.CellRect(ACol,ARow))
+    sgText.Canvas.Rectangle(sgText.CellRect(ACol,ARow));
+
 //    sgText.Canvas.Rectangle(Rect.Left-5, Rect.Top, Rect.Right+1, Rect.Bottom);
   end;
 
+end;
+
+procedure TMainForm.sgTextFixedCellClick(Sender: TObject; ACol, ARow: Integer);
+var
+  i,j:integer;
+  sl:TStringList;
+  s:string;
+  Srt:boolean;
+
+begin
+  if Arow=0 then
+  begin
+     sl:=TStringList.Create;
+     sl.Sorted := True;
+     sl.Duplicates := dupAccept;
+     Srt := True;
+
+     if (ARow=-1)or(ACol=0) then
+       Srt := True
+     else
+       Srt := copy(sgText.Cells[Acol,0],1,1)<>'^';
+
+
+
+     for I := 0 to sgText.ColCount-1 do
+     begin
+       sgText.Cells[i,0]:=Stringreplace(sgText.Cells[i,0], '^[','[',[rfReplaceAll]);
+       sgText.Cells[i,0]:=Stringreplace(sgText.Cells[i,0], 'v[','[',[rfReplaceAll]);
+       sgText.Cells[i,0]:=Stringreplace(sgText.Cells[i,0], '^¹','¹',[rfReplaceAll]);
+       sgText.Cells[i,0]:=Stringreplace(sgText.Cells[i,0], 'v¹','¹',[rfReplaceAll]);
+     end;
+
+     if Srt then
+     begin
+       for I := 1 to sgText.RowCount-1 do
+       begin
+         s:=sgText.Cells[Acol,i];
+         if ACol=0 then
+           s:=RightStr('00000'+s,5);
+         j := sl.Add(s);
+         while (j<sl.Count-1) and (sl[j]=sl[j+1]) do inc(j);
+
+         if j+1 <> i then
+           THackGrid(sgText).MoveRow(i, j+1);
+       end;
+       if (ARow<>-1)and(ACol<>0) then
+        sgText.Cells[Acol,0] := '^'+sgText.Cells[Acol,0];
+     end
+     else
+     begin
+       for I := sgText.RowCount-1 downto 1 do
+       begin
+         s:=sgText.Cells[Acol,i];
+         if ACol=0 then
+           s:=RightStr('00000'+s,5);
+         j := sl.Add(s);
+//         while (j<sl.Count-1) and (sl[j]=sl[j+1]) do inc(j);
+
+         if sgText.RowCount -j-1 <> i then
+           THackGrid(sgText).MoveRow(i, sgText.RowCount-j-1);
+       end;
+       if (ACol<>0) then
+         sgText.Cells[Acol,0] := 'v'+sgText.Cells[Acol,0];
+     end;
+
+     if sgText.Row  <sgText.TopRow then
+       sgText.TopRow := sgText.Row;
+     if sgText.Row > sgText.TopRow+sgText.VisibleRowCount  then
+       sgText.TopRow := sgText.Row-sgText.VisibleRowCount+1;
+
+
+
+     sl.Destroy;
+  end;
 end;
 
 procedure TMainForm.sgTextKeyPress(Sender: TObject; var Key: Char);

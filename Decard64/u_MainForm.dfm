@@ -1642,37 +1642,56 @@ object MainForm: TMainForm
               ButtonWidth = 32
               ExplicitWidth = 264
               ExplicitHeight = 46
+              inherited ToolButton37: TToolButton
+                ExplicitWidth = 32
+                ExplicitHeight = 44
+              end
               inherited ToolButton3: TToolButton
                 Left = 32
                 ExplicitLeft = 32
+                ExplicitHeight = 44
               end
               inherited btnNewObject: TToolButton
                 Left = 40
                 ExplicitLeft = 40
+                ExplicitWidth = 32
+                ExplicitHeight = 44
               end
               inherited tbCopyTag: TToolButton
                 Left = 72
                 ExplicitLeft = 72
+                ExplicitWidth = 32
+                ExplicitHeight = 44
               end
               inherited btn10: TToolButton
                 Left = 104
                 ExplicitLeft = 104
+                ExplicitWidth = 32
+                ExplicitHeight = 44
               end
               inherited btnUp: TToolButton
                 Left = 136
                 ExplicitLeft = 136
+                ExplicitWidth = 32
+                ExplicitHeight = 44
               end
               inherited btnDown: TToolButton
                 Left = 168
                 ExplicitLeft = 168
+                ExplicitWidth = 32
+                ExplicitHeight = 44
               end
               inherited btnSearch1: TToolButton
                 Left = 200
                 ExplicitLeft = 200
+                ExplicitWidth = 32
+                ExplicitHeight = 44
               end
               inherited tbXML: TToolButton
                 Left = 232
                 ExplicitLeft = 232
+                ExplicitWidth = 32
+                ExplicitHeight = 44
               end
             end
           end
@@ -1793,7 +1812,6 @@ object MainForm: TMainForm
           inherited tsAtr: TTabSheet
             AlignWithMargins = True
             ExplicitLeft = 7
-            ExplicitTop = 27
             ExplicitWidth = 307
             ExplicitHeight = 385
             inherited splInspector: TSplitter
@@ -1872,14 +1890,14 @@ object MainForm: TMainForm
             end
           end
           inherited tsReplace: TTabSheet
-            ExplicitLeft = 4
             ExplicitTop = 24
-            ExplicitWidth = 610
             ExplicitHeight = 533
             inherited ReplaceFrame: TSynEditFrame
               Height = 533
+              ExplicitHeight = 533
               inherited SynEditor: TSynEdit
                 Height = 505
+                ExplicitHeight = 505
               end
             end
           end
@@ -2134,13 +2152,15 @@ object MainForm: TMainForm
           DefaultRowHeight = 18
           DrawingStyle = gdsClassic
           RowCount = 2
-          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goDrawFocusSelected, goColSizing, goAlwaysShowEditor]
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goDrawFocusSelected, goColSizing, goAlwaysShowEditor, goFixedColClick, goFixedRowClick]
           ParentCtl3D = False
           TabOrder = 0
           OnDblClick = tbCellEditClick
           OnDrawCell = sgTextDrawCell
+          OnFixedCellClick = sgTextFixedCellClick
           OnKeyPress = sgTextKeyPress
           OnSelectCell = sgTextSelectCell
+          ExplicitTop = 1
         end
       end
     end
@@ -2270,7 +2290,6 @@ object MainForm: TMainForm
           ExplicitWidth = 522
           ExplicitHeight = 596
           inherited tsAtr: TTabSheet
-            ExplicitLeft = 4
             ExplicitTop = 24
             ExplicitWidth = 514
             ExplicitHeight = 568
@@ -2350,14 +2369,14 @@ object MainForm: TMainForm
             end
           end
           inherited tsReplace: TTabSheet
-            ExplicitLeft = 4
             ExplicitTop = 24
-            ExplicitWidth = 610
             ExplicitHeight = 533
             inherited ReplaceFrame: TSynEditFrame
               Height = 533
+              ExplicitHeight = 533
               inherited SynEditor: TSynEdit
                 Height = 505
+                ExplicitHeight = 505
               end
             end
           end
