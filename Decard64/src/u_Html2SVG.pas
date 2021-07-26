@@ -896,17 +896,12 @@ begin
   end
   else
   if (nod.LocalName='text')
-//  and Assigned(nod.Nodes.ByName('rect'))
   then begin
-    if Assigned(nod.Nodes.ByName('rect')) then
-      level(nod.Nodes.ByName('rect'));
+    for i:=0 to nod.Nodes.Count-1 do
+      level(nod.Nodes[i]);
     if nod.text <> '' then
       FormatText(nod);
   end
-  else
-  if (nod.LocalName='text') and (Pos(WideString('[P]'),WideUpperCase(nod.text))>0)
-  then
-    FormatText(nod)
   else
   for i:=0 to nod.Nodes.Count-1 do
     level(nod.Nodes[i]);
