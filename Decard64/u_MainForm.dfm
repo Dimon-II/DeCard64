@@ -1634,7 +1634,7 @@ object MainForm: TMainForm
           ExplicitHeight = 358
           inherited treeTemplate: TTreeView
             Width = 276
-            Height = 314
+            Height = 309
             OnChange = SvgTreeFrame1treeTemplateChange
             OnExit = SVGFrametreeTemplateExit
             ExplicitWidth = 276
@@ -1643,6 +1643,9 @@ object MainForm: TMainForm
           inherited pscrTemplate: TPageScroller
             Width = 276
             ExplicitWidth = 276
+          end
+          inherited pnFindRemind: TPanel
+            Width = 276
           end
           inherited pmFileSVG: TPopupMenu
             inherited File1: TMenuItem
@@ -1653,6 +1656,9 @@ object MainForm: TMainForm
                 OnClick = SVGFrameSave1Click
               end
             end
+          end
+          inherited svgFindDialog: TFindDialog
+            OnShow = nil
           end
         end
         object pscrCellGrid: TPageScroller
@@ -1786,11 +1792,19 @@ object MainForm: TMainForm
               Width = 307
               ExplicitWidth = 307
               inherited tbrInspector: TToolBar
+                Width = 280
+                ExplicitWidth = 280
                 inherited tbResize: TToolButton
                   OnClick = InspectorFrametbResizeClick
                 end
               end
             end
+          end
+          inherited tsReplace: TTabSheet
+            ExplicitLeft = 4
+            ExplicitTop = 24
+            ExplicitWidth = 610
+            ExplicitHeight = 533
           end
         end
       end
@@ -2043,11 +2057,12 @@ object MainForm: TMainForm
           DefaultRowHeight = 18
           DrawingStyle = gdsClassic
           RowCount = 2
-          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goDrawFocusSelected, goColSizing, goAlwaysShowEditor]
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goDrawFocusSelected, goColSizing, goAlwaysShowEditor, goFixedColClick, goFixedRowClick]
           ParentCtl3D = False
           TabOrder = 0
           OnDblClick = tbCellEditClick
           OnDrawCell = sgTextDrawCell
+          OnFixedCellClick = sgTextFixedCellClick
           OnKeyPress = sgTextKeyPress
           OnSelectCell = sgTextSelectCell
         end
@@ -2073,9 +2088,15 @@ object MainForm: TMainForm
         TabOrder = 0
         ExplicitHeight = 596
         inherited treeTemplate: TTreeView
-          Height = 552
+          Height = 547
           OnChange = ClipartFrametreeTemplateChange
           ExplicitHeight = 552
+        end
+        inherited pnFindRemind: TPanel
+          Color = clFuchsia
+          inherited pnRemindDialog: TPanel
+            Color = clFuchsia
+          end
         end
         inherited pmFileSVG: TPopupMenu
           inherited File1: TMenuItem
@@ -2118,6 +2139,8 @@ object MainForm: TMainForm
           ExplicitWidth = 522
           ExplicitHeight = 596
           inherited tsAtr: TTabSheet
+            ExplicitLeft = 4
+            ExplicitTop = 24
             ExplicitWidth = 514
             ExplicitHeight = 568
             inherited splInspector: TSplitter
@@ -2142,11 +2165,19 @@ object MainForm: TMainForm
               Width = 514
               ExplicitWidth = 514
               inherited tbrInspector: TToolBar
+                Width = 280
+                ExplicitWidth = 280
                 inherited tbResize: TToolButton
                   Visible = False
                 end
               end
             end
+          end
+          inherited tsReplace: TTabSheet
+            ExplicitLeft = 4
+            ExplicitTop = 24
+            ExplicitWidth = 610
+            ExplicitHeight = 533
           end
         end
       end

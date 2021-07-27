@@ -6,9 +6,9 @@ object SvgTreeFrame: TSvgTreeFrame
   TabOrder = 0
   object treeTemplate: TTreeView
     Left = 0
-    Top = 44
+    Top = 49
     Width = 444
-    Height = 376
+    Height = 371
     Align = alClient
     HideSelection = False
     Indent = 14
@@ -16,6 +16,8 @@ object SvgTreeFrame: TSvgTreeFrame
     ShowRoot = False
     TabOrder = 0
     OnCollapsing = treeTemplateCollapsing
+    ExplicitTop = 44
+    ExplicitHeight = 376
   end
   object pscrTemplate: TPageScroller
     Left = 0
@@ -113,6 +115,33 @@ object SvgTreeFrame: TSvgTreeFrame
         ImageIndex = 27
         OnClick = tbXMLClick
       end
+    end
+  end
+  object pnFindRemind: TPanel
+    Left = 0
+    Top = 44
+    Width = 444
+    Height = 5
+    Align = alTop
+    BevelOuter = bvNone
+    Color = clAqua
+    Ctl3D = False
+    ParentBackground = False
+    ParentCtl3D = False
+    TabOrder = 2
+    Visible = False
+    object pnRemindDialog: TPanel
+      Left = 0
+      Top = 44
+      Width = 600
+      Height = 5
+      BevelOuter = bvNone
+      Color = clAqua
+      Ctl3D = False
+      ParentBackground = False
+      ParentCtl3D = False
+      TabOrder = 0
+      Visible = False
     end
   end
   object pmAddTag: TPopupMenu

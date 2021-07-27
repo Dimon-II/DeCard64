@@ -303,12 +303,14 @@ type
     procedure miTableHeadClick(Sender: TObject);
     procedure sgTextKeyPress(Sender: TObject; var Key: Char);
     procedure dlgTextFindShow(Sender: TObject);
+    procedure sgTextFixedCellClick(Sender: TObject; ACol, ARow: Integer);
   private
     { Private declarations }
     FSel:TRect;
     FSelCel:TRect;
     NoTempStyle :boolean;
     fBufPreview:boolean;
+    BVL1, BVL2:TPanel;
   public
     { Public declarations }
     SVG:TXML_Doc;
@@ -325,6 +327,7 @@ type
     RenderReq:integer;
     FStartRender:TDateTime;
     GridMouse:boolean;
+
     procedure PrepareAtr(ANod: TXML_Nod);
     procedure ReadGrid(AFilename:string);
     procedure DrawSheet;
@@ -355,7 +358,12 @@ implementation
 {$R *.dfm}
 
 uses u_MainData, vcl.FileCtrl, u_XMLEditForm, Vcl.Imaging.pngimage, ShellAPI,
-  u_ThreadRender, System.DateUtils, resvg, u_Html2SVG, u_CellEditForm, u_CalcSVG;
+  u_ThreadRender, System.DateUtils, resvg, u_Html2SVG, u_CellEditForm, u_CalcSVG,
+  System.StrUtils;
+
+type
+  THackGrid=class(TStringGrid);
+  THackBevel=class(TBevel);
 
 function Zero(AEdit: TSpinEdit): integer;
 begin
@@ -582,6 +590,14 @@ begin
     ClipartFrame.btnSearch1Click(Sender);
 
   aFind.ActionComponent := Nil;
+
+  BVL2.Visible := True;
+//  BVL2.Parent := sgText;
+  BVL2.Top :=0;
+  Winapi.Windows.SetParent(BVL2.handle, dlgTextFind.Handle);
+  BVL1.Visible := True;
+
+
 end;
 
 procedure TMainForm.aNextExecute(Sender: TObject);
@@ -1599,6 +1615,8 @@ end;
 procedure TMainForm.dlgTextFindClose(Sender: TObject);
 begin
   Application.MainForm.SetFocus;
+  BVL1.Visible := False;
+  BVL2.Visible := False;
 end;
 
 procedure TMainForm.dlgTextFindFind(Sender: TObject);
@@ -1682,6 +1700,7 @@ begin
   StopFlag := CanClose;
 end;
 
+
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   SVG:=TXML_Doc.Create;
@@ -1714,6 +1733,32 @@ begin
   FSel.Width:=imgPreview.Picture.Bitmap.Width;
   FSel.Height:=imgPreview.Picture.Bitmap.Height;
   cbZoomChange(nil);
+
+
+  BVL1:=TPanel.Create(Self);
+//  BVL1.ParentColor := False;
+  BVL1.ParentBackground := False;
+  BVL1.Color := clLime;
+  BVL1.Align := alTop;
+  BVL1.Height := 5;
+  BVL1.Ctl3D := false;
+  BVL1.BevelOuter := bvNone;
+
+  sgText.InsertControl(BVL1);
+  BVL1.Visible := False;
+
+  BVL2:=TPanel.Create(Self);
+  BVL2.ParentBackground := False;
+  BVL2.Color := clLime;
+  BVL2.Ctl3D := false;
+  BVL2.BevelOuter := bvNone;
+//  BVL2.Align := alTop;
+  BVL2.Height := 5;
+  BVL2.Width := 600;
+  sgText.InsertControl(BVL2);
+  BVL2.Visible := false;
+
+
 end;
 
 procedure TMainForm.FormDestroy(Sender: TObject);
@@ -2475,6 +2520,7 @@ procedure TMainForm.SaveTable(AFileName: string);
 var i,j:Integer;
   s: string;
 begin
+  sgTextFixedCellClick(nil,0,-1);
   with TStringList.Create do
   try
     for i := 0 to sgText.RowCount-1 do
@@ -2630,6 +2676,9 @@ end;
 procedure TMainForm.sgTextDrawCell(Sender: TObject; ACol, ARow: Integer;
   Rect: TRect; State: TGridDrawState);
 begin
+  if (ACol=0)and (Arow>0) then
+    sgText.Canvas.TextRect(Rect, Rect.Left, Rect.Top+2, IntToStr(Arow));
+
   if ARow=sgText.Row then
   begin
     sgText.Canvas.Brush.Style := bsClear;
@@ -2638,6 +2687,80 @@ begin
 //    sgText.Canvas.Rectangle(Rect.Left-5, Rect.Top, Rect.Right+1, Rect.Bottom);
   end;
 
+end;
+
+procedure TMainForm.sgTextFixedCellClick(Sender: TObject; ACol, ARow: Integer);
+var
+  i,j:integer;
+  sl:TStringList;
+  s:string;
+  Srt:boolean;
+
+begin
+  if Arow=0 then
+  begin
+     sl:=TStringList.Create;
+     sl.Sorted := True;
+     sl.Duplicates := dupAccept;
+     Srt := True;
+
+     if (ARow=-1)or(ACol=0) then
+       Srt := True
+     else
+       Srt := copy(sgText.Cells[Acol,0],1,1)<>'^';
+
+
+
+     for I := 0 to sgText.ColCount-1 do
+     begin
+       sgText.Cells[i,0]:=Stringreplace(sgText.Cells[i,0], '^[','[',[rfReplaceAll]);
+       sgText.Cells[i,0]:=Stringreplace(sgText.Cells[i,0], 'v[','[',[rfReplaceAll]);
+       sgText.Cells[i,0]:=Stringreplace(sgText.Cells[i,0], '^¹','¹',[rfReplaceAll]);
+       sgText.Cells[i,0]:=Stringreplace(sgText.Cells[i,0], 'v¹','¹',[rfReplaceAll]);
+     end;
+
+     if Srt then
+     begin
+       for I := 1 to sgText.RowCount-1 do
+       begin
+         s:=sgText.Cells[Acol,i];
+         if ACol=0 then
+           s:=RightStr('00000'+s,5);
+         j := sl.Add(s);
+         while (j<sl.Count-1) and (sl[j]=sl[j+1]) do inc(j);
+
+         if j+1 <> i then
+           THackGrid(sgText).MoveRow(i, j+1);
+       end;
+       if (ARow<>-1)and(ACol<>0) then
+        sgText.Cells[Acol,0] := '^'+sgText.Cells[Acol,0];
+     end
+     else
+     begin
+       for I := sgText.RowCount-1 downto 1 do
+       begin
+         s:=sgText.Cells[Acol,i];
+         if ACol=0 then
+           s:=RightStr('00000'+s,5);
+         j := sl.Add(s);
+//         while (j<sl.Count-1) and (sl[j]=sl[j+1]) do inc(j);
+
+         if sgText.RowCount -j-1 <> i then
+           THackGrid(sgText).MoveRow(i, sgText.RowCount-j-1);
+       end;
+       if (ACol<>0) then
+         sgText.Cells[Acol,0] := 'v'+sgText.Cells[Acol,0];
+     end;
+
+     if sgText.Row  <sgText.TopRow then
+       sgText.TopRow := sgText.Row;
+     if sgText.Row > sgText.TopRow+sgText.VisibleRowCount  then
+       sgText.TopRow := sgText.Row-sgText.VisibleRowCount+1;
+
+
+
+     sl.Destroy;
+  end;
 end;
 
 procedure TMainForm.sgTextKeyPress(Sender: TObject; var Key: Char);
