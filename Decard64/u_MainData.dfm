@@ -4476,7 +4476,7 @@ object MainData: TMainData
     DefaultExt = 'SVG'
     Filter = 'SVG file|*.svg|Any file|*.*'
     InitialDir = '.'
-    Options = [ofHideReadOnly, ofNoChangeDir, ofNoValidate, ofEnableSizing]
+    Options = [ofHideReadOnly, ofNoChangeDir, ofNoValidate, ofFileMustExist, ofEnableSizing]
     Title = 'Open SVG-template'
     Left = 136
     Top = 168
@@ -4484,7 +4484,7 @@ object MainData: TMainData
   object dlgOpenText: TOpenTextFileDialog
     Filter = 'Google table TSV|*.tsv|Text|*.txt|Any file|*.*'
     InitialDir = '.'
-    Options = [ofHideReadOnly, ofNoChangeDir, ofNoValidate, ofEnableSizing]
+    Options = [ofHideReadOnly, ofNoChangeDir, ofNoValidate, ofFileMustExist, ofEnableSizing]
     Title = 'Open cards content table'
     Encodings.Strings = (
       'default'
@@ -6896,7 +6896,7 @@ object MainData: TMainData
     FileName = 'DeCard.XML'
     Filter = 'XML config file|*.xml|Any file|*.*'
     InitialDir = '.'
-    Options = [ofHideReadOnly, ofNoValidate, ofNoLongNames, ofEnableSizing]
+    Options = [ofHideReadOnly, ofNoValidate, ofFileMustExist, ofNoLongNames, ofEnableSizing]
     Title = 'Save DeCard project '
     Left = 136
     Top = 232
@@ -8206,7 +8206,7 @@ object MainData: TMainData
       'EG Image File (*.jpeg)|*.jpeg|Scalable Vector Graphics (*.svg)|*' +
       '.svg'
     InitialDir = '.'
-    Options = [ofHideReadOnly, ofNoChangeDir, ofNoValidate, ofEnableSizing]
+    Options = [ofHideReadOnly, ofNoChangeDir, ofNoValidate, ofFileMustExist, ofEnableSizing]
     Left = 136
     Top = 104
   end

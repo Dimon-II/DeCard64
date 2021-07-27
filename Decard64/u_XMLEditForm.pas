@@ -16,6 +16,7 @@ type
     SynEditFrame: TSynEditFrame;
     seTags: TSynMemo;
     splTags: TSplitter;
+    procedure FormCreate(Sender: TObject);
   private
     procedure SetXML(const Value: string);
     function GetXML: string;
@@ -33,6 +34,11 @@ implementation
 {$R *.dfm}
 
 { TXMLEditForm }
+
+procedure TXMLEditForm.FormCreate(Sender: TObject);
+begin
+  SynEditFrame.FindCaption := ': SVG/XML '
+end;
 
 function TXMLEditForm.GetXML: string;
 begin

@@ -84,12 +84,15 @@ type
     procedure SynEditorExit(Sender: TObject);
     procedure FindDialogClose(Sender: TObject);
     procedure tbGlyphClick(Sender: TObject);
+    procedure FindDialogShow(Sender: TObject);
+    procedure ReplaceDialogShow(Sender: TObject);
   private
     gsSearchText: string;
     gsReplaceText: string;
     FSVGNode: TXML_Nod;
     procedure SetSVGNode(const Value: TXML_Nod);
   public
+    FindCaption:string;
     procedure Apply;
     property SVGNode: TXML_Nod read FSVGNode write SetSVGNode;
 
@@ -283,6 +286,14 @@ begin
   DoSearchReplaceText(False, not (frDown in FindDialog.Options));
 end;
 
+procedure TSynEditFrame.FindDialogShow(Sender: TObject);
+var
+  Buffer: array[0..255] of Char;
+begin
+  GetWindowText(FindDialog.Handle, Buffer, SizeOf(Buffer));
+  SetWindowText(FindDialog.Handle, PChar(@Buffer)+Findcaption);
+end;
+
 procedure TSynEditFrame.ReplaceDialogFind(Sender: TObject);
 begin
   gsSearchText:=ReplaceDialog.FindText;
@@ -294,6 +305,14 @@ begin
   gsSearchText:=ReplaceDialog.FindText;
   gsReplaceText:=ReplaceDialog.ReplaceText;
   DoSearchReplaceText(True, not (frDown in ReplaceDialog.Options));
+end;
+
+procedure TSynEditFrame.ReplaceDialogShow(Sender: TObject);
+var
+  Buffer: array[0..255] of Char;
+begin
+  GetWindowText(ReplaceDialog.Handle, Buffer, SizeOf(Buffer));
+  SetWindowText(ReplaceDialog.Handle, PChar(@Buffer)+Findcaption);
 end;
 
 procedure TSynEditFrame.SetSVGNode(const Value: TXML_Nod);

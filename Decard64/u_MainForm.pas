@@ -8,7 +8,7 @@ uses
   Vcl.StdCtrls, Vcl.Samples.Spin, Vcl.Buttons, ProfixXML, u_SvgTreeFrame,
   SynEdit, SynEditHighlighter, SynHighlighterXML, Vcl.Grids, Vcl.Menus,
   u_SvgInspectorFrame, System.Math, Vcl.Imaging.jpeg, System.Actions, Vcl.ActnList,
-  Vcl.ColorGrd, System.UITypes, System.Types, StrUtils;
+  Vcl.ColorGrd, System.UITypes, System.Types, SynPdf;
 
 type
   TMainForm = class(TForm)
@@ -209,6 +209,7 @@ type
     tbPreviewMM: TToolButton;
     Rendering3: TPanel;
     miTableHead: TMenuItem;
+    chbTextLayer: TCheckBox;
     procedure sbOpenRootClick(Sender: TObject);
     procedure sbOpenTextClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -301,7 +302,7 @@ type
     procedure SVGFrametreeTemplateExit(Sender: TObject);
     procedure miTableHeadClick(Sender: TObject);
     procedure sgTextKeyPress(Sender: TObject; var Key: Char);
-    procedure sgTextFixedCellClick(Sender: TObject; ACol, ARow: Integer);
+    procedure dlgTextFindShow(Sender: TObject);
   private
     { Private declarations }
     FSel:TRect;
@@ -333,6 +334,7 @@ type
     procedure ShowRendering(AFlag:boolean);
     procedure SaveTable(AFileName:string);
     procedure ChildDraw(ANod:TXML_Nod);
+    procedure PDFText(AXML:string; aPDF:TPdfDocument);
   end;
 
 
@@ -353,11 +355,7 @@ implementation
 {$R *.dfm}
 
 uses u_MainData, vcl.FileCtrl, u_XMLEditForm, Vcl.Imaging.pngimage, ShellAPI,
-  u_ThreadRender, System.DateUtils, resvg, u_Html2SVG, u_CellEditForm, SynPdf, u_CalcSVG;
-
-type
-  THackGrid=class(TStringGrid);
-
+  u_ThreadRender, System.DateUtils, resvg, u_Html2SVG, u_CellEditForm, u_CalcSVG;
 
 function Zero(AEdit: TSpinEdit): integer;
 begin
@@ -574,7 +572,16 @@ end;
 
 procedure TMainForm.aFindExecute(Sender: TObject);
 begin
-  dlgTextFind.Execute()
+  if (aFind.ActionComponent = tbFindText) or (ActiveControl = sgText) then
+    dlgTextFind.Execute()
+  else if (ActiveControl = SVGFrame.treeTemplate) then
+    SVGFrame.btnSearch1Click(Sender)
+  else if (ActiveControl = InspectorFrame.ReplaceFrame.SynEditor) then
+    InspectorFrame.ReplaceFrame.actSearchFind.Execute
+  else if (ActiveControl = ClipartFrame.treeTemplate) then
+    ClipartFrame.btnSearch1Click(Sender);
+
+  aFind.ActionComponent := Nil;
 end;
 
 procedure TMainForm.aNextExecute(Sender: TObject);
@@ -1036,7 +1043,11 @@ begin
           if chkJPEG.Checked then
             lPDF.ForceJPEGCompression := StrToIntDef(seForce.Text,0);
 
+          if chbTextLayer.Checked then
+            PDFText(FBufXml.Text, lPDF);
+
           lPDF.CreateOrGetImage(imgRender.Picture.Bitmap, @Box);
+
 
 
 
@@ -1055,6 +1066,9 @@ begin
             Box.Top := 0;
             Box.Width :=lPdf.DefaultPageWidth;
             Box.Height := lPdf.DefaultPageHeight;
+
+            if chbTextLayer.Checked then
+               PDFText(FBufXml.Text, lPDF);
 
             lPDF.CreateOrGetImage(imgRender.Picture.Bitmap, @Box);
           end;
@@ -1385,6 +1399,8 @@ end;
 procedure TMainForm.ChildDraw(ANod: TXML_Nod);
 var i:integer;
    r:TTetra;
+   Mtr:TMatrix;
+
 begin
   if ANod.LocalName='svg' then exit;
   FontCanvas := PaintBox.Canvas;
@@ -1588,8 +1604,6 @@ end;
 procedure TMainForm.dlgTextFindFind(Sender: TObject);
 var i:integer;
 
-
-
    function Compare(txt:string):Boolean;
    var
      s1,s2:string;
@@ -1630,6 +1644,14 @@ begin
     if i >= sgText.ColCount*sgText.RowCount then exit;
     Compare(sgText.Cells[i mod sgText.ColCount, i div sgText.ColCount])
   end;
+end;
+
+procedure TMainForm.dlgTextFindShow(Sender: TObject);
+var
+  Buffer: array[0..255] of Char;
+begin
+  GetWindowText(dlgTextFind.Handle, Buffer, SizeOf(Buffer));
+  SetWindowText(dlgTextFind.Handle, PChar(@Buffer)+': '+lblCfgText.Caption);
 end;
 
 procedure TMainForm.edCfgRootDblClick(Sender: TObject);
@@ -1801,17 +1823,18 @@ end;
 procedure TMainForm.FormShow(Sender: TObject);
 begin
   InspectorFrame.Initialize;
+  InspectorFrame.ReplaceFrame.FindCaption := ': Macros for replacing';
   ClipartInspectorFrame.Initialize;
   ClipartInspectorFrame.sgAttr.ColCount := 3;
   SVGFrame.SVG := SVG;
+  SVGFrame.Findcaption := ': '+lblCfgTemplate.Caption;
   ClipartFrame.SVG := Clipart;
+  ClipartFrame.Findcaption := ': '+lblCfgClipart.Caption;
   seWidthChange(nil);
   ClipartInspectorFrame.tsReplace.Caption := 'Preview';
   ClipartInspectorFrame.ReplaceFrame.Visible := False;
   pnClipartPreview.SetParentComponent(ClipartInspectorFrame.tsReplace);
   pnClipartPreview.Align :=alClient;
-
-
 end;
 
 
@@ -1872,12 +1895,6 @@ end;
 procedure TMainForm.miTableHeadClick(Sender: TObject);
 var i:integer;
 begin
-  for I := 0 to sgText.ColCount-1 do
-  begin
-    sgText.Cells[i,0]:=Stringreplace(sgText.Cells[i,0], '^[','[',[rfReplaceAll]);
-    sgText.Cells[i,0]:=Stringreplace(sgText.Cells[i,0], 'v[','[',[rfReplaceAll]);
-  end;
-
   XMLEditForm.XML := sgText.Rows[0].Text;
   XMLEditForm.seTags.Visible := False;
   XMLEditForm.splTags.Visible := False;
@@ -2147,6 +2164,134 @@ begin
 //   InspectorFrame.SVGNode := InspectorFrame.SVGNode;
 end;
 
+procedure TMainForm.PDFText(AXML: string; aPDF: TPdfDocument);
+var
+   xmlText:TXML_Doc;
+   Box:TPdfBox;
+   Nod, Ref, Prv :TXML_Nod;
+   M:TMatrix;
+
+begin
+  xmlText:=TXML_Doc.Create;
+  try
+    xmlText.xml := AXML;
+    nod:=xmlText.Node['svg'];
+    while nod.Next <> nil do
+    begin
+      Prv := nod;
+      nod := nod.Next;
+      if (nod.LocalName='use') then
+      begin
+        if nod.Attribute['xlink:href']<>'' then
+          Ref := xmlText.FindByHRef(nod.Attribute['xlink:href'])
+        else
+        if nod.Attribute['href']<>'' then
+          Ref := xmlText.FindByHRef(nod.Attribute['href'])
+        else
+          Ref := Nil;
+
+        if Ref<>nil then
+        begin
+          nod.LocalName := 'g';
+          nod.Attribute['xlink:href'] :='';
+          nod.Attribute['href'] :='';
+          nod.Add.ResetXml(Ref.xml);
+        end
+        else
+        begin
+          nod.Destroy;
+          nod := Prv;
+        end;
+      end
+      else
+      if (nod.LocalName='tspan') or
+         (nod.LocalName='textPath')
+      then begin
+        nod.parent.text := nod.parent.text + ' '  + nod.text;
+        nod.Destroy;
+        nod := Prv;
+      end
+      else
+      if (nod.LocalName<>'defs') and
+         (nod.LocalName<>'text') and
+         (nod.LocalName<>'g') and
+         (nod.LocalName<>'symbol')
+      then begin
+        nod.Destroy;
+        nod := Prv;
+      end;
+    end;
+
+    nod:=xmlText.Node['svg'];
+    while nod.Next <> nil do
+    begin
+      Prv := nod;
+      nod := nod.Next;
+      if (nod.LocalName='text')and (nod.parent.LocalName<>'svg') then
+      begin
+        M := NodeTrans(nod);
+        nod.Attribute['transform']:='matrix('
+          +  SvgFloat(M.A[0, 0]) +','
+          +  SvgFloat(M.A[0, 1]) +','
+          +  SvgFloat(M.A[1, 0]) +','
+          +  SvgFloat(M.A[1, 1]) +','
+          +  SvgFloat(M.A[2, 0]) +','
+          +  SvgFloat(M.A[2, 1]) +')';
+        nod.Attribute['x']:='';
+        nod.Attribute['y']:='';
+        nod.parent := xmlText.Node['svg'];
+        nod := Prv;
+      end
+      else
+      if (nod.LocalName<>'text') and
+         (nod.LocalName<>'g')
+      then begin
+        nod.Destroy;
+        nod := Prv;
+      end;
+    end;
+
+    nod:=xmlText.Node['svg'];
+    while nod.Next <> nil do
+    begin
+      Prv := nod;
+      nod := nod.Next;
+      if (nod.LocalName<>'text')
+      then begin
+        nod.Destroy;
+        nod := Prv;
+      end;
+    end;
+
+
+
+//    xmlText.SaveToFile('C:\dc64\Ever\temp\temp.svg');
+
+
+    Box.Left := 0;
+    Box.Top := 0;
+    Box.Width :=aPdf.DefaultPageWidth;
+    Box.Height := aPdf.DefaultPageHeight;
+    nod:=xmlText.Node['svg'];
+    xmlText.Node['svg'].Attribute['transform'] := 'scale('+ SvgFloat(72/StrToIntDef(cbDPI.Text,300))+')';
+    aPdf.Canvas.BeginText;
+    while nod.Next <> nil do begin
+      nod := nod.Next;
+      with aPdf.Canvas do
+      begin
+        M := NodeTrans(nod);
+        SetFont(nod.Attribute['font-family'],
+           StrToIntDef(nod.Attribute['font-size'],8) ,[]);
+        SetTextMatrix(M.A[0, 0], M.A[0, 1], M.A[1, 0], M.A[1, 1], M.A[2, 0], Box.Height - M.A[2, 1]);
+        ShowText(nod.text+' ');
+      end;
+    end;
+    aPdf.Canvas.EndText;
+  finally
+    xmlText.Destroy
+  end;
+end;
+
 procedure TMainForm.PrepareAtr(ANod: TXML_Nod);
 begin
 end;
@@ -2223,12 +2368,10 @@ var sl:TStringList;
     end;
     sgText.RowCount := sl.Count+1;
     sgText.Cells[0,0] := '¹';
-    sgText.Cells[0,1] := '1';
 
     for i:=1 to sl.Count do
     begin
-//      sgText.Cells[0,i+1]:=IntToStr(I+1);
-      sgText.Rows[i+1].Text:=IntToStr(I+1);
+      sgText.Cells[0,i+1]:=IntToStr(I+1);
       s:=sl[i-1];
       j:=0;
       while s<>'' do
@@ -2332,7 +2475,6 @@ procedure TMainForm.SaveTable(AFileName: string);
 var i,j:Integer;
   s: string;
 begin
-  sgTextFixedCellClick(nil,0,-1);
   with TStringList.Create do
   try
     for i := 0 to sgText.RowCount-1 do
@@ -2488,94 +2630,14 @@ end;
 procedure TMainForm.sgTextDrawCell(Sender: TObject; ACol, ARow: Integer;
   Rect: TRect; State: TGridDrawState);
 begin
-  if (ACol=0)and (Arow>0) then
-    sgText.Canvas.TextRect(Rect,Rect.Left,Rect.Top, IntToStr(Arow));
-
   if ARow=sgText.Row then
   begin
-
-
     sgText.Canvas.Brush.Style := bsClear;
     sgText.Canvas.Pen.Color := clBlue;
-    sgText.Canvas.Rectangle(sgText.CellRect(ACol,ARow));
-
+    sgText.Canvas.Rectangle(sgText.CellRect(ACol,ARow))
 //    sgText.Canvas.Rectangle(Rect.Left-5, Rect.Top, Rect.Right+1, Rect.Bottom);
   end;
 
-end;
-
-procedure TMainForm.sgTextFixedCellClick(Sender: TObject; ACol, ARow: Integer);
-var
-  i,j:integer;
-  sl:TStringList;
-  s:string;
-  Srt:boolean;
-
-begin
-  if Arow=0 then
-  begin
-     sl:=TStringList.Create;
-     sl.Sorted := True;
-     sl.Duplicates := dupAccept;
-     Srt := True;
-
-     if (ARow=-1)or(ACol=0) then
-       Srt := True
-     else
-       Srt := copy(sgText.Cells[Acol,0],1,1)<>'^';
-
-
-
-     for I := 0 to sgText.ColCount-1 do
-     begin
-       sgText.Cells[i,0]:=Stringreplace(sgText.Cells[i,0], '^[','[',[rfReplaceAll]);
-       sgText.Cells[i,0]:=Stringreplace(sgText.Cells[i,0], 'v[','[',[rfReplaceAll]);
-       sgText.Cells[i,0]:=Stringreplace(sgText.Cells[i,0], '^¹','¹',[rfReplaceAll]);
-       sgText.Cells[i,0]:=Stringreplace(sgText.Cells[i,0], 'v¹','¹',[rfReplaceAll]);
-     end;
-
-     if Srt then
-     begin
-       for I := 1 to sgText.RowCount-1 do
-       begin
-         s:=sgText.Cells[Acol,i];
-         if ACol=0 then
-           s:=RightStr('00000'+s,5);
-         j := sl.Add(s);
-         while (j<sl.Count-1) and (sl[j]=sl[j+1]) do inc(j);
-
-         if j+1 <> i then
-           THackGrid(sgText).MoveRow(i, j+1);
-       end;
-       if (ARow<>-1)and(ACol<>0) then
-        sgText.Cells[Acol,0] := '^'+sgText.Cells[Acol,0];
-     end
-     else
-     begin
-       for I := sgText.RowCount-1 downto 1 do
-       begin
-         s:=sgText.Cells[Acol,i];
-         if ACol=0 then
-           s:=RightStr('00000'+s,5);
-         j := sl.Add(s);
-//         while (j<sl.Count-1) and (sl[j]=sl[j+1]) do inc(j);
-
-         if sgText.RowCount -j-1 <> i then
-           THackGrid(sgText).MoveRow(i, sgText.RowCount-j-1);
-       end;
-       if (ACol<>0) then
-         sgText.Cells[Acol,0] := 'v'+sgText.Cells[Acol,0];
-     end;
-
-     if sgText.Row  <sgText.TopRow then
-       sgText.TopRow := sgText.Row;
-     if sgText.Row > sgText.TopRow+sgText.VisibleRowCount  then
-       sgText.TopRow := sgText.Row-sgText.VisibleRowCount+1;
-
-
-
-     sl.Destroy;
-  end;
 end;
 
 procedure TMainForm.sgTextKeyPress(Sender: TObject; var Key: Char);

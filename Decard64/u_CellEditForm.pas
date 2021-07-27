@@ -158,6 +158,7 @@ end;
 procedure TCellEditForm.FormCreate(Sender: TObject);
 begin
   btnCancel.OnClick := btnCancelClick;
+  CellEditFrame.FindCaption := ': Edited Text [table cell]'
 end;
 
 function TCellEditForm.GetText: string;

@@ -191,7 +191,7 @@ begin
     OnSetEditText := sgAttrSetEditText;
     OnDblClick := aEditExecute;
     OnTopLeftChanged := sgAttrTopLeftChanged;
-    OnKeyDown :=sgAttrKeyDown;
+    OnKeyDown := sgAttrKeyDown;
 
   end;
 
@@ -549,13 +549,14 @@ end;
 procedure TSvgInspectorFrame.sgAttrKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
-  if (Key=13)and(ssCtrl in Shift) then
+  if (Key=13) and (ssCtrl in Shift) then
     if NOT assigned(THackStringGrid(sgAttr).InplaceEditor)
      or not (THackInplaceEditList(THackStringGrid(sgAttr).InplaceEditor).EditStyle=esPickList) then
     begin
       aEdit.Execute;
       Key :=0
     end;
+
 end;
 
 procedure TSvgInspectorFrame.sgAttrSelectCell(Sender: TObject; ACol,

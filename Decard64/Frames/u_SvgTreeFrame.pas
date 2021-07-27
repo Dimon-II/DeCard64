@@ -90,6 +90,7 @@ type
     procedure miOuterCrossClick(Sender: TObject);
     procedure miInnerCrssClick(Sender: TObject);
     procedure miPattertClick(Sender: TObject);
+    procedure svgFindDialogShow(Sender: TObject);
   private
     { Private declarations }
     FSVG: TXML_Doc;
@@ -104,6 +105,7 @@ type
     procedure SetFrameSize(const Value: integer);
   public
     { Public declarations }
+    Findcaption: string;
     procedure ResetSvg(ANode:TXML_Nod; AItem:TTreeNode);
     property SVG: TXML_Doc read FSVG write SetSVG;
     property FocusedNode:TTreeNode read GetFocusedNode write SetFocusedNode;
@@ -630,6 +632,14 @@ begin
     end;
     FFindAttr := '';
   end;
+end;
+
+procedure TSvgTreeFrame.svgFindDialogShow(Sender: TObject);
+var
+  Buffer: array[0..255] of Char;
+begin
+  GetWindowText(svgFindDialog.Handle, Buffer, SizeOf(Buffer));
+  SetWindowText(svgFindDialog.Handle, PChar(@Buffer)+FindCaption);
 end;
 
 procedure TSvgTreeFrame.tbXMLClick(Sender: TObject);

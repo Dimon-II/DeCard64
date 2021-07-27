@@ -174,7 +174,7 @@ var
 
 function DoReplace(txt:string;Nod:TXML_Nod):string;
 var i:integer;
-  s,n:string;
+  s,n,r:string;
   sn, idx:TStringList;
   Prnt:TXML_Nod;
 begin
@@ -220,14 +220,16 @@ begin
         n:=WideUpperCase(Copy(sn[i], 1, Pos('=', sn[i])-1));
 
 
-//        n:=AnsiWideUpperCase(sn.Names[i]);
         if idx.IndexOf(n)=-1 then
         begin
           idx.Add(n);
           if Pos(WideString(n), WideUpperCase(s)) >0 then
           begin
-//             s := StringReplace(s, n, (sn.Values[n] ,[rfReplaceAll, rfIgnoreCase]);
-             s := StringReplace(s, n, copy(sn[i],length(n)+2, Length(sn[i])) ,[rfReplaceAll, rfIgnoreCase]);
+            r := copy(sn[i],length(n)+2, Length(sn[i]));
+            if copy(r,1,1)='=' then
+              s := StringReplace(s, n, copy(r,2,length(r)) ,[rfReplaceAll])
+            else
+              s := StringReplace(s, n, r ,[rfReplaceAll, rfIgnoreCase]);
           end;
         end;
 
@@ -327,7 +329,7 @@ begin
   nod.Attribute['font-weight'] := ParentStyle(nod,'font-weight');
   nod.Attribute['font-style'] := ParentStyle(nod,'font-style');
   nod.Attribute['letter-spacing'] := ParentStyle(nod,'letter-spacing','0');
-  nod.Attribute['font-variant'] := ParentStyle(nod,'font-variant');
+  nod.Attribute['font-variant'] := ParentStyle(nod,'normal');
 
   Nod.text := StringReplace(Nod.text,'[p]',' [p] ',[rfReplaceAll, rfIgnoreCase]);
   Nod.text := StringReplace(Nod.text,'  ',' ',[rfReplaceAll, rfIgnoreCase]);
@@ -895,13 +897,16 @@ begin
     NOD.xml := DoReplace(NOD.Attribute['dekart:body'], NOD);
   end
   else
-  if (nod.LocalName='text')
+  if (nod.LocalName='text')and Assigned(nod.Nodes.ByName('rect'))
   then begin
-    for i:=0 to nod.Nodes.Count-1 do
-      level(nod.Nodes[i]);
+    level(nod.Nodes.ByName('rect'));
     if nod.text <> '' then
       FormatText(nod);
   end
+  else
+  if (nod.LocalName='text') and (Pos(WideString('[P]'),WideUpperCase(nod.text))>0)
+  then
+    FormatText(nod)
   else
   for i:=0 to nod.Nodes.Count-1 do
     level(nod.Nodes[i]);

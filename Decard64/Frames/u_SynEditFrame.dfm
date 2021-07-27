@@ -240,7 +240,6 @@ object SynEditFrame: TSynEditFrame
       Enabled = False
       Hint = 'Find'
       ImageIndex = 12
-      ShortCut = 16454
       OnExecute = actSearchFindExecute
       OnUpdate = actSearchFindUpdate
     end
@@ -320,6 +319,7 @@ object SynEditFrame: TSynEditFrame
   end
   object ReplaceDialog: TReplaceDialog
     OnClose = FindDialogClose
+    OnShow = ReplaceDialogShow
     OnFind = ReplaceDialogFind
     OnReplace = ReplaceDialogReplace
     Left = 216
@@ -327,6 +327,7 @@ object SynEditFrame: TSynEditFrame
   end
   object FindDialog: TFindDialog
     OnClose = FindDialogClose
+    OnShow = FindDialogShow
     OnFind = FindDialogFind
     Left = 88
     Top = 128

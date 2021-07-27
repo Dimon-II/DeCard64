@@ -2,16 +2,20 @@ unit u_CalcSVG;
 
 interface
 
-uses Profixxml, System.Classes, System.Types, vcl.graphics;
+uses Profixxml, System.Classes, System.Types, vcl.graphics, UMatrix;
 
 type TTetra = array [0..3] of TPoint;
+   TMatrix=UMatrix.TMatrix;
+
 function NodeRect(Anod:TXML_Nod):TTetra;
+function NodeTrans(Anod:TXML_Nod):TMatrix;
 
 var FontCanvas:TCanvas;
+   AxisY:integer;
 
 implementation
 
-uses UMatrix, Math, System.SysUtils;
+uses  Math, System.SysUtils;
 
 function StrToFloat(S:string):extended;
 var err:integer;
@@ -79,7 +83,7 @@ begin
      cy:=StrToFloat(Params[2]);
   end;
   tm:=TransMx(cx,cy);
-  rm:=RotMx(ang);
+  rm:=RotMx(AxisY*ang);
   t:=MulMx(tm,rm);
   tm:=TransMx(-cx,-cy);
   Result:=MulMx(t,tm);
@@ -209,6 +213,7 @@ var
   prnt:TXML_Nod;
   err:integer;
 begin
+  AxisY:=1;
 
   if Anod.LocalName='ellipse' then
   begin
@@ -306,5 +311,37 @@ begin
   result[0].Y:=round(zy);
 end;
 
+function SvgFloat(d:double):string;
+begin
+  str(d:0:4,result);
+end;
+
+
+
+function NodeTrans(Anod:TXML_Nod):TMatrix;
+var
+  x,y :Extended;
+  trn: TMatrix;
+  prnt:TXML_Nod;
+  err:integer;
+begin
+  AxisY:=-1;
+  trn := IdentityMatrix;
+  prnt := ANod;
+  while prnt<> nil do
+  begin
+    try
+      val(prnt.Attribute['x'],x,err);
+      val(prnt.Attribute['y'],y,err);
+      trn := MulMx(SVGParseTransform('translate('+SvgFloat(x)+ ','+SvgFloat(y)+ ')'),trn);
+      if prnt.Attribute['transform']<> '' then
+         trn := MulMx(SVGParseTransform(prnt.Attribute['transform']),trn);
+    except
+    end;
+    prnt := prnt.parent;
+  end;
+
+  result := trn;
+end;
 
 end.

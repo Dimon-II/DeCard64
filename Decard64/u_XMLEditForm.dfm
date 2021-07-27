@@ -12,6 +12,7 @@ object XMLEditForm: TXMLEditForm
   Font.Style = []
   OldCreateOrder = False
   Position = poMainFormCenter
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object pnBottom: TPanel
@@ -84,10 +85,7 @@ object XMLEditForm: TXMLEditForm
       end
       inherited pscrSysEdit: TPageScroller
         Width = 622
-        inherited tbrEditor: TToolBar
-          Width = 622
-          ExplicitWidth = 622
-        end
+        ExplicitWidth = 622
       end
     end
     object seTags: TSynMemo
