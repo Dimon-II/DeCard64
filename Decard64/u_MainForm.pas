@@ -1425,16 +1425,15 @@ begin
   r:= NodeRect(ANod);
 
   PaintBox.Canvas.Pen.Color := rgb(0,204,255);
+  PaintBox.Canvas.Pen.Width := 3;
+  PaintBox.Canvas.Brush.Style := bsClear;
+{
   if SVGFrame.treeTemplate.Focused then
   begin
     PaintBox.Canvas.Brush.Style := bsFDiagonal;
     PaintBox.Canvas.Brush.Color := clWhite;
   end
-  else
-  begin
-    PaintBox.Canvas.Brush.Style := bsClear;
-  end;
-
+}
   for i:=0 to 3 do
   begin
     r[i].X := round(r[i].X * ZoomFactor);
