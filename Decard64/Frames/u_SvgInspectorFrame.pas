@@ -132,20 +132,23 @@ begin
     XMLEditForm.seTags.Visible := True;
     XMLEditForm.splTags.Visible := True;
     XMLEditForm.splTags.top :=1;
+    XMLEditForm.TEXT := sgAttr.Cells[sgAttr.Col,sgAttr.Row];
   end
   else
   begin
     XMLEditForm.seTags.Visible := False;
     XMLEditForm.splTags.Visible := False;
+    XMLEditForm.SynEditFrame.SynEditor.Text := sgAttr.Cells[sgAttr.Col,sgAttr.Row];
   end;
 
-  XMLEditForm.SynEditFrame.SynEditor.Text := sgAttr.Cells[sgAttr.Col,sgAttr.Row];
+
   XMLEditForm.Caption := '<'+SVGNode.LocalName+'>.'+s;
   if XMLEditForm.ShowModal=mrOk then
   begin
-//    sgAttr.Cells[sgAttr.Col,sgAttr.Row] := XMLEditForm.GetText;
-
-    sgAttr.Cells[sgAttr.Col,sgAttr.Row] := StringReplace(XMLEditForm.XML,#13#10,'',[rfReplaceAll]);
+    if sgAttr.Cells[0,sgAttr.Row]='body' then
+      sgAttr.Cells[sgAttr.Col,sgAttr.Row] := XMLEditForm.TEXT
+    else
+      sgAttr.Cells[sgAttr.Col,sgAttr.Row] := StringReplace(XMLEditForm.XML,#13#10,'',[rfReplaceAll]);
     sgAttrSetEditText(sgAttr,sgAttr.Col, sgAttr.Row,sgAttr.Cells[sgAttr.Col,sgAttr.Row] );
   end;
 end;

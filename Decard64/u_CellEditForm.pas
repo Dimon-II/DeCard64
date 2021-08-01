@@ -165,11 +165,6 @@ function TCellEditForm.GetText: string;
 begin
   Result := StringReplace(CellEditFrame.SynEditor.Text, #13#10,'',[rfReplaceAll]);
   Result := StringReplace(Result, '  ',' ',[rfReplaceAll]) ;
-{  Result := StringReplace(Result, '/>','\>',[rfReplaceAll]) ;
-  Result := StringReplace(Result, '</','<\',[rfReplaceAll]) ;
-  Result := StringReplace(Result, '/','&#47;',[rfReplaceAll]) ;
-  Result := StringReplace(Result, '\>','/>',[rfReplaceAll]) ;
-  Result := StringReplace(Result, '<\','</',[rfReplaceAll]) ;}
 end;
 
 procedure TCellEditForm.lbCommonDblClick(Sender: TObject);
@@ -183,8 +178,10 @@ begin
     lbCommon.Items.Insert(0,s);
   end;
 
-  if (s = '<br/>')or(s = '<p/>') then
-  s := s + ^M;
+  if (s = '<br/>')or(s = '<p/>')
+    or (copy(s,1,4) = '<br ')or(copy(s,1,3) = '<p ')
+  then
+    s :=  ^M+s;
   CellEditFrame.SynEditor.SelText := s;
   CellEditFrame.SynEditor.SetFocus;
 
@@ -239,11 +236,12 @@ procedure TCellEditForm.SetText(const Value: string);
 var s: string;
 begin
   FOldText := Value;
-  s := StringReplace(Value, '<br/>', '<br/>'#13#10,[rfreplaceall]);
+
+  s := StringReplace(Value, '<br/>', #13#10'<br/>',[rfreplaceall]);
+  s := StringReplace(s, '<br ', #13#10'<br ',[rfreplaceall]);
   s := StringReplace(s, '<p/>', #13#10'<p/>',[rfreplaceall]);
+  s := StringReplace(s, '<p ', #13#10'<p ',[rfreplaceall]);
   s := StringReplace(s, '&#47;', '/',[rfreplaceall]);
-  s := StringReplace(s, '[p]', '[p]'#13#10,[rfreplaceall]);
-  s := StringReplace(s, '[P]', '[P]'#13#10,[rfreplaceall]);
   CellEditFrame.SynEditor.Text := s;
 end;
 

@@ -226,7 +226,7 @@ object CellEditForm: TCellEditForm
     object chbScrollPreview: TCheckBox
       Left = 82
       Top = 16
-      Width = 123
+      Width = 97
       Height = 17
       Caption = 'Preview'#9660#9650
       Font.Charset = DEFAULT_CHARSET
