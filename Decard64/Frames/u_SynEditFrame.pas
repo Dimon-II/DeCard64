@@ -9,6 +9,13 @@ uses
   SynEditSearch, Vcl.Menus, Vcl.ComCtrls, Vcl.ToolWin, SynEdit,  SynHighlighterIni, ProfixXML,
   SynEditCodeFolding, Vcl.ExtCtrls;
 type
+
+  TSynXMLSyn=class(SynHighlighterXML.TSynXMLSyn)
+  public
+    function IsIdentChar(AChar: WideChar): Boolean;override;
+  end;
+
+
   TSynEditFrame = class(TFrame)
     actlMain: TActionList;
     actEditCut: TAction;
@@ -105,6 +112,8 @@ implementation
 
 uses
    u_MainData, SynEditTypes, frmGlyph, u_ThreadRender;
+
+
 
 { TSynEditFrame }
 
@@ -357,6 +366,13 @@ begin
     SynEditor.Options := SynEditor.Options + [eoShowSpecialChars]
   else
     SynEditor.Options := SynEditor.Options - [eoShowSpecialChars]
+end;
+
+{ TSynXMLSyn }
+
+function TSynXMLSyn.IsIdentChar(AChar: WideChar): Boolean;
+begin
+  Result := AChar > #32;
 end;
 
 end.
