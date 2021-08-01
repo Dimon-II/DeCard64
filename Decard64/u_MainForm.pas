@@ -2348,6 +2348,8 @@ end;
 
 procedure TMainForm.PrepareXML;
 begin
+  InspectorFrame.SVGNode := Nil;
+
   SVG.Node['svg'].Attribute['id'] := ExtractFileName(edCfgPropotype.Text);
   SvgFrame.SVG := SVG;
   NoTempStyle := False;

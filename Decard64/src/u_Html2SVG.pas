@@ -808,10 +808,12 @@ begin
   end;
 end;
 
+
 procedure level(nod:TXML_Nod);
 var
   i:Integer;
   s:string;
+  r,g,b:byte;
 
 begin
 {
@@ -822,6 +824,7 @@ begin
       NOD.Attributes[i].value := DoReplace(NOD.Attribute['dekart:'+StringReplace(NOD.Attributes[i].name,':','_',[rfReplaceAll])], NOD);
 }
   for i := 0 to NOD.Attributes.Count-1 do
+  begin
     if (Pos('dekart:', NOD.Attributes[i].name)=1) then
     begin
       s := StringReplace(Copy(NOD.Attributes[i].name,8,256),'_',':',[rfReplaceAll]);
@@ -839,6 +842,47 @@ begin
            NOD.Attribute[s] := 'visible';
       end;
     end;
+
+    if (NOD.Attributes[i].name='fill') or
+       (NOD.Attributes[i].name='stroke') or
+       (NOD.Attributes[i].name='stop-color') or
+       (NOD.Attributes[i].name='flood-color')
+    then
+    begin
+      s := NOD.Attributes[i].value;
+
+      if copy(s,1,4)='rgb(' then
+      begin
+        s:=copy(s,pos('(',s)+1,length(s));
+        r := StrToIntDef(copy(s,1,pos(',',s)-1),0);
+        s:=copy(s,pos(',',s)+1,length(s));
+        g := StrToIntDef(copy(s,1,pos(',',s)-1),0);
+        s:=copy(s,pos(',',s)+1,length(s));
+        b := StrToIntDef(copy(s,1,pos(')',s)-1),0);
+        NOD.Attributes[i].value := '#'+IntToHex(r,2)+IntToHex(g ,2)+ IntToHex(b ,2);
+      end;
+
+      if copy(s,1,5)='rgba(' then
+      begin
+        s:=copy(s,pos('(',s)+1,length(s));
+        r := StrToIntDef(copy(s,1,pos(',',s)-1),0);
+        s:=copy(s,pos(',',s)+1,length(s));
+        g := StrToIntDef(copy(s,1,pos(',',s)-1),0);
+        s:=copy(s,pos(',',s)+1,length(s));
+        b := StrToIntDef(copy(s,1,pos(',',s)-1),0);
+
+        NOD.Attributes[i].value := '#'+IntToHex(r,2)+IntToHex(g ,2)+ IntToHex(b ,2);
+
+        s:=copy(s,pos(',',s)+1,length(s));
+        s:=copy(s,1, pos(')',s)-1);
+        NOD.Attribute[NOD.Attributes[i].name+'-opacity'] := s;
+
+      end;
+
+    end;
+
+  end;
+
   if NOD.Attribute['visibility'] = 'hidden' then
      NOD.Attribute['display'] := 'none';
 

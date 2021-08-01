@@ -337,6 +337,7 @@ begin
     TreNod.MoveTo(FocusedNode,naInsert);
   end;
   nod.ResetXml(AXML);
+  //nod.xml := AXML;
   ResetSvg(nod, TreNod);
 
   TreNod.Selected := True;

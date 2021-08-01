@@ -505,6 +505,7 @@ begin
     text := n.Nodes[0].text;
 
     s := copy(aXml, Pos('<',aXml)+1, 128);
+    Delete(s,Pos('>',s+'>'),128);
     Delete(s,Pos('/',s+'/'),128);
     Delete(s,Pos(' ',s+' '),128);
     LocalName := s;
