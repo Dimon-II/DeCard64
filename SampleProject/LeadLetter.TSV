@@ -1,0 +1,10 @@
+﻿[1] Code	[2] Count	[3] Name	[4] Text	[5] Flawor	[6] Cnt(rome)
+1	5	Sniper	Choose a player and name a card (other than Sniper). If that player has that card - he's knocked out.	Don't run from snipers, you'll just die tired...	V
+2	2	Scout	You can look at one other player's hand. Do not reveal the hand to all players.	Float like a butterfly, sting like a bee.	II
+3	2	Soldier	Choose opponent to compare your hands. The player with the lower rank card is knocked out.	It's just a job. I beat people up.	II
+4	2	Engineer	You are immune to the effects ofother players' cards until the start of your next turn.	I can nothing to do...	II
+5	2	Flamer	Choose one player or yourself. That player discards hand (do not apply its effect) and draws a new card.	I love the smell of napalm in the morning!	II
+6	1	Medic	Exchange the card in your hand with the card held by another player of your choice.	Doctor, You sewed me not my had!	I
+7	1	Demolisher	You must discard the Demolisher, when Your seсond card is Medic or Flamer.	It is a good day to Die!	I
+8	1	Spy	If you discard the Spy, no matter how - You are knocked.	What's under my mask? Another mask, of course!	I
+0	1	Ambush	If you are targeted by the Sniper, he is knocked out. Take a new card.	Give up... or don't give up, it's even more interesting!	I
