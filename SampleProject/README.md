@@ -3,7 +3,7 @@ redesign popular game LoveLetter with characters of TeamForters.
 
 Resources used:
 
-Ogiginal card game
+Original card game
 https://boardgamegeek.com/boardgame/129622/love-letter
 
 TeamFortress 1920 stilization image clipart by Ramida-r
