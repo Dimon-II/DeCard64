@@ -25,7 +25,7 @@ object MainForm: TMainForm
     Top = 0
     Width = 977
     Height = 624
-    ActivePage = tsDesigner
+    ActivePage = tsClipart
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -1827,6 +1827,7 @@ object MainForm: TMainForm
           inherited tsAtr: TTabSheet
             AlignWithMargins = True
             ExplicitLeft = 7
+            ExplicitTop = 27
             ExplicitWidth = 307
             ExplicitHeight = 385
             inherited splInspector: TSplitter
@@ -1905,20 +1906,16 @@ object MainForm: TMainForm
             end
           end
           inherited tsReplace: TTabSheet
+            ExplicitLeft = 4
             ExplicitTop = 24
+            ExplicitWidth = 610
             ExplicitHeight = 533
             inherited ReplaceFrame: TSynEditFrame
-              Width = 313
-              Height = 391
+              Height = 533
+              ExplicitHeight = 533
               inherited SynEditor: TSynEdit
-                Width = 313
-                Height = 363
-                ExplicitWidth = 313
-                ExplicitHeight = 363
-              end
-              inherited pscrSysEdit: TPageScroller
-                Width = 313
-                ExplicitWidth = 313
+                Height = 505
+                ExplicitHeight = 505
               end
             end
           end
@@ -2295,6 +2292,7 @@ object MainForm: TMainForm
             end
             inherited Clear1: TMenuItem
               Caption = 'Clear clipart'
+              OnClick = ClipartFrameClear1Click
             end
           end
         end
@@ -2316,6 +2314,7 @@ object MainForm: TMainForm
           ExplicitWidth = 522
           ExplicitHeight = 596
           inherited tsAtr: TTabSheet
+            ExplicitLeft = 4
             ExplicitTop = 24
             ExplicitWidth = 514
             ExplicitHeight = 568
@@ -2395,20 +2394,16 @@ object MainForm: TMainForm
             end
           end
           inherited tsReplace: TTabSheet
+            ExplicitLeft = 4
             ExplicitTop = 24
+            ExplicitWidth = 610
             ExplicitHeight = 533
             inherited ReplaceFrame: TSynEditFrame
-              Width = 514
-              Height = 568
+              Height = 533
+              ExplicitHeight = 533
               inherited SynEditor: TSynEdit
-                Width = 514
-                Height = 540
-                ExplicitWidth = 514
-                ExplicitHeight = 540
-              end
-              inherited pscrSysEdit: TPageScroller
-                Width = 514
-                ExplicitWidth = 514
+                Height = 505
+                ExplicitHeight = 505
               end
             end
           end

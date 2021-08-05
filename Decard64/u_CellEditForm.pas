@@ -48,6 +48,7 @@ type
   private
     FOldText:string;
     FGrid: TStringGrid;
+    FRow: integer;
     function GetText: string;
     procedure SetText(const Value: string);
     procedure SetGrid(const Value: TStringGrid);
@@ -92,8 +93,10 @@ begin
       Grid.Cells[0, Grid.RowCount-1] := IntToStr(Grid.RowCount-1);
     end;
   Grid.Row :=Grid.Row+1;
+{
   if chbScrollPreview.Checked then
      aPreview.Execute
+}
 end;
 
 procedure TCellEditForm.aGridRightExecute(Sender: TObject);
@@ -113,8 +116,10 @@ end;
 procedure TCellEditForm.aGridUpExecute(Sender: TObject);
 begin
   Grid.Row := Grid.Row -1;
+{
   if chbScrollPreview.Checked then
      aPreview.Execute
+}
 end;
 
 procedure TCellEditForm.aGridUpUpdate(Sender: TObject);
@@ -176,6 +181,7 @@ begin
   begin
     lbCommon.Items.Delete(lbCommon.ItemIndex);
     lbCommon.Items.Insert(0,s);
+    lbCommon.ItemIndex := 0;
   end;
 
   if (s = '<br/>')or(s = '<p/>')
@@ -184,6 +190,7 @@ begin
     s :=  ^M+s;
   CellEditFrame.SynEditor.SelText := s;
   CellEditFrame.SynEditor.SetFocus;
+  SetCursorPos(Mouse.CursorPos.x, lbCommon.ClientToScreen(point(0,10)).y);
 
 end;
 
@@ -243,6 +250,10 @@ begin
   s := StringReplace(s, '<p ', #13#10'<p ',[rfreplaceall]);
   s := StringReplace(s, '&#47;', '/',[rfreplaceall]);
   CellEditFrame.SynEditor.Text := s;
+
+  if (FRow <> Grid.Row) and chbScrollPreview.Checked then
+     aPreview.Execute;
+  FRow := Grid.Row;
 end;
 
 end.

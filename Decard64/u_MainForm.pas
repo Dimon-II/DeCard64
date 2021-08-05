@@ -304,6 +304,7 @@ type
     procedure sgTextKeyPress(Sender: TObject; var Key: Char);
     procedure dlgTextFindShow(Sender: TObject);
     procedure sgTextFixedCellClick(Sender: TObject; ACol, ARow: Integer);
+    procedure ClipartFrameClear1Click(Sender: TObject);
   private
     { Private declarations }
     FSel:TRect;
@@ -1448,6 +1449,12 @@ begin
       ChildDraw(ANod.Nodes[i])
 end;
 
+procedure TMainForm.ClipartFrameClear1Click(Sender: TObject);
+begin
+  ClipartFrame.Clear1Click(Sender);
+
+end;
+
 procedure TMainForm.ClipartFrameSave1Click(Sender: TObject);
 begin
   MainData.dlgSaveSVG.Title := 'Save SVG-clipart';
@@ -2342,6 +2349,8 @@ end;
 
 procedure TMainForm.PrepareClipart;
 begin
+  ClipartInspectorFrame.SVGNode := Nil;
+
   Clipart.Node['svg'].Attribute['id'] := ExtractFileName(edCfgClipart.Text);
   ClipartFrame.SVG := Clipart;
 end;

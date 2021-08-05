@@ -568,6 +568,8 @@ var
   s:string;
   HelpNod:TXML_Nod;
 begin
+  if SVGNode = nil then exit;
+
   s:= '<' + SVGNode.LocalName+'>';
   HelpNod := MainData.HLP.Node['help'].Node['elements'].Nodes.ByName(SVGNode.LocalName);
   if HelpNod <> nil then
