@@ -16,10 +16,6 @@ object SvgInspectorFrame: TSvgInspectorFrame
     object tsAtr: TTabSheet
       Caption = 'Inspector'
       OnResize = tsAtrResize
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object splInspector: TSplitter
         Left = 0
         Top = 426
@@ -86,7 +82,7 @@ object SvgInspectorFrame: TSvgInspectorFrame
         object tbrInspector: TToolBar
           Left = 0
           Top = 0
-          Width = 269
+          Width = 310
           Height = 39
           Align = alNone
           AutoSize = True
@@ -99,7 +95,7 @@ object SvgInspectorFrame: TSvgInspectorFrame
           Wrapable = False
           object cbAtrShow: TComboBox
             Left = 0
-            Top = 7
+            Top = 0
             Width = 80
             Height = 24
             Style = csDropDownList
@@ -164,10 +160,6 @@ object SvgInspectorFrame: TSvgInspectorFrame
     object tsReplace: TTabSheet
       Caption = 'Replace'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       inline ReplaceFrame: TSynEditFrame
         Left = 0
         Top = 0

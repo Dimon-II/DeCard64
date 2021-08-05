@@ -317,7 +317,7 @@ procedure TSvgInspectorFrame.SetSVGNode(const Value: TXML_Nod);
     begin
     end
     else
-    if (LocalName<>'stop') and (Aname='stop-color')or(Aname='stop-opacity')  then
+    if (LocalName<>'stop') and ((Aname='stop-color')or(Aname='stop-opacity'))  then
       exit
     else
 
