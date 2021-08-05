@@ -1726,7 +1726,7 @@ begin
   sgText.col := 1;
   sgText.row := 1;
 
-  edCfgRoot.Text := ExtractFilePath(paramstr(0));
+  edCfgRoot.Text := GetCurrentDir+'\'; //ExtractFilePath(paramstr(0));
   NoTempStyle := true;
 
   pcMain.ActivePage := tsProject;

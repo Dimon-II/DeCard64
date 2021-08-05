@@ -25,7 +25,7 @@ object MainForm: TMainForm
     Top = 0
     Width = 977
     Height = 624
-    ActivePage = tsClipart
+    ActivePage = tsProject
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
