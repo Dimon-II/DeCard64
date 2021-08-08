@@ -182,6 +182,7 @@ begin
 //  sn:=TStringList.Create;
   idx:=TStringList.Create;
   idx.Sorted := True;
+  idx.CaseSensitive := True;
   try
     s := txt;
 
@@ -217,13 +218,13 @@ begin
       for i:=0 to sn.Count-1 do
       if Pos('=', sn[i])>0 then
       begin
-        n:=WideUpperCase(Copy(sn[i], 1, Pos('=', sn[i])-1));
+        n:=Copy(sn[i], 1, Pos('=', sn[i])-1);
 
 
         if idx.IndexOf(n)=-1 then
         begin
           idx.Add(n);
-          if Pos(WideString(n), WideUpperCase(s)) >0 then
+          if Pos(WideUpperCase(WideString(n)), WideUpperCase(s)) >0 then
           begin
             r := copy(sn[i],length(n)+2, Length(sn[i]));
             if copy(r,1,1)='=' then
@@ -812,7 +813,7 @@ end;
 procedure level(nod:TXML_Nod);
 var
   i:Integer;
-  s:string;
+  s,vl:string;
   r,g,b:byte;
 
 begin
@@ -823,7 +824,7 @@ begin
     then
       NOD.Attributes[i].value := DoReplace(NOD.Attribute['dekart:'+StringReplace(NOD.Attributes[i].name,':','_',[rfReplaceAll])], NOD);
 }
-  for i := 0 to NOD.Attributes.Count-1 do
+  for i := NOD.Attributes.Count-1 downto 0 do
   begin
     if (Pos('dekart:', NOD.Attributes[i].name)=1) then
     begin
@@ -832,7 +833,11 @@ begin
       if (s='attr') or (s='text') or (s='body') or (s='replace') or (s='background')
       then Continue;
 
+
       NOD.Attribute[s] := DoReplace(NOD.Attributes[i].value, NOD);
+
+      if NOD.Attribute[s]='' then continue;
+
       if (s = 'visibility') and (NOD.Attribute[s] <> 'hidden') and (NOD.Attribute[s] <> 'visible')  then
       begin
 
@@ -1582,6 +1587,8 @@ bkg := nil;
 
            n2.Attribute['height'] := ParentStyle(xn,'font-size');
            n2.Attribute['y'] := ParentStyle(xn, 'dy');
+           n2.Attribute['filter'] := ParentStyle(xn, 'filter');
+//           n2.Attribute['filter'] := xn.Attribute['filter'];
 
            if pos('%', ParentStyle(xn,'line-height',''))>0 then
            begin
@@ -1616,6 +1623,7 @@ bkg := nil;
           n2 := n1.Add('image');
 
 
+          n2.Attribute['filter'] := xn.Attribute['filter'];
           n2.Attribute['width'] := xn.Attribute['width'];
           n2.Attribute['height'] := xn.Attribute['height'];
           n2.Attribute['x'] := IntToStr(StrToIntDef(n1.Attribute['width'],0) + w5  + StrToIntDef(xn.Attribute['dx'],0));
@@ -1693,6 +1701,8 @@ bkg := nil;
              n2.Attribute['height'] := IntToStr(w2)
            else
              n2.Attribute['height'] := xn.Attribute['height'];
+
+           n2.Attribute['filter'] := xn.Attribute['filter'];
 
            w1 := StrToIntDef(n2.Attribute['width'],0);
 

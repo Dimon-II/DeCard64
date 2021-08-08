@@ -356,6 +356,7 @@ object CellEditForm: TCellEditForm
     object aPreview: TAction
       Caption = 'Preview F5'
       ShortCut = 116
+      OnUpdate = aPreviewUpdate
     end
   end
 end

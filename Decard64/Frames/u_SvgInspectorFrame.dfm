@@ -35,12 +35,11 @@ object SvgInspectorFrame: TSvgInspectorFrame
         BevelInner = bvNone
         ColCount = 4
         Ctl3D = False
-        DefaultColWidth = 80
+        DefaultColWidth = 120
         DefaultRowHeight = 19
         DrawingStyle = gdsClassic
-        FixedCols = 0
         RowCount = 2
-        Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goDrawFocusSelected, goColSizing, goEditing, goAlwaysShowEditor, goFixedColClick]
+        Options = [goVertLine, goHorzLine, goDrawFocusSelected, goColSizing, goEditing, goAlwaysShowEditor, goFixedColClick]
         ParentCtl3D = False
         TabOrder = 0
         OnDrawCell = sgAttrDrawCell

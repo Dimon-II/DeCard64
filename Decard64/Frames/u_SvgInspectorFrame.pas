@@ -9,6 +9,11 @@ uses
   system.UITYpes, System.Actions, Vcl.ActnList;
 
 type
+  TStringGrid=class(Vcl.Grids.TStringGrid)
+  protected
+    function CreateEditor: TInplaceEdit; override;
+    function GetEditStyle(ACol, ARow: Longint): TEditStyle; override;
+  end;
 
   TSvgInspectorFrame = class(TFrame)
     pcAtrInspector: TPageControl;
@@ -77,13 +82,7 @@ uses u_MainData, Vcl.Themes, u_XMLEditForm, u_MainForm, u_ThreadRender,
 
 type
   THackCombo=class(TComboBox);
-  THackGrid=class(TStringGrid);
 
-  THackStringGrid=class(TStringGrid)
-  protected
-    function CreateEditor: TInplaceEdit; override;
-    function GetEditStyle(ACol, ARow: Longint): TEditStyle; override;
-  end;
 
   THackInplaceEditList=class(TInplaceEditList)
   protected
@@ -172,32 +171,6 @@ end;
 procedure TSvgInspectorFrame.Initialize;
 var i:integer;
 begin
-  sgAttr.Destroy;
-
-  sgAttr := THackStringGrid.Create(self);
-
-  with sgAttr do
-  begin
-    SetParentComponent(tsAtr);
-    Align := alClient;
-    BevelInner := bvNone;
-    ColCount := 4;
-    DefaultColWidth := 120;
-    DefaultRowHeight := 19;
-    DrawingStyle := gdsClassic;
-    FixedCols := 1;
-    RowCount := 2;
-    Ctl3d:=false;
-    Options := [ goVertLine, goHorzLine, goDrawFocusSelected, goColSizing, goEditing,  goAlwaysShowEditor];
-    OnDrawCell := sgAttrDrawCell;
-    OnSelectCell := sgAttrSelectCell;
-    OnSetEditText := sgAttrSetEditText;
-    OnDblClick := aEditExecute;
-    OnTopLeftChanged := sgAttrTopLeftChanged;
-    OnKeyDown := sgAttrKeyDown;
-
-  end;
-
   sgAttr.Rows[0].CommaText := '"  NAME","  PARENT","  VALUE","  OVERRIDE"';
   sgAttr.ColWidths[0]:=120;
   sgAttr.ColWidths[1]:=60;
@@ -394,7 +367,7 @@ procedure TSvgInspectorFrame.SetSVGNode(const Value: TXML_Nod);
         idx2 := MainData.HLP.Node['config'].Node['sorting'].Nodes.Count +    AllAtr.IndexOf(sgAttr.Cells[0,i]);
       if Idx1<Idx2 then
           begin
-            THackGrid(sgAttr).MoveRow(sgAttr.RowCount-1, i);
+            sgAttr.MoveRow(sgAttr.RowCount-1, i);
             break;
           end;
     end;
@@ -553,8 +526,8 @@ procedure TSvgInspectorFrame.sgAttrKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
 begin
   if (Key=13) and (ssCtrl in Shift) then
-    if NOT assigned(THackStringGrid(sgAttr).InplaceEditor)
-     or not (THackInplaceEditList(THackStringGrid(sgAttr).InplaceEditor).EditStyle=esPickList) then
+    if NOT assigned(sgAttr.InplaceEditor)
+     or not (THackInplaceEditList(sgAttr.InplaceEditor).EditStyle=esPickList) then
     begin
       aEdit.Execute;
       Key :=0
@@ -727,10 +700,10 @@ end;
 
 
 
-{ THackStringGrid }
+{ Hack TStringGrid }
 type TPickList=class(TCustomListbox);
 
-function THackStringGrid.CreateEditor: TInplaceEdit;
+function TStringGrid.CreateEditor: TInplaceEdit;
 begin
   Result := THackInplaceEditList.Create(Self);
   THackInplaceEditList(Result).OnEditButtonClick := OnDblClick;
@@ -738,7 +711,7 @@ begin
 end;
 
 
-function THackStringGrid.GetEditStyle(ACol, ARow: Longint): TEditStyle;
+function TStringGrid.GetEditStyle(ACol, ARow: Longint): TEditStyle;
 begin
   if (ACol>1) and ((Cells[4,ARow]<>'') or (Cells[0, ARow]='font-family'))
   then
@@ -758,8 +731,8 @@ end;
 
 procedure THackInplaceEditList.DoGetPickListItems;
 begin
-  if (THackStringGrid(Grid).Col>1) then
-  with Grid as THackStringGrid do
+  if (TStringGrid(Grid).Col>1) then
+  with Grid as TStringGrid do
   begin
     if (Cells[0, Row]='font-family') then
       PickList.Items.Text := StringReplace(StringReplace(LocalFonts,',',^M,[rfReplaceAll]),'"','',[rfReplaceAll])

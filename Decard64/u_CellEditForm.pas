@@ -45,10 +45,11 @@ type
     procedure aGridRightExecute(Sender: TObject);
     procedure aGridDownExecute(Sender: TObject);
     procedure CellEditFrameToolButton3Click(Sender: TObject);
+    procedure aPreviewUpdate(Sender: TObject);
   private
     FOldText:string;
     FGrid: TStringGrid;
-    FRow: integer;
+    FRow,RowDisplay: integer;
     function GetText: string;
     procedure SetText(const Value: string);
     procedure SetGrid(const Value: TStringGrid);
@@ -59,6 +60,7 @@ type
     procedure btnCancelClick(Sender: TObject);
     property Text:string read GetText write SetText;
     property Grid:TStringGrid read FGrid write SetGrid;
+    property Row: integer read FRow write FRow;
 
   end;
 
@@ -69,7 +71,7 @@ implementation
 
 {$R *.dfm}
 
-uses u_MainData;
+uses u_MainData, u_MainForm;
 
 { TCellEditForm }
 
@@ -125,6 +127,15 @@ end;
 procedure TCellEditForm.aGridUpUpdate(Sender: TObject);
 begin
   aGridUp.Enabled := (Grid<>nil) and (Grid.Row >1);
+end;
+
+procedure TCellEditForm.aPreviewUpdate(Sender: TObject);
+begin
+  if (FRow <> RowDisplay) and chbScrollPreview.Checked then
+  begin
+    RowDisplay := FRow;
+    MainForm.RenderRow(RowDisplay);
+  end;
 end;
 
 procedure TCellEditForm.btnApplyClick(Sender: TObject);
@@ -250,10 +261,6 @@ begin
   s := StringReplace(s, '<p ', #13#10'<p ',[rfreplaceall]);
   s := StringReplace(s, '&#47;', '/',[rfreplaceall]);
   CellEditFrame.SynEditor.Text := s;
-
-  if (FRow <> Grid.Row) and chbScrollPreview.Checked then
-     aPreview.Execute;
-  FRow := Grid.Row;
 end;
 
 end.

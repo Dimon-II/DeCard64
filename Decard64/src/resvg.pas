@@ -2,6 +2,8 @@ unit resvg;
 
 interface
 
+uses Vcl.Imaging.pngimage;
+
 const
 
 {$IFDEF WIN32}
@@ -113,7 +115,51 @@ Type
  procedure resvg_options_set_image_rendering_mode(opt:Presvg_options;  mode:resvg_image_rendering );cdecl; external resvgdll;
  function resvg_options_load_font_file(opt:Presvg_options; file_path:PChar):Integer ;cdecl; external resvgdll;
 
+
+ procedure BmpGRBA(BMP: TPNGImage; Img: Pointer);
+
+
 implementation
+
+uses  Winapi.Windows;
+
+type
+  PRGBTripleArray = ^TRGBTripleArray;
+  TRGBTripleArray = array [Byte] of TRGBTriple;
+  PRGBQuadArray = ^TRGBQuadArray;
+  TRGBQuadArray = array [Byte] of TRGBQuad;
+
+procedure BmpGRBA(BMP: TPNGImage; Img: Pointer);
+var
+  i, j: Integer;
+  RowBMP: PRGBTripleArray;
+  RowSVG: PRGBQuadArray;
+  Alp: pByteArray;
+begin
+
+  RowSVG := Img;
+
+  for j := 0 to BMP.height - 1 do
+  begin
+    RowBMP := BMP.Scanline[j];
+    Alp := BMP.AlphaScanline[j];
+    for i := 0 to BMP.width - 1 do
+      if (Alp = nil)and(RowSVG[i + j * BMP.width].rgbReserved = 0) then
+      begin
+        RowBMP[i].rgbtRed := 255;
+        RowBMP[i].rgbtGreen := 255;
+        RowBMP[i].rgbtBlue := 255;
+      end
+      else
+      begin
+        RowBMP[i].rgbtRed := RowSVG[i + j * BMP.width].rgbBlue;
+        RowBMP[i].rgbtGreen := RowSVG[i + j * BMP.width].rgbGreen;
+        RowBMP[i].rgbtBlue := RowSVG[i + j * BMP.width].rgbRed;
+        if (Alp <> nil) then
+          Alp[i] := RowSVG[i + j * BMP.width].rgbReserved;
+      end;
+  end;
+end;
 
 
 end.

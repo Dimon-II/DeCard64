@@ -216,7 +216,6 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure sbOpenTemplateClick(Sender: TObject);
     procedure SvgTreeFrame1treeTemplateChange(Sender: TObject; Node: TTreeNode);
-    procedure atrCellEditDblClick(Sender: TObject);
     procedure cbAtrShowChange(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure cbZoomChange(Sender: TObject);
@@ -339,6 +338,7 @@ type
     procedure SaveTable(AFileName:string);
     procedure ChildDraw(ANod:TXML_Nod);
     procedure PDFText(AXML:string; aPDF:TPdfDocument);
+    procedure RenderRow(ARow:integer);
   end;
 
 
@@ -593,7 +593,6 @@ begin
   aFind.ActionComponent := Nil;
 
   BVL2.Visible := True;
-//  BVL2.Parent := sgText;
   BVL2.Top :=0;
   Winapi.Windows.SetParent(BVL2.handle, dlgTextFind.Handle);
   BVL1.Visible := True;
@@ -621,77 +620,8 @@ begin
 end;
 
 procedure TMainForm.aShowExecute(Sender: TObject);
-var
-  rndr:integer;
 begin
-  RenderReq:=sgText.Row;
-
-  if Rendering1.Visible then exit;
-
-  InspectorFrame.ReplaceFrame.Apply;
-
-  repeat
-  rndr:=RenderReq;
-  try
-     ShowRendering(True);;
-//     Rendering2.Visible := True;
-//     Rendering3.Visible := True;
-
-
-
-//  StartAnalitics('Preview');
-  StopFlag:=False;
-
-  ForceDirectories(edCfgRoot.text + edCfgTemp.Text);
-  ChDir(edCfgRoot.text);
-
-
-  //FBufXml.Text :=   Processcard(sgText.Row, '',XML);
-//  row:=TStringList.Create;
-//  row.Assign(sgText.Rows[sgText.Row]);
-
-  FBufXml.Text :=   Processcard(
-    sgText.Rows[sgText.Row],
-    '',
-    SVG,
-    Clipart,
-    edCfgRoot.Text + edCfgTemp.Text,
-    edCfgClipart.Text,
-    edCfgRoot.Text);
-//    row.free;
-{
-  if chbSaveTemp.Checked then
-    FBufXml.SaveToFile(edCfgRoot.Text +'temp.svg');
- }
-  RenderSize.Clear;
-
-
-  ThreadRender(imgPreview, edCfgRoot.Text +'temp.svg', FBufXml.Text, '', 1, 300, RenderSize);
-  cbZoomChange(nil);
-  imgRender.Picture.Assign(imgPreview.Picture);
-  imgRender.Width := Round(imgRender.Picture.Width*ZoomPreview);
-  imgRender.Height := Round(imgRender.Picture.Height*ZoomPreview);
-
-
-  //OpenPictureDialog1.FileName := edCfgRoot.Text +'temp.svg';
-
-//  Image1.Picture.Bitmap.Assign(imgRender.Picture.Bitmap);
-
-  //StopAnalitics('Preview');
-//  ShowAnalitics;
-  finally
-     ShowRendering(False);
-//     Rendering2.Visible := False;
-//     Rendering3.Visible := False;
-  end;
-  fBufPreview := True;
-  until RenderReq=rndr;
-
-end;
-
-procedure TMainForm.atrCellEditDblClick(Sender: TObject);
-begin
- ShowMessage('!');
+  RenderRow(sgText.Row)
 end;
 
 procedure TMainForm.btnAllClick(Sender: TObject);
@@ -2207,7 +2137,9 @@ begin
     pscrCellGrid.Align := alTop;
     sgText.SetParentComponent(pnGridRight);
   end;
-
+  BVL2.Top :=0;
+  BVL2.Left :=0;
+  Winapi.Windows.SetParent(BVL2.handle, dlgTextFind.Handle);
 end;
 
 procedure TMainForm.pcMainChanging(Sender: TObject; var AllowChange: Boolean);
@@ -2399,6 +2331,7 @@ var sl:TStringList;
     seTo.Value := sl.Count;
     sgText.RowCount:=2;
     sgText.ColCount:=2;
+    sgText.Rows[0].Clear;
     if copy(sl[0],1,3)='[1]' then
     begin
       j:=0;
@@ -2426,6 +2359,7 @@ var sl:TStringList;
 
     for i:=1 to sl.Count do
     begin
+      sgText.Rows[i+1].Clear;
       sgText.Cells[0,i+1]:=IntToStr(I+1);
       s:=sl[i-1];
       j:=0;
@@ -2471,6 +2405,49 @@ procedure TMainForm.Reloadtable1Click(Sender: TObject);
 begin
   if MessageDlg('Discard changes, reload table?', mtConfirmation, [mbYes, mbNo], 0)=mrYes  then
     ReadGrid(MainData.dlgOpenText.FileName);
+end;
+
+procedure TMainForm.RenderRow(ARow: integer);
+var
+  rndr:integer;
+begin
+  RenderReq:=ARow;
+
+  if Rendering1.Visible then exit;
+
+  InspectorFrame.ReplaceFrame.Apply;
+
+  repeat
+    rndr:=RenderReq;
+    try
+      ShowRendering(True);;
+      StopFlag:=False;
+
+      ForceDirectories(edCfgRoot.text + edCfgTemp.Text);
+      ChDir(edCfgRoot.text);
+
+      FBufXml.Text :=   Processcard(
+        sgText.Rows[sgText.Row],
+        '',
+        SVG,
+        Clipart,
+        edCfgRoot.Text + edCfgTemp.Text,
+        edCfgClipart.Text,
+        edCfgRoot.Text);
+
+      RenderSize.Clear;
+
+      ThreadRender(imgPreview, edCfgRoot.Text +'temp.svg', FBufXml.Text, '', 1, 300, RenderSize);
+      cbZoomChange(nil);
+      imgRender.Picture.Assign(imgPreview.Picture);
+      imgRender.Width := Round(imgRender.Picture.Width*ZoomPreview);
+      imgRender.Height := Round(imgRender.Picture.Height*ZoomPreview);
+    finally
+      ShowRendering(False);
+    end;
+    fBufPreview := True;
+    Application.ProcessMessages;
+  until RenderReq = rndr;
 end;
 
 function TMainForm.ResultName(S: string; Cnt, Npp, N: integer): string;
@@ -2789,7 +2766,8 @@ begin
   begin
     CellEditForm.Text := sgText.Cells[ACol,ARow];
     CellEditForm.Caption := 'Cell['+IntToStr(ACol)+':'+ IntToStr(ARow)+'] <'
-      + ExtractFileName(edCfgCardsFile.Text) +'>'
+      + ExtractFileName(edCfgCardsFile.Text) +'>';
+    CellEditForm.Row := Arow;
   end;
   sgText.Invalidate;
 end;
