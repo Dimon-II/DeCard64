@@ -42,6 +42,7 @@ object SvgInspectorFrame: TSvgInspectorFrame
         Options = [goVertLine, goHorzLine, goDrawFocusSelected, goColSizing, goEditing, goAlwaysShowEditor, goFixedColClick]
         ParentCtl3D = False
         TabOrder = 0
+        OnDblClick = aEditExecute
         OnDrawCell = sgAttrDrawCell
         OnKeyDown = sgAttrKeyDown
         OnSelectCell = sgAttrSelectCell

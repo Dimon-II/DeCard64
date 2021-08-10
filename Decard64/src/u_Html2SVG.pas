@@ -836,7 +836,6 @@ begin
 
       NOD.Attribute[s] := DoReplace(NOD.Attributes[i].value, NOD);
 
-      if NOD.Attribute[s]='' then continue;
 
       if (s = 'visibility') and (NOD.Attribute[s] <> 'hidden') and (NOD.Attribute[s] <> 'visible')  then
       begin
@@ -846,6 +845,9 @@ begin
          else
            NOD.Attribute[s] := 'visible';
       end;
+
+      if NOD.Attribute[s]='' then continue;
+
     end;
 
     if (NOD.Attributes[i].name='fill') or
