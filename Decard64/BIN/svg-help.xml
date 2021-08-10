@@ -275,10 +275,11 @@
 			<d/>
 			<decard-format/>
 			<style/>
-			<stroke/>
 			<fill/>
-			<stroke-width/>
+			<fill-opacity/>
+			<stroke/>
 			<stroke-opacity/>
+			<stroke-width/>
 			<opacity/>
 			<mask/>
 			<text/>
