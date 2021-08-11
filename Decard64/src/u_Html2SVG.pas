@@ -1718,9 +1718,18 @@ bkg := nil;
 
            n2.Attribute['xlink:href'] := xn.Attribute['src'];
            n1.Attribute['width'] := IntToStr(StrToIntDef(n1.Attribute['width'],0) + w5 + w1 + StrToIntDef(xn.Attribute['dx'],0));
-//         n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),-StrToIntDef(n2.Attribute['y'],0)))
            n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),
            StrToIntDef(n2.Attribute['height'],0) - abs(StrToIntDef(xn.Attribute['dy'],0))));
+
+           if xn.Attribute['scale']<>'' then
+           begin
+             n2.Attribute['transform'] := 'translate(' +n2.Attribute['x'] +','+n2.Attribute['y']+ ') '
+                                         +'scale('+xn.Attribute['scale']+')';
+             n2.Attribute['x'] := '';
+             n2.Attribute['y'] := '';
+           end;
+
+
 
            w_dy := Max(w_dy, StrToIntDef(xn.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
            w5 := 0;
