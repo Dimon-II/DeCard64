@@ -1604,6 +1604,7 @@ procedure TMainForm.dlgTextFindShow(Sender: TObject);
 var
   Buffer: array[0..255] of Char;
 begin
+
   GetWindowText(dlgTextFind.Handle, Buffer, SizeOf(Buffer));
   SetWindowText(dlgTextFind.Handle, PChar(@Buffer)+': '+lblCfgText.Caption);
 end;
@@ -2332,6 +2333,7 @@ var sl:TStringList;
     sgText.RowCount:=2;
     sgText.ColCount:=2;
     sgText.Rows[0].Clear;
+    sgText.Cells[1,0] := '[1]';
     if copy(sl[0],1,3)='[1]' then
     begin
       j:=0;
@@ -2359,7 +2361,7 @@ var sl:TStringList;
 
     for i:=1 to sl.Count do
     begin
-      sgText.Rows[i+1].Clear;
+      sgText.Rows[i].Clear;
       sgText.Cells[0,i+1]:=IntToStr(I+1);
       s:=sl[i-1];
       j:=0;
@@ -2892,6 +2894,7 @@ begin
     SVG.SaveToFile(MainData.dlgSaveSVG.FileName);
   end;
 end;
+
 
 procedure TMainForm.SVGFrametreeTemplateExit(Sender: TObject);
 begin

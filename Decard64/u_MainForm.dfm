@@ -25,7 +25,7 @@ object MainForm: TMainForm
     Top = 0
     Width = 977
     Height = 624
-    ActivePage = tsDesigner
+    ActivePage = tsProject
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -1827,6 +1827,7 @@ object MainForm: TMainForm
           inherited tsAtr: TTabSheet
             AlignWithMargins = True
             ExplicitLeft = 7
+            ExplicitTop = 27
             ExplicitWidth = 307
             ExplicitHeight = 385
             inherited splInspector: TSplitter
@@ -1905,7 +1906,9 @@ object MainForm: TMainForm
             end
           end
           inherited tsReplace: TTabSheet
+            ExplicitLeft = 4
             ExplicitTop = 24
+            ExplicitWidth = 610
             ExplicitHeight = 533
             inherited ReplaceFrame: TSynEditFrame
               Height = 533
@@ -2311,6 +2314,7 @@ object MainForm: TMainForm
           ExplicitWidth = 522
           ExplicitHeight = 596
           inherited tsAtr: TTabSheet
+            ExplicitLeft = 4
             ExplicitTop = 24
             ExplicitWidth = 514
             ExplicitHeight = 568
@@ -2390,7 +2394,9 @@ object MainForm: TMainForm
             end
           end
           inherited tsReplace: TTabSheet
+            ExplicitLeft = 4
             ExplicitTop = 24
+            ExplicitWidth = 610
             ExplicitHeight = 533
             inherited ReplaceFrame: TSynEditFrame
               Height = 533
@@ -2504,10 +2510,6 @@ object MainForm: TMainForm
     object tsPreview: TTabSheet
       Caption = 'Preview'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Splitter5: TSplitter
         Left = 651
         Top = 0

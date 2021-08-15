@@ -17,6 +17,7 @@ object CellEditForm: TCellEditForm
   OldCreateOrder = False
   Position = poMainFormCenter
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
   object Splitter2: TSplitter
@@ -190,6 +191,19 @@ object CellEditForm: TCellEditForm
         FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00FF00}
       ParentFont = False
     end
+    object sbChkRepl: TSpeedButton
+      Left = 308
+      Top = 9
+      Width = 110
+      Height = 27
+      Action = aChkRepl
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+    end
     object btnApply: TButton
       Left = 458
       Top = 9
@@ -357,6 +371,11 @@ object CellEditForm: TCellEditForm
       Caption = 'Preview F5'
       ShortCut = 116
       OnUpdate = aPreviewUpdate
+    end
+    object aChkRepl: TAction
+      Caption = 'Replaces F9'
+      ShortCut = 120
+      OnExecute = aChkReplExecute
     end
   end
 end

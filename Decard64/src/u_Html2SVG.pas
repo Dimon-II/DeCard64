@@ -1,4 +1,4 @@
-unit u_Html2SVG;
+    unit u_Html2SVG;
 
 interface
 
@@ -1073,13 +1073,15 @@ function html2svg(ASvg,DPI,AFilter, TopStyle:string; NOD:TXML_Nod; Clipart:TXML_
 var
   XML,xn,n1,n2, RST, Bkg, MainSVG:TXML_Nod;
   s,s1:String;
-  i,j,err,npp:Integer;
+  i,j,err,npp,Row1:Integer;
   Z:Char;
   sz:Double;
   sl:TStringList;
   w4, zz:string;
-  w1, w2, w3, w5, w_dy, hgh:Integer;
+  w1, w2, w3, w5, w_dy, hgh, RowFont:Integer;
   ZoomValue,r, WordSpacing:double;
+
+  LineUp, LineDn: integer;
 
 
 
@@ -1114,7 +1116,16 @@ var
      s: String;
 
   begin
+    if (npp=1) then
+    begin
+     if (hgh = StrToIntDef(NOD.Attribute['font-size'],0)) then
+      Row1 := Round(StrToIntDef(NOD.Attribute['font-size'],0)*0.2);
+    end;
+
     dl:=0;
+    if (LineDn=0)and(LineUp=0) then
+      LineDn := StrToIntDef(w4,0);
+
     while (n1.Nodes.Count > 0) and (n1.Nodes.Last.Attribute['class']='space') do
       n1.Nodes.Delete(n1.Nodes.Count-1);
 
@@ -1123,15 +1134,30 @@ var
       if n1.Attribute['height'] = '0' then
         n1.Attribute['height'] := w4;
 
-      if StrToIntDef(n1.Attribute['height'],0) < w_dy then
-        dl := w_dy - StrToIntDef(n1.Attribute['height'],0);
+      if (ParentStyle(NOD, 'decard-baseline','80%')<>'100%')  then
+      begin
+        if StrToIntDef(n1.Attribute['height'],0) <= LineDn-LineUp  then
+          dl := LineDn;
+      end
+      else
+        if StrToIntDef(n1.Attribute['height'],0) < w_dy then
+          dl := w_dy - StrToIntDef(n1.Attribute['height'],0);
     end
     else
     begin
       n1.Attribute['height'] := ParentStyle(n1,'line-height','');
+      LineUp := round(-StrToIntDef(n1.Attribute['height'],0)) ;
+      LineDn := 0;
+
+//      LineUp := round(-StrToIntDef(n1.Attribute['height'],0)*0.8) ;
+//      LineDn := round(StrToIntDef(n1.Attribute['height'],0)*0.2) ;
+
     end;
 
-    hgh := hgh + StrToIntDef(n1.Attribute['height'],0);
+    if (ParentStyle(NOD, 'decard-baseline','80%')<>'100%')  then
+      hgh := hgh  - LineUp
+    else
+     hgh := hgh + StrToIntDef(n1.Attribute['height'],0);
 
     x := StrToIntDef(nod.Attribute['x'],0);
 
@@ -1208,6 +1234,7 @@ var
     if n1 <> nil then
       ResetRow(Align);
     inc(npp);
+
     n1 := rst.Add('g');
     n1.Attribute['id'] := 'ROW'+IntToStr(npp);
     n1.Attribute['align'] := ParentStyle(xn,'align','left');
@@ -1229,6 +1256,10 @@ var
     w3 := 0;
     w5 := 0;
     w_dy := 0;
+    RowFont := 0;
+
+    LineUp:=0;
+    LineDn:=0;
 
     hgh := hgh + dy;
   end;
@@ -1416,6 +1447,8 @@ bkg := nil;
                xn.Attribute['stroke'] := xn.Attribute['color'];
 //               xn.Attributes.ByName('color').Free;
              end;
+             xn.Attribute['baselile-shift'] := xn.Attribute['dy'];
+             xn.Attribute['dy'] :='';
 
 
            end;
@@ -1497,6 +1530,8 @@ bkg := nil;
       w4 := ParentStyle(nod,'font-size');
       w3 := 0;
       hgh := 0;
+      LineUp:=0;
+      LineDn:=0;
 
       repeat
 
@@ -1588,7 +1623,7 @@ bkg := nil;
            n2.Attribute['x'] := IntToStr(StrToIntDef(n1.Attribute['width'],0) + w5);
 
            n2.Attribute['height'] := ParentStyle(xn,'font-size');
-           n2.Attribute['y'] := ParentStyle(xn, 'dy');
+           n2.Attribute['y'] := ParentStyle(xn, 'baselile-shift');
            n2.Attribute['filter'] := ParentStyle(xn, 'filter');
 //           n2.Attribute['filter'] := xn.Attribute['filter'];
 
@@ -1601,12 +1636,17 @@ bkg := nil;
            end;
 
            n1.Attribute['width'] := IntToStr(StrToIntDef(n1.Attribute['width'],0) + w5 + w1);
+
            if StrToIntDef(n2.Attribute['y'],0)>0 then
              n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),StrToIntDef(n2.Attribute['height'],0)-StrToIntDef(n2.Attribute['y'],0)) )
            else
              n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),StrToIntDef(n2.Attribute['height'],0)) );
+
            w3 := w2-2*w1;
            w5 := 0;
+
+           LineUp:=Min(LineUp, -round(StrToIntDef(n2.Attribute['height'],12)*0.8) + StrToIntDef(n2.Attribute['y'],0));
+           LineDn:=Max(LineDn, round(StrToIntDef(n2.Attribute['height'],12)*0.2 - StrToIntDef(n2.Attribute['y'],0)));
         end;
 
         if xn.LocalName='img' then
@@ -1664,6 +1704,9 @@ bkg := nil;
           n2.Attribute['y'] := IntToStr(StrToIntDef(n2.Attribute['y'],0) + ImgRect.Top);
           n2.Attribute['width'] := IntToStr( ImgRect.Right - ImgRect.Left);
           n2.Attribute['height'] := IntToStr(ImgRect.Bottom - ImgRect.Top);
+
+          LineUp:=Min(LineUp, -StrToIntDef(xn.Attribute['height'],0));
+          LineDn:=Max(LineDn, 0);
 
 
           if w3 =0 then
@@ -1740,6 +1783,8 @@ bkg := nil;
             w3 := w3 div 3;
           end;
 
+          LineUp:=Min(LineUp, -StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
+          LineDn:=Max(LineDn, StrToIntDef(xn.Attribute['dy'],0));
         end;
 
         xn := xn.Next
@@ -1785,8 +1830,8 @@ bkg := nil;
     if (bkg<>nil) and (ZoomValue<>1)and (ZoomValue<>0) then
         Bkg.Attribute['width'] := IntToStr(Round(StrToIntDef(Bkg.Attribute['width'],0)/ZoomValue ));
 
-  if ParentStyle(NOD, 'decard-baseline','80%')<>'100%' then
-    nody:= nody - round(StrToIntDef(NOD.Attribute['font-size'],0)*0.2*ZoomValue);
+    if (ParentStyle(NOD, 'decard-baseline','80%')<>'100%')  then
+      nody:= nody - Round(Row1*ZoomValue);
 
 
     if pos('valign:',nod.Attribute['decard-format'])>0 then

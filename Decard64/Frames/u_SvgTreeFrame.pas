@@ -332,9 +332,11 @@ begin
   else
   begin
     nod := SVGNode.parent.Add;
-    nod.index := SVGNode.index;
+    nod.index := SVGNode.index+1;
     TreNod := treeTemplate.Items.Add(FocusedNode,'');
+//    TreNod.MoveTo(FocusedNode,naInsert);
     TreNod.MoveTo(FocusedNode,naInsert);
+    FocusedNode.MoveTo(TreNod,naInsert);
   end;
   nod.ResetXml(AXML);
   //nod.xml := AXML;
