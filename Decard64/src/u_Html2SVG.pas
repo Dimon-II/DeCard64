@@ -1611,7 +1611,8 @@ bkg := nil;
            n2.Attribute['font-size'] := ParentStyle(xn, 'font-size');
            n2.Attribute['font-family'] := ParentStyle(xn, 'font-family');
            n2.Attribute['font-weight'] := ParentStyle(xn, 'font-weight');
-//         n2.Attribute['letter-spacing'] := ParentStyle(xn, 'letter-spacing');
+           if ParentStyle(xn, 'align')<>'width' then
+             n2.Attribute['letter-spacing'] := ParentStyle(xn, 'letter-spacing');
            n2.Attribute['text-decoration'] := ParentStyle(xn, 'text-decoration');
            n2.Attribute['font-style'] := ParentStyle(xn, 'font-style');
            n2.Attribute['fill'] := ParentStyle(xn, 'fill');
@@ -1647,6 +1648,46 @@ bkg := nil;
 
            LineUp:=Min(LineUp, -round(StrToIntDef(n2.Attribute['height'],12)*0.8) + StrToIntDef(n2.Attribute['y'],0));
            LineDn:=Max(LineDn, round(StrToIntDef(n2.Attribute['height'],12)*0.2 - StrToIntDef(n2.Attribute['y'],0)));
+        end;
+
+        if xn.LocalName='rect' then
+        begin
+          if n1= nil then NewRow(False, 0,0);
+            w1 := StrToIntDef(xn.Attribute['width'],0);
+
+          if {(n1.Attribute['width'] = '0') and} (w1 > (StrToIntDef(RST.Attribute['width'],0)/ZoomValue)) then
+            addzoom := min(addzoom,StrToIntDef(RST.Attribute['width'],0)/ZoomValue / w1);
+
+
+          if (n1.Attribute['width'] <> '0') and
+            (StrToIntDef(n1.Attribute['width'],0) + w5 + w1 > StrToIntDef(RST.Attribute['width'],0)/ZoomValue)
+          then NewRow(True, 0,0);
+
+          n2 := n1.Add('rect');
+          n2.ResetXml(xn.xml);
+
+          n2.Attribute['x'] := IntToStr(StrToIntDef(n1.Attribute['width'],0) + w5  + StrToIntDef(xn.Attribute['dx'],0));
+          n2.Attribute['y'] := IntToStr(-StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
+
+
+          n1.Attribute['width'] := IntToStr(StrToIntDef(n1.Attribute['width'],0) + w5 + w1 + StrToIntDef(xn.Attribute['dx'],0));
+          n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),
+            StrToIntDef(n2.Attribute['height'],0) - abs(StrToIntDef(xn.Attribute['dy'],0))));
+
+          w_dy := Max(w_dy, StrToIntDef(xn.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
+
+          w5 := 0;
+
+
+          LineUp:=Min(LineUp, -StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
+          LineDn:=Max(LineDn, StrToIntDef(xn.Attribute['dy'],0));
+
+
+          if w3 =0 then
+          begin
+            Val(w4, w3, err);
+            w3 := w3 div 3;
+          end;
         end;
 
         if xn.LocalName='img' then

@@ -644,6 +644,7 @@ var
    fn,s:string;
 
 begin
+{
   if (Nod.LocalName='image') and
      (Nod.Attribute['xlink:href']<>'') and
      (Pos('data:image',Nod.Attribute['xlink:href'])<>1) and
@@ -666,6 +667,7 @@ begin
 
   for i := 0 to nod.Nodes.Count-1 do
     EmbedImg(nod.Nodes[i]);
+}
 end;
 
 
@@ -1043,11 +1045,11 @@ begin
         else
         if (cbOutFormat.text='SVG') then
         begin
-          FBufXml.SaveToFile(edCfgRoot.text + edCfgResult.Text + CheckNewFile(ChangeFileExt(fn,'.'+cbOutFormat.text)));
+          FBufXml.SaveToFile(edCfgRoot.text + edCfgResult.Text + CheckNewFile(ChangeFileExt(fn,'.'+cbOutFormat.text)),TEncoding.UTF8);
           if edBackTemplate.Text <> '' then
           begin
             FBufXml.Text := x1bk.xml;
-            FBufXml.SaveToFile(edCfgRoot.text + edCfgResult.Text + CheckNewFile(ChangeFileExt(fn,cbFileSfx.text+'.'+cbOutFormat.text)))
+            FBufXml.SaveToFile(edCfgRoot.text + edCfgResult.Text + CheckNewFile(ChangeFileExt(fn,cbFileSfx.text+'.'+cbOutFormat.text)),TEncoding.UTF8)
           end
         end
         else

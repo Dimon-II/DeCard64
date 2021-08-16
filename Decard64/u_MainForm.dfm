@@ -1733,10 +1733,10 @@ object MainForm: TMainForm
             Left = 0
             Top = 0
             Width = 261
-            Height = 44
+            Height = 21
             Align = alNone
             AutoSize = True
-            ButtonHeight = 44
+            ButtonHeight = 21
             ButtonWidth = 35
             Images = MainData.ilDecard
             ShowCaptions = True
@@ -2510,6 +2510,10 @@ object MainForm: TMainForm
     object tsPreview: TTabSheet
       Caption = 'Preview'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Splitter5: TSplitter
         Left = 651
         Top = 0
