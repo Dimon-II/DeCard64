@@ -725,8 +725,9 @@ Begin
   for i:=0 to sl.Count-1 do begin
     typ:=COPY(sl[i],1,3);
     dat:=COPY(sl[i],4,length(sl[i]));
-    if copy(dat,length(dat),1)='/' then
-      system.delete(dat,length(dat),1);
+    if typ<>'TX:' then
+      if copy(dat,length(dat),1)='/' then
+         system.delete(dat,length(dat),1);
 
     if typ='SY:' then Begin
       // Системный TAG
