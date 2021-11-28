@@ -133,6 +133,7 @@ var
   fmt: string;
 
   fit_to: resvg_fit_to;
+  trans: resvg_transform;
   tree: ^presvg_render_tree;
   pth: utf8String;
 
@@ -171,7 +172,7 @@ begin
 
     try
 
-      resvg_render(tree, fit_to, Round(sz.width), Round(sz.height), @(Img[0]));
+      resvg_render(tree, fit_to, resvg_transform_identity(), Round(sz.width), Round(sz.height), @(Img[0]));
 
     except
 
