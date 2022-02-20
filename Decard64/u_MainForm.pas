@@ -8,7 +8,7 @@ uses
   Vcl.StdCtrls, Vcl.Samples.Spin, Vcl.Buttons, ProfixXML, u_SvgTreeFrame,
   SynEdit, SynEditHighlighter, SynHighlighterXML, Vcl.Grids, Vcl.Menus,
   u_SvgInspectorFrame, System.Math, Vcl.Imaging.jpeg, System.Actions, Vcl.ActnList,
-  Vcl.ColorGrd, System.UITypes, System.Types, SynPdf;
+  Vcl.ColorGrd, System.UITypes, System.Types, SynPdf ;
 
 type
   TMainForm = class(TForm)
@@ -210,6 +210,17 @@ type
     Rendering3: TPanel;
     miTableHead: TMenuItem;
     chbTextLayer: TCheckBox;
+    tbCopyImg: TToolButton;
+    aCopyImg: TAction;
+    miApplysorting: TMenuItem;
+    chbFlipBack: TCheckBox;
+    pmTextGrig: TPopupMenu;
+    DeleteRow1: TMenuItem;
+    CopySelection1: TMenuItem;
+    FillSelection1: TMenuItem;
+    ClerrSelection1: TMenuItem;
+    N2: TMenuItem;
+    btnBleed2mm: TButton;
     procedure sbOpenRootClick(Sender: TObject);
     procedure sbOpenTextClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -304,6 +315,16 @@ type
     procedure dlgTextFindShow(Sender: TObject);
     procedure sgTextFixedCellClick(Sender: TObject; ACol, ARow: Integer);
     procedure ClipartFrameClear1Click(Sender: TObject);
+    procedure FormResize(Sender: TObject);
+    procedure aCopyImgExecute(Sender: TObject);
+    procedure aCopyImgUpdate(Sender: TObject);
+    procedure miApplysortingClick(Sender: TObject);
+    procedure PaintBoxDblClick(Sender: TObject);
+    procedure DeleteRow1Click(Sender: TObject);
+    procedure CopySelection1Click(Sender: TObject);
+    procedure ClerrSelection1Click(Sender: TObject);
+    procedure FillSelection1Click(Sender: TObject);
+    procedure btnBleed2mmClick(Sender: TObject);
   private
     { Private declarations }
     FSel:TRect;
@@ -339,6 +360,7 @@ type
     procedure ChildDraw(ANod:TXML_Nod);
     procedure PDFText(AXML:string; aPDF:TPdfDocument);
     procedure RenderRow(ARow:integer);
+    procedure GridSort(ACol:integer;Srt:boolean);
   end;
 
 
@@ -360,7 +382,7 @@ implementation
 
 uses u_MainData, vcl.FileCtrl, u_XMLEditForm, Vcl.Imaging.pngimage, ShellAPI,
   u_ThreadRender, System.DateUtils, resvg, u_Html2SVG, u_CellEditForm, u_CalcSVG,
-  System.StrUtils;
+  System.StrUtils, u_PipeForm, vcl.Clipbrd;
 
 type
   THackGrid=class(TStringGrid);
@@ -579,6 +601,19 @@ begin
   fBufPreview := True;
 end;
 
+procedure TMainForm.aCopyImgExecute(Sender: TObject);
+begin
+  Clipboard.Assign(imgRender.Picture);
+end;
+
+procedure TMainForm.aCopyImgUpdate(Sender: TObject);
+begin
+  aCopyImg.Enabled := (pcMain.ActivePage = tsPreview)
+//    and NOT  sgText.Focused
+    and assigned(imgRender.Picture)
+    and (imgRender.Picture.Width >0);
+end;
+
 procedure TMainForm.aFindExecute(Sender: TObject);
 begin
   if (aFind.ActionComponent = tbFindText) or (ActiveControl = sgText) then
@@ -631,6 +666,24 @@ begin
   chbRange.Checked := False;
 end;
 
+procedure TMainForm.btnBleed2mmClick(Sender: TObject);
+var s:string;
+  x,y:real;
+  err:integer;
+begin
+  btnBleed2mm.Enabled := False;
+  s := cbPreset.text;
+  cbPreset.ItemIndex := 5;
+
+  Val(Trim(copy(s,1,Pos('X',s)-1)), x, err);
+  seWidth.Value := Round((x+2) * StrToIntDef(cbDPI.Text,300) / 25.4  );
+
+  Val(Trim(copy(s,Pos('X',s)+2,3)), y, err);
+  seHeight.Value := Round((y+2) * StrToIntDef(cbDPI.Text,300) / 25.4  );
+
+  seFrame.Value := Round(StrToIntDef(cbDPI.Text, 300) / 25.4 * 2);
+end;
+
 procedure TMainForm.btnProcessClick(Sender: TObject);
 var i,j,cnt,n, w, h:Integer;
   x1,x2:TXML_Doc;
@@ -640,481 +693,505 @@ var i,j,cnt,n, w, h:Integer;
 
 procedure EmbedImg(Nod:TXML_NOD);
 var
-   i:Integer;
-   fn,s:string;
+    i: Integer;
+    fn, S: string;
 
-begin
-{
-  if (Nod.LocalName='image') and
-     (Nod.Attribute['xlink:href']<>'') and
-     (Pos('data:image',Nod.Attribute['xlink:href'])<>1) and
-     FileExists(Nod.Attribute['xlink:href'])
-  then begin
-    fn:=Nod.Attribute['xlink:href'];
-    with TFileStream.Create(fn,fmOpenRead	) do
-    try
+  begin
+    {
+      if (Nod.LocalName='image') and
+      (Nod.Attribute['xlink:href']<>'') and
+      (Pos('data:image',Nod.Attribute['xlink:href'])<>1) and
+      FileExists(Nod.Attribute['xlink:href'])
+      then begin
+      fn:=Nod.Attribute['xlink:href'];
+      with TFileStream.Create(fn,fmOpenRead	) do
+      try
       SetLength(s, Size);
       Read(s[1], Size);
-    finally
+      finally
       free;
-    end;
+      end;
 
-    fn := LowerCase(StringReplace(ExtractFileExt(fn),'.','',[]));
-    if fn='jpg' then fn:='jpeg';
+      fn := LowerCase(StringReplace(ExtractFileExt(fn),'.','',[]));
+      if fn='jpg' then fn:='jpeg';
 
-    Nod.Attribute['xlink:href']:= 'data:image/'+fn+';base64,'+ encodebase64(s);
+      Nod.Attribute['xlink:href']:= 'data:image/'+fn+';base64,'+ encodebase64(s);
+      end;
+
+      for i := 0 to nod.Nodes.Count-1 do
+      EmbedImg(nod.Nodes[i]);
+    }
   end;
 
-  for i := 0 to nod.Nodes.Count-1 do
-    EmbedImg(nod.Nodes[i]);
-}
-end;
-
-
 var
- Bleed, PdfPages: integer;
- BackXml, x1bk, x2bk:TXML_Doc;
- lPdf   : TPdfDocument;
- lPage  : TPdfPage;
- Box: TPdfBox;
- PrevFile:string;
- AbsIndex:integer;
+  Bleed, PdfPages: Integer;
+  BackXml, x1bk, x2bk: TXML_Doc;
+  lPdf: TPdfDocument;
+  lPage: TPdfPage;
+  Box: TPdfBox;
+  PrevFile: string;
+  AbsIndex: Integer;
 
- function CheckNewFile(AName:string):string;
- var i:integer;
- begin
-   result := AName;
-   i:=1;
-   while pos('['+result+']',PrevFile)>0 do
-   begin
-     inc(i);
-     result := StringReplace(AName, '.', '['+IntToStr(i)+'].', []);
-   end;
+  function CheckNewFile(AName: string): string;
+  var
+    i: Integer;
+  begin
+    result := AName;
+    i := 1;
+    while pos('[' + result + ']', PrevFile) > 0 do
+    begin
+      inc(i);
+      result := StringReplace(AName, '.', '[' + IntToStr(i) + '].', []);
+    end;
 
-   PrevFile := PrevFile + '['+result+']';
- end;
+    PrevFile := PrevFile + '[' + result + ']';
+  end;
+
+  procedure SaveRender;
+  begin
+
+    fn := ResultName(cbFileName.Text, sgText.RowCount - 1, i, j) + '.SVG';
+
+    AddClipart(x1, Clipart, edCfgClipart.Text);
+
+    if edBackTemplate.Text <> '' then
+      AddClipart(x1bk, Clipart, edCfgClipart.Text);
+
+    if chbSaveTemp.Checked then
+    begin
+      f := TFileStream.Create(edCfgRoot.Text + edCfgTemp.Text + fn, fmCreate);
+      try
+        // s := AnsiToUtf8Ex(x1.xml,CP_ACP);
+        S := x1.xml;
+        f.Write(S[1], length(S));
+      finally
+        f.Destroy;
+      end;
+    end;
+
+    if (cbOutFormat.Text = 'SVG') then
+      EmbedImg(x1.Node['svg']);
+
+    // FBufXml.Text := AnsiToUtf8Ex(x1.xml,CP_ACP);
+    FBufXml.Text := x1.xml;
+
+    // StartAnalitics('Thread');
+    if (cbOutFormat.Text = 'PDF') then
+    begin
+      ThreadRender(imgRender, edCfgRoot.Text + 'temp.svg', FBufXml.Text, '', 1,
+        StrToIntDef(DPI, 300));
+      // Image1.Picture.Bitmap.Assign(imgRender.Picture.Bitmap);
+      imgRender.Width := Round(imgRender.Picture.Width * ZoomPreview);
+      imgRender.Height := Round(imgRender.Picture.Height * ZoomPreview);
+
+      lPage := lPdf.AddPage;
+      inc(PdfPages);
+
+      Box.Left := 0;
+      Box.Top := 0;
+      Box.Width := lPdf.DefaultPageWidth;
+      Box.Height := lPdf.DefaultPageHeight;
+      if chkJPEG.Checked then
+        lPdf.ForceJPEGCompression := StrToIntDef(seForce.Text, 0);
+
+      if chbTextLayer.Checked then
+        PDFText(FBufXml.Text, lPdf);
+
+      lPdf.CreateOrGetImage(imgRender.Picture.Bitmap, @Box);
+
+      if edBackTemplate.Text <> '' then
+      begin
+        // FBufXml.Text := AnsiToUtf8Ex(x1bk.xml,CP_ACP);
+        FBufXml.Text := x1bk.xml;
+        ThreadRender(imgRender, edCfgRoot.Text + 'temp.svg', FBufXml.Text, '',
+          1, StrToIntDef(DPI, 300));
+        imgRender.Width := Round(imgRender.Picture.Width * ZoomPreview);
+        imgRender.Height := Round(imgRender.Picture.Height * ZoomPreview);
+        // Image1.Picture.Bitmap.Assign(imgRender.Picture.Bitmap);
+        lPdf.AddPage;
+        inc(PdfPages);
+
+        Box.Left := 0;
+        Box.Top := 0;
+        Box.Width := lPdf.DefaultPageWidth;
+        Box.Height := lPdf.DefaultPageHeight;
+
+        if chbTextLayer.Checked then
+          PDFText(FBufXml.Text, lPdf);
+
+        lPdf.CreateOrGetImage(imgRender.Picture.Bitmap, @Box);
+      end;
+
+      if (StrToIntDef(edPageLimit.Text, 0) > 0) and
+        (StrToIntDef(edPageLimit.Text, 0) = PdfPages) then
+      begin
+        lPdf.SaveToFile(edCfgRoot.Text + edCfgResult.Text +
+          CheckNewFile(ChangeFileExt(fn, '.' + cbOutFormat.Text)));
+
+        lPdf.Free;
+        begin
+          lPdf := TPdfDocument.Create;
+          lPdf.Info.Author := 'Unknown pirate';
+          lPdf.Info.CreationDate := Now;
+          lPdf.Info.Creator := 'DeCard';
+          lPdf.DefaultPaperSize := psUserDefined;
+          lPdf.ScreenLogPixels := StrToIntDef(cbDPI.Text, 300);
+          lPdf.DefaultPageWidth :=
+            PdfCoord(25.4 * PageSize.X / StrToIntDef(cbDPI.Text, 300));
+          lPdf.DefaultPageHeight :=
+            PdfCoord(25.4 * PageSize.Y / StrToIntDef(cbDPI.Text, 300));
+          PdfPages := 0;
+        end;
+      end;
+
+    end
+    else if (cbOutFormat.Text = 'SVG') then
+    begin
+      FBufXml.SaveToFile(edCfgRoot.Text + edCfgResult.Text +
+        CheckNewFile(ChangeFileExt(fn, '.' + cbOutFormat.Text)),
+        TEncoding.UTF8);
+      if edBackTemplate.Text <> '' then
+      begin
+        FBufXml.Text := x1bk.xml;
+        FBufXml.SaveToFile(edCfgRoot.Text + edCfgResult.Text +
+          CheckNewFile(ChangeFileExt(fn, cbFileSfx.Text + '.' +
+          cbOutFormat.Text)), TEncoding.UTF8)
+      end
+    end
+    else
+    begin
+      ThreadRender(imgRender, edCfgRoot.Text + fn, FBufXml.Text,
+        edCfgRoot.Text + edCfgResult.Text + CheckNewFile(ChangeFileExt(fn,
+        '.' + cbOutFormat.Text)), 1, StrToIntDef(DPI, 300));
+      imgRender.Width := Round(imgRender.Picture.Width * ZoomPreview);
+      imgRender.Height := Round(imgRender.Picture.Height * ZoomPreview);
+
+      if edBackTemplate.Text <> '' then
+      begin
+        FBufXml.Text := x1bk.xml;
+        ThreadRender(imgRender, edCfgRoot.Text + fn, FBufXml.Text,
+          edCfgRoot.Text + edCfgResult.Text + CheckNewFile(ChangeFileExt(fn,
+          cbFileSfx.Text + '.' + cbOutFormat.Text)), 1, StrToIntDef(DPI, 300));
+
+        imgRender.Width := Round(imgRender.Picture.Width * ZoomPreview);
+        imgRender.Height := Round(imgRender.Picture.Height * ZoomPreview);
+        // imgRender.Picture.Bitmap.Assign(imgRender.Picture.Bitmap);
+      end
+    end;
+    // StopAnalitics('Thread');
+
+    // DeleteFile(pchar(edCfgRoot.text + edCfgTemp.Text + fn));
+    // MoveFile(pchar(edCfgRoot.text + fn), pchar(edCfgRoot.text + edCfgTemp.Text + fn));
+
+    x1.xml := sx1;
+    x1bk.xml := sxb1;
+  end;
+
 begin
-  PrevFile:='';
+  PrevFile := '';
 
-  if (SVG.Nodes.Count=0) then
+  if (SVG.Nodes.Count = 0) then
     Raise Exception.Create('Template is empty');
 
-  if (cbOutFormat.text<>'PDF') and (edBackTemplate.Text<>'') and (cbFileSfx.Text='')
-  then
+  if (cbOutFormat.Text <> 'PDF') and (edBackTemplate.Text <> '') and
+    (cbFileSfx.Text = '') then
     Raise Exception.Create('Prevent overwrite: back file suffix is empty');
 
-
-  if (cbOutFormat.text='PDF') then
+  if (cbOutFormat.Text = 'PDF') then
   begin
     lPdf := TPdfDocument.Create;
-    lPdf.Info.Author        := 'Unknown pirate';
-    lPdf.Info.CreationDate  := Now;
-    lPdf.Info.Creator       := 'DeCard';
-    lPdf.DefaultPaperSize   := psUserDefined;
-    lPdf.ScreenLogPixels := StrToIntDef(cbDPI.Text,300);
-    lPdf.DefaultPageWidth := PdfCoord(25.4*PageSize.X/StrToIntDef(cbDPI.Text,300));
-    lPdf.DefaultPageHeight := PdfCoord(25.4*PageSize.Y/StrToIntDef(cbDPI.Text,300));
+    lPdf.Info.Author := 'Unknown pirate';
+    lPdf.Info.CreationDate := Now;
+    lPdf.Info.Creator := 'DeCard';
+    lPdf.DefaultPaperSize := psUserDefined;
+    lPdf.ScreenLogPixels := StrToIntDef(cbDPI.Text, 300);
+    lPdf.DefaultPageWidth :=
+      PdfCoord(25.4 * PageSize.X / StrToIntDef(cbDPI.Text, 300));
+    lPdf.DefaultPageHeight :=
+      PdfCoord(25.4 * PageSize.Y / StrToIntDef(cbDPI.Text, 300));
     PdfPages := 0;
   end;
 
+  btnProcess.Enabled := false;
+  StopFlag := false;
+  btnStop.Enabled := True;
+  BackXml := TXML_Doc.Create;
+  x1bk := TXML_Doc.Create;
+  x2bk := TXML_Doc.Create;
+  gbCardSize.Enabled := false;
+  gbPageSetup.Enabled := false;
 
- btnProcess.Enabled := False;
- StopFlag := False;
- btnStop.Enabled := True;
- BackXml := TXML_Doc.Create;
- x1bk := TXML_Doc.Create;
- x2bk := TXML_Doc.Create;
- gbCardSize.Enabled := false;
- gbPageSetup.Enabled := false;
+  gbCardSize.Font.Color := clBtnShadow;
+  gbPageSetup.Font.Color := gbCardSize.Font.Color;
 
-   gbCardSize.font.Color := clBtnShadow;
-   gbPageSetup.font.Color := gbCardSize.font.Color;
+  try
+    ShowRendering(True);
+    // Rendering2.Visible := True;
+    // Rendering3.Visible := True;
+    ForceDirectories(edCfgRoot.Text + edCfgResult.Text);
+    ChDir(edCfgRoot.Text);
+    PdfPages := 0;
 
- try
-  ShowRendering(True);
-//  Rendering2.Visible := True;
-//  Rendering3.Visible := True;
-  ForceDirectories(edCfgRoot.text + edCfgResult.Text);
-  ChDir(edCfgRoot.text);
-  PdfPages := 0;
+    ProgressBar1.Max := sgText.RowCount;
+    ProgressBar1.Position := 0;
+    ProgressBar1.Visible := True;
+    x1 := TXML_Doc.Create;
+    x2 := TXML_Doc.Create;
+    x1.xml := SVG.xml;
 
+    x1.Nodes.Last.Nodes.Clear;
 
-  ProgressBar1.Max := sgText.RowCount;
-  ProgressBar1.Position := 0;
-  ProgressBar1.Visible := True;
-  x1:=TXML_Doc.Create;
-  x2:=TXML_Doc.Create;
-  x1.xml := SVG.xml;
+    S := x1.Nodes.Last.Attribute['width'];
 
-  x1.Nodes.Last.Nodes.Clear;
+    Bleed := StrToIntDef(edBleed.Text, 0);
 
-  s:=x1.Nodes.Last.Attribute['width'];
+    dlt.X := (PageSize.X - CardsSize.X) div 2 + Bleed;
+    dlt.Y := (PageSize.Y - CardsSize.Y) div 2 + Bleed;
 
-  Bleed := StrToIntDef(edBleed.Text,0);
+    // DPI:=x1.Nodes.Last.Attribute['DPI'];
+    DPI := cbDPI.Text;
+    if (DPI = '') or (DPI = '0') then
+      DPI := '300';
+    str(0.24 * 300 / StrToIntDef(DPI, 300): 0: 5, ZM);
 
-  dlt.X := (PageSize.X - CardsSize.X) div 2+Bleed;
-  dlt.Y := (PageSize.Y - CardsSize.Y) div 2+Bleed;
+    for i := length(S) downto 1 do
+      if pos(S[i], '0123456789') = 0 then
+        delete(S, i, 1);
+    w := StrToInt(S) * seScale1.Value div seScale2.Value + Bleed * 2;
 
-//  DPI:=x1.Nodes.Last.Attribute['DPI'];
-  DPI:=cbDPI.Text;
-  if (DPI='') or (DPI='0') then DPI:='300';
-  str(0.24 * 300 / StrToIntDef(DPI,300):0:5, ZM);
+    S := x1.Nodes.Last.Attribute['height'];
+    for i := length(S) downto 1 do
+      if pos(S[i], '0123456789') = 0 then
+        delete(S, i, 1);
+    h := StrToInt(S) * seScale1.Value div seScale2.Value + Bleed * 2;
 
+    // x1.Nodes.Last.Attribute['width'] := IntToStr(w * seCountX.value)  ;
+    // x1.Nodes.Last.Attribute['height'] := IntToStr(h * seCountY.value)  ;
+    x1.Nodes.Last.Attribute['width'] := IntToStr(PageSize.X) + 'px';
+    x1.Nodes.Last.Attribute['height'] := IntToStr(PageSize.Y) + 'px';
+    x1.Nodes.Last.Attribute['viewBox'] := '';
+    // x1.Nodes.Last.Attribute['transform'] := 'scale('+SvgFloat(seScale1.Value/seScale2.Value)+ ')';
 
-  for i:=Length(s) downto 1 do
-    if Pos(s[i],'0123456789') = 0 then
-      delete(s,i,1);
-  w := StrToInt(s)*seScale1.Value div seScale2.Value + Bleed*2;
-
-  s:= x1.Nodes.Last.Attribute['height'];
-  for i:=Length(s) downto 1 do
-    if Pos(s[i],'0123456789') = 0 then
-      delete(s,i,1);
-  h := StrToInt(s)*seScale1.Value div seScale2.Value + Bleed*2;
-
-//  x1.Nodes.Last.Attribute['width'] := IntToStr(w * seCountX.value)  ;
-//  x1.Nodes.Last.Attribute['height'] := IntToStr(h * seCountY.value)  ;
-  x1.Nodes.Last.Attribute['width'] := IntToStr(PageSize.x)+'px';
-  x1.Nodes.Last.Attribute['height'] := IntToStr(PageSize.y)+'px';
-  x1.Nodes.Last.Attribute['viewBox'] := '';
-//  x1.Nodes.Last.Attribute['transform'] := 'scale('+SvgFloat(seScale1.Value/seScale2.Value)+ ')';
-
-  with x1.Nodes.Last.Add('rect') do
-  begin
-    Attribute['stroke'] := 'none';
-    Attribute['fill'] := '#FFFFFF';
-    Attribute['width'] := '100%';
-    Attribute['height'] := '100%';
-  end;
-
-//  AddBack(x1,0);
-
-  s := x1.Nodes.Last.Attribute['fill'];
-  if s <> '' then
-  with x1.Nodes.Last.Add('rect') do
-  begin
-    Attribute['stroke'] := 'none';
-    Attribute['fill'] := s;
-    if edOutline.Text <> '' then
-    begin
-      Attribute['x'] := IntTostr(dlt.X-Bleed-StrToIntDef(edOutline.Text,0));
-      Attribute['y'] := IntTostr(dlt.Y-Bleed-StrToIntDef(edOutline.Text,0));
-      Attribute['width'] := IntTostr(CardsSize.X+2*StrToIntDef(edOutline.Text,0));
-      Attribute['height'] := IntTostr(CardsSize.Y+2*StrToIntDef(edOutline.Text,0));
-    end
-//    index := 1;
-  end;
-
-  if edBackTemplate.Text <> '' then
-  begin
-    if uppercase(ExtractFileExt(edBackTemplate.Text))='.SVG' then
-      BackXml.LoadFromFile(edCfgRoot.text + edBackTemplate.Text)
-    else
-      BackXml.xml := '<?xml version="1.0" encoding="UTF-8"?>'
-        + '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">'
-        + '<svg xmlns:xlink="http://www.w3.org/1999/xlink" fill="white" font-weight="normal" stroke-width="1"  xmlns="http://www.w3.org/2000/svg" font-size="12" image-rendering="auto" '
-        + ' width="'+IntToStr(seWidth.Value + 2*StrToIntDef(edBleed.Text,0)*seScale2.Value div seScale1.Value )+'" '
-        + ' height="'+IntToStr(seHeight.Value + 2*StrToIntDef(edBleed.Text,0)*seScale2.Value div seScale1.Value)+'">'
-        + '<image dekart:xlink_href="'+edBackTemplate.Text+'" '
-        + ' width="'+IntToStr(seWidth.Value + 2*StrToIntDef(edBleed.Text,0)*seScale2.Value div seScale1.Value )+'" '
-        + ' height="'+IntToStr(seHeight.Value + 2*StrToIntDef(edBleed.Text,0)*seScale2.Value div seScale1.Value)+'"></svg>';
-
-    x1bk.xml := BackXml.xml;
-
-    dltbk.x := (w-StrToInt(BackXml.Nodes.Last.Attribute['width'])*seScale1.Value div seScale2.Value ) div 2-Bleed;
-    dltbk.y := (h-StrToInt(BackXml.Nodes.Last.Attribute['height'])*seScale1.Value div seScale2.Value ) div 2-Bleed;
-
-    x1bk.Nodes.Last.Attribute['width'] := IntToStr(PageSize.x)+'px';
-    x1bk.Nodes.Last.Attribute['height'] := IntToStr(PageSize.y)+'px';
-//    x1bk.Nodes.Last.Attribute['transform'] := 'scale('+SvgFloat(seScale1.Value/seScale2.Value)+ ')';
-
-    x1bk.Nodes.Last.Nodes.Clear;
-    with x1bk.Nodes.Last.Add('rect') do
+    with x1.Nodes.Last.Add('rect') do
     begin
       Attribute['stroke'] := 'none';
       Attribute['fill'] := '#FFFFFF';
       Attribute['width'] := '100%';
       Attribute['height'] := '100%';
     end;
-    s := x1bk.Nodes.Last.Attribute['fill'];
-    if s <> '' then
-    with x1bk.Nodes.Last.Add('rect') do
-    begin
-      Attribute['stroke'] := 'none';
-      Attribute['fill'] := s;
-      if edOutline.Text<>'' then
+
+    // AddBack(x1,0);
+
+    S := x1.Nodes.Last.Attribute['fill'];
+    if S <> '' then
+      with x1.Nodes.Last.Add('rect') do
       begin
-        Attribute['x'] := IntTostr(dlt.X-StrToIntDef(edOutline.Text,0)-Bleed );
-        Attribute['y'] := IntTostr(dlt.Y-StrToIntDef(edOutline.Text,0)-Bleed);
-        Attribute['width'] := IntTostr(CardsSize.X + StrToIntDef(edOutline.Text,0)*2);
-        Attribute['height'] := IntTostr(CardsSize.Y + StrToIntDef(edOutline.Text,0)*2);
-      end
-      else
-      begin
-        Attribute['width'] := '100%';
-        Attribute['height'] := '100%';
+        Attribute['stroke'] := 'none';
+        Attribute['fill'] := S;
+        if edOutline.Text <> '' then
+        begin
+          Attribute['x'] :=
+            IntToStr(dlt.X - Bleed - StrToIntDef(edOutline.Text, 0));
+          Attribute['y'] :=
+            IntToStr(dlt.Y - Bleed - StrToIntDef(edOutline.Text, 0));
+          Attribute['width'] :=
+            IntToStr(CardsSize.X + 2 * StrToIntDef(edOutline.Text, 0));
+          Attribute['height'] :=
+            IntToStr(CardsSize.Y + 2 * StrToIntDef(edOutline.Text, 0));
+        end
+        // index := 1;
       end;
-  end;
-
-
-    sxb1 := x1bk.xml;
- end;
-
-
-  sx1 := x1.xml;
-  n:=0;
-  fmt := Stringofchar('0', Length(IntToStr(sgText.RowCount)));
-  for i:=1 to sgText.RowCount-1 do
-  begin
-    Application.ProcessMessages;
-
-    if chbRange.Checked and ((i < seFrom.Value) or (i> seTo.Value)) then
-      Continue;
-    if StopFlag then Abort;
-//    StartAnalitics('Process');
-    Inc(AbsIndex);
-
-    ProgressBar1.Position := i;
-    sgText.Row := i;
-    Application.ProcessMessages;
-
-    x2.xml:= Processcard(sgText.Rows[i],
-      'N'+FormatFloat(fmt,i)+'-',
-       SVG,
-       Clipart,
-       edCfgRoot.Text + edCfgTemp.Text,
-       edCfgClipart.Text,
-       edCfgRoot.Text);
-
-    x2.Nodes.Last.Attributes.Clear;
-    x2.Nodes.Last.LocalName := 'g';
 
     if edBackTemplate.Text <> '' then
     begin
-      x2bk.xml:= Processcard(
-         sgText.Rows[i],
-         'N'+FormatFloat(fmt,i)+'-',
-          BackXml,
-          Clipart,
-          edCfgRoot.Text + edCfgTemp.Text,
-          edCfgClipart.Text,
-          edCfgRoot.Text);
+      if uppercase(ExtractFileExt(edBackTemplate.Text)) = '.SVG' then
+        BackXml.LoadFromFile(edCfgRoot.Text + edBackTemplate.Text)
+      else
+        BackXml.xml := '<?xml version="1.0" encoding="UTF-8"?>' +
+          '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">'
+          + '<svg xmlns:xlink="http://www.w3.org/1999/xlink" fill="white" font-weight="normal" stroke-width="1"  xmlns="http://www.w3.org/2000/svg" font-size="12" image-rendering="auto" '
+          + ' width="' + IntToStr(seWidth.Value + 2 * StrToIntDef(edBleed.Text,
+          0) * seScale2.Value div seScale1.Value) + '" ' + ' height="' +
+          IntToStr(seHeight.Value + 2 * StrToIntDef(edBleed.Text, 0) *
+          seScale2.Value div seScale1.Value) + '">' +
+          '<image dekart:xlink_href="' + edBackTemplate.Text + '" ' + ' width="'
+          + IntToStr(seWidth.Value + 2 * StrToIntDef(edBleed.Text, 0) *
+          seScale2.Value div seScale1.Value) + '" ' + ' height="' +
+          IntToStr(seHeight.Value + 2 * StrToIntDef(edBleed.Text, 0) *
+          seScale2.Value div seScale1.Value) + '"></svg>';
 
-      x2bk.Nodes.Last.Attributes.Clear;
-      x2bk.Nodes.Last.LocalName := 'g';
+      x1bk.xml := BackXml.xml;
+
+      dltBK.X := (w - StrToInt(BackXml.Nodes.Last.Attribute['width']) *
+        seScale1.Value div seScale2.Value) div 2 - Bleed;
+      dltBK.Y := (h - StrToInt(BackXml.Nodes.Last.Attribute['height']) *
+        seScale1.Value div seScale2.Value) div 2 - Bleed;
+
+      x1bk.Nodes.Last.Attribute['width'] := IntToStr(PageSize.X) + 'px';
+      x1bk.Nodes.Last.Attribute['height'] := IntToStr(PageSize.Y) + 'px';
+
+
+      // x1bk.Nodes.Last.Attribute['transform'] := 'scale('+SvgFloat(seScale1.Value/seScale2.Value)+ ')';
+
+      x1bk.Nodes.Last.Nodes.Clear;
+      with x1bk.Nodes.Last.Add('rect') do
+      begin
+        Attribute['stroke'] := 'none';
+        Attribute['fill'] := '#FFFFFF';
+        Attribute['width'] := '100%';
+        Attribute['height'] := '100%';
+      end;
+      S := x1bk.Nodes.Last.Attribute['fill'];
+      if S <> '' then
+        with x1bk.Nodes.Last.Add('rect') do
+        begin
+          Attribute['stroke'] := 'none';
+          Attribute['fill'] := S;
+          if edOutline.Text <> '' then
+          begin
+            Attribute['x'] := IntToStr(dlt.X - StrToIntDef(edOutline.Text,
+              0) - Bleed);
+            Attribute['y'] := IntToStr(dlt.Y - StrToIntDef(edOutline.Text,
+              0) - Bleed);
+            Attribute['width'] :=
+              IntToStr(CardsSize.X + StrToIntDef(edOutline.Text, 0) * 2);
+            Attribute['height'] :=
+              IntToStr(CardsSize.Y + StrToIntDef(edOutline.Text, 0) * 2);
+          end
+          else
+          begin
+            Attribute['width'] := '100%';
+            Attribute['height'] := '100%';
+          end;
+        end;
+
+      sxb1 := x1bk.xml;
     end;
 
-
-    if (cbCount.Text <> '') then
+    sx1 := x1.xml;
+    N := 0;
+    fmt := Stringofchar('0', length(IntToStr(sgText.RowCount)));
+    for i := 1 to sgText.RowCount - 1 do
     begin
-      s := cbCount.Text;
-      s := Copy(s,Pos('[',s+'[')+1,Length(s));
-      s := Copy(s,1,Pos(']',s+']')-1);
+      Application.ProcessMessages;
 
-      cnt := StrToIntDef(s ,-1);
-      if cnt > 0 then
-        cnt := StrToIntDef(sgText.Cells[cnt,i],1)
-      else
-        cnt := 1;
-    end
-    else
-      cnt := 1;
+      if chbRange.Checked and ((i < seFrom.Value) or (i > seTo.Value)) then
+        Continue;
+      if StopFlag then
+        Abort;
+      // StartAnalitics('Process');
+      inc(AbsIndex);
 
+      ProgressBar1.Position := i;
+      sgText.Row := i;
+      Application.ProcessMessages;
 
-    for j:=1 to cnt do
-    begin
+      x2.xml := Processcard(sgText.Rows[i], 'N' + FormatFloat(fmt, i) + '-',
+        SVG, Clipart, edCfgRoot.Text + edCfgTemp.Text, edCfgClipart.Text,
+        edCfgRoot.Text);
 
-
-      if chbMirror.Checked then
-        x2.Nodes.Last.Attribute['transform']:='translate('+IntToStr(dlt.X+ (seCountX.value-1 - n mod seCountX.value) * w)+','+IntToStr(dlt.Y+(n div seCountX.value) * h)+')'
-      else
-        x2.Nodes.Last.Attribute['transform']:='translate('+IntToStr(dlt.X+(n mod seCountX.value) * w)+','+IntToStr(dlt.Y+(n div seCountX.value) * h)+')';
-
-      x2.Nodes.Last.Attribute['transform']:= x2.Nodes.Last.Attribute['transform'] + ' scale('+SvgFloat(seScale1.Value / seScale2.Value) +')';
+      x2.Nodes.Last.Attributes.Clear;
+      x2.Nodes.Last.LocalName := 'g';
 
       if edBackTemplate.Text <> '' then
       begin
-        x2bk.Nodes.Last.Attribute['transform']:='translate('+IntToStr(dlt.X+dltbk.X+ (seCountX.value-1 - n mod seCountX.value) * w)+','+IntToStr(dlt.Y +dltbk.Y+(n div seCountX.value) * h)+')  scale('+SvgFloat(seScale1.Value / seScale2.Value) +')';
-        x1bk.Nodes.Last.Add('g').xml := x2bk.Nodes.Last.xml;
+        x2bk.xml := Processcard(sgText.Rows[i], 'N' + FormatFloat(fmt, i) + '-',
+          BackXml, Clipart, edCfgRoot.Text + edCfgTemp.Text, edCfgClipart.Text,
+          edCfgRoot.Text);
+
+        x2bk.Nodes.Last.Attributes.Clear;
+        x2bk.Nodes.Last.LocalName := 'g';
       end;
 
-      x1.Nodes.Last.Add('g').xml := x2.Nodes.Last.xml;
-      inc(n);
-      if (n =  seCountX.value * seCountY.value)
-        or ((i=sgText.RowCount-1)and (j=cnt))
-        or( chbRange.Checked and (i = seTo.Value) and (j=cnt) ) then
+      if (cbCount.Text <> '') then
+      begin
+        S := cbCount.Text;
+        S := Copy(S, pos('[', S + '[') + 1, length(S));
+        S := Copy(S, 1, pos(']', S + ']') - 1);
+
+        Cnt := StrToIntDef(S, -1);
+        if Cnt > 0 then
+          Cnt := StrToIntDef(sgText.Cells[Cnt, i], 1)
+        else
+          Cnt := 1;
+      end
+      else
+        Cnt := 1;
+
+      for j := 1 to Cnt do
       begin
 
-//      XML.Node[1].Attribute['dekart:background']
-//      AddBack( +++,x1);
+        if chbMirror.Checked then
+          x2.Nodes.Last.Attribute['transform'] := 'translate(' +
+            IntToStr(dlt.X + (seCountX.Value - 1 - N mod seCountX.Value) * w) +
+            ',' + IntToStr(dlt.Y + (N div seCountX.Value) * h) + ')'
+        else
+          x2.Nodes.Last.Attribute['transform'] := 'translate(' +
+            IntToStr(dlt.X + (N mod seCountX.Value) * w) + ',' +
+            IntToStr(dlt.Y + (N div seCountX.Value) * h) + ')';
 
-        fn := ResultName(cbFileName.Text, sgText.RowCount-1, i, j)+'.SVG';
-
-        AddClipart(x1,Clipart, edCfgClipart.Text);
+        x2.Nodes.Last.Attribute['transform'] := x2.Nodes.Last.Attribute
+          ['transform'] + ' scale(' +
+          SvgFloat(seScale1.Value / seScale2.Value) + ')';
 
         if edBackTemplate.Text <> '' then
-           AddClipart(x1bk,Clipart, edCfgClipart.Text);
-
-        if chbSaveTemp.Checked then
         begin
-          f:=TFileStream.Create(edCfgRoot.text + edCfgTemp.Text + fn, fmCreate);
-          try
-//            s := AnsiToUtf8Ex(x1.xml,CP_ACP);
-            s := x1.xml;
-            f.Write(s[1],Length(s));
-          finally
-            f.Destroy;
+          x2bk.Nodes.Last.Attribute['transform'] := 'translate(' +
+            IntToStr(dlt.X + dltBK.X + (seCountX.Value - 1 -
+            N mod seCountX.Value) * w) + ',' +
+            IntToStr(dlt.Y + dltBK.Y + (N div seCountX.Value) * h) + ')  scale('
+            + SvgFloat(seScale1.Value / seScale2.Value) + ')';
+          with x1bk.Nodes.Last.Add('g') do
+          begin
+            xml := x2bk.Nodes.Last.xml;
+            if chbFlipBack.Checked then
+              Attribute['transform'] := 'rotate(180, '+IntToStr(PageSize.X div 2)+', '+IntToStr(PageSize.Y div 2)+')';
           end;
+
         end;
 
-        if (cbOutFormat.text='SVG') then
-          EmbedImg(x1.Node['svg']);
-
-//        FBufXml.Text := AnsiToUtf8Ex(x1.xml,CP_ACP);
-        FBufXml.Text := x1.xml;
-
-//        StartAnalitics('Thread');
-        if (cbOutFormat.text='PDF') then
+        x1.Nodes.Last.Add('g').xml := x2.Nodes.Last.xml;
+        inc(N);
+        if (N = seCountX.Value * seCountY.Value) or
+          ((i = sgText.RowCount - 1) and (j = Cnt)) or
+          (chbRange.Checked and (i = seTo.Value) and (j = Cnt)) then
         begin
-           ThreadRender(imgRender, edCfgRoot.Text +'temp.svg', FBufXml.Text, '', 1, StrToIntDef(DPI,300));
-//            Image1.Picture.Bitmap.Assign(imgRender.Picture.Bitmap);
-           imgRender.Width := Round(imgRender.Picture.Width*ZoomPreview);
-           imgRender.Height := Round(imgRender.Picture.Height*ZoomPreview);
-
-
-          lPage := lPDF.AddPage;
-          Inc(PdfPages);
-
-          Box.Left := 0;
-          Box.Top := 0;
-          Box.Width :=lPdf.DefaultPageWidth;
-          Box.Height := lPdf.DefaultPageHeight;
-          if chkJPEG.Checked then
-            lPDF.ForceJPEGCompression := StrToIntDef(seForce.Text,0);
-
-          if chbTextLayer.Checked then
-            PDFText(FBufXml.Text, lPDF);
-
-          lPDF.CreateOrGetImage(imgRender.Picture.Bitmap, @Box);
-
-
-
-
-          if edBackTemplate.Text <> '' then
-          begin
-//            FBufXml.Text := AnsiToUtf8Ex(x1bk.xml,CP_ACP);
-            FBufXml.Text := x1bk.xml;
-            ThreadRender(imgRender, edCfgRoot.Text +'temp.svg', FBufXml.Text, '', 1, StrToIntDef(DPI,300));
-            imgRender.Width := Round(imgRender.Picture.Width*ZoomPreview);
-            imgRender.Height := Round(imgRender.Picture.Height*ZoomPreview);
-//            Image1.Picture.Bitmap.Assign(imgRender.Picture.Bitmap);
-            lPDF.AddPage;
-            Inc(PdfPages);
-
-            Box.Left := 0;
-            Box.Top := 0;
-            Box.Width :=lPdf.DefaultPageWidth;
-            Box.Height := lPdf.DefaultPageHeight;
-
-            if chbTextLayer.Checked then
-               PDFText(FBufXml.Text, lPDF);
-
-            lPDF.CreateOrGetImage(imgRender.Picture.Bitmap, @Box);
-          end;
-
-          if (StrToIntDef(edPageLimit.Text,0)>0) and (StrToIntDef(edPageLimit.Text,0)=PdfPages) then
-          begin
-            lPdf.SaveToFile(edCfgRoot.text + edCfgResult.Text + CheckNewFile(ChangeFileExt(fn,'.'+cbOutFormat.text)));
-
-            lPdf.Free;
-            begin
-              lPdf := TPdfDocument.Create;
-              lPdf.Info.Author        := 'Unknown pirate';
-              lPdf.Info.CreationDate  := Now;
-              lPdf.Info.Creator       := 'DeCard';
-              lPdf.DefaultPaperSize   := psUserDefined;
-              lPdf.ScreenLogPixels := StrToIntDef(cbDPI.Text,300);
-              lPdf.DefaultPageWidth := PdfCoord(25.4*PageSize.X/StrToIntDef(cbDPI.Text,300));
-              lPdf.DefaultPageHeight := PdfCoord(25.4*PageSize.Y/StrToIntDef(cbDPI.Text,300));
-              PdfPages := 0;
-            end;
-          end;
-
-
-        end
-        else
-        if (cbOutFormat.text='SVG') then
-        begin
-          FBufXml.SaveToFile(edCfgRoot.text + edCfgResult.Text + CheckNewFile(ChangeFileExt(fn,'.'+cbOutFormat.text)),TEncoding.UTF8);
-          if edBackTemplate.Text <> '' then
-          begin
-            FBufXml.Text := x1bk.xml;
-            FBufXml.SaveToFile(edCfgRoot.text + edCfgResult.Text + CheckNewFile(ChangeFileExt(fn,cbFileSfx.text+'.'+cbOutFormat.text)),TEncoding.UTF8)
-          end
-        end
-        else
-        begin
-          ThreadRender(imgRender, edCfgRoot.text + fn, FBufXml.Text,
-            edCfgRoot.text + edCfgResult.Text + CheckNewFile(ChangeFileExt(fn,'.'+cbOutFormat.text)),
-            1, StrToIntDef(DPI,300));
-          imgRender.Width := Round(imgRender.Picture.Width*ZoomPreview);
-          imgRender.Height := Round(imgRender.Picture.Height*ZoomPreview);
-
-          if edBackTemplate.Text <> '' then
-          begin
-            FBufXml.Text := x1bk.xml;
-              ThreadRender(imgRender, edCfgRoot.text + fn, FBufXml.Text,
-              edCfgRoot.text + edCfgResult.Text + CheckNewFile(ChangeFileExt(fn,cbFileSfx.text+'.'+cbOutFormat.text)),
-              1, StrToIntDef(DPI,300));
-
-            imgRender.Width := Round(imgRender.Picture.Width*ZoomPreview);
-            imgRender.Height := Round(imgRender.Picture.Height*ZoomPreview);
-//              imgRender.Picture.Bitmap.Assign(imgRender.Picture.Bitmap);
-          end
+          SaveRender;
+          N := 0;
         end;
-//        StopAnalitics('Thread');
-
-//        DeleteFile(pchar(edCfgRoot.text + edCfgTemp.Text + fn));
-//        MoveFile(pchar(edCfgRoot.text + fn), pchar(edCfgRoot.text + edCfgTemp.Text + fn));
-
-        x1.xml := sx1;
-        x1bk.xml := sxb1;
-        n:=0;
       end;
+      // StopAnalitics('Process');
+      // ShowAnalitics;
     end;
+    if N > 0 then
+      SaveRender;
 
+    x1.Free;
+    x2.Free;
+    if (cbOutFormat.Text = 'PDF') and (PdfPages > 0) then
+      try
+        lPdf.SaveToFile(edCfgRoot.Text + edCfgResult.Text +
+          CheckNewFile(ChangeFileExt(fn, '.' + cbOutFormat.Text)));
+      finally
+        lPdf.Free;
+      end;
 
+  finally
+    ProgressBar1.Visible := false;
+    btnStop.Enabled := false;
+    ShowRendering(false);
+    // Rendering2.Visible := False;
+    // Rendering3.Visible := False;
+    btnProcess.Enabled := True;
+    BackXml.Free;
+    x2bk.Free;
+    x1bk.Free;
+    gbCardSize.Enabled := True;
+    gbPageSetup.Enabled := True;
+    gbCardSize.Font.Color := clWindowText;
+    gbPageSetup.Font.Color := gbCardSize.Font.Color;
 
-//    StopAnalitics('Process');
-
-//     ShowAnalitics;
   end;
-  x1.free;
-  x2.free;
-    if (cbOutFormat.text='PDF') and (PdfPages>0) then
-    try
-      lPdf.SaveToFile(edCfgRoot.text + edCfgResult.Text + CheckNewFile(ChangeFileExt(fn,'.'+cbOutFormat.text)));
-    finally
-      lPdf.Free;
-    end;
-
- finally
-   ProgressBar1.Visible := False;
-   btnStop.Enabled := False;
-   ShowRendering(False);
-//   Rendering2.Visible := False;
-//   Rendering3.Visible := False;
-   btnProcess.Enabled := True;
-   BackXml.Free;
-   x2bk.Free;
-   x1bk.Free;
-   gbCardSize.Enabled := True;
-   gbPageSetup.Enabled := True;
-   gbCardSize.font.Color := clWindowText;
-   gbPageSetup.font.Color := gbCardSize.font.Color;
-
-
- end;
 end;
 
 procedure TMainForm.btnResetlogClick(Sender: TObject);
@@ -1125,7 +1202,7 @@ end;
 
 procedure TMainForm.btnStopClick(Sender: TObject);
 begin
- StopFlag := True;
+  StopFlag := True;
 end;
 
 procedure TMainForm.cbAtrShowChange(Sender: TObject);
@@ -1219,6 +1296,8 @@ begin
 
    CardsSize.X :=(StrToIntDef(seWidth.Text,0) * seScale1.Value div seScale2.Value + 2*StrToIntDef(edBleed.Text,0)) * StrToIntDef(seCountX.Text,0) ;
    CardsSize.Y :=(StrToIntDef(seHeight.Text,0)* seScale1.Value div seScale2.Value + 2*StrToIntDef(edBleed.Text,0)) * StrToIntDef(seCountY.Text,0) ;
+   btnBleed2mm.Visible := True;
+   btnBleed2mm.Enabled := True;
   end;
 end;
 
@@ -1381,6 +1460,15 @@ begin
       ChildDraw(ANod.Nodes[i])
 end;
 
+procedure TMainForm.ClerrSelection1Click(Sender: TObject);
+var i,j: integer;
+begin
+  if MessageDlg('Clear selection?',mtConfirmation,[mbYes, mbNo],0) = mrYes then
+  for i := sgText.Selection.Top to sgText.Selection.Bottom do
+    for j := sgText.Selection.Left to sgText.Selection.Right do
+      sgText.Cells[j,i] := '';
+end;
+
 procedure TMainForm.ClipartFrameClear1Click(Sender: TObject);
 begin
   ClipartFrame.Clear1Click(Sender);
@@ -1417,6 +1505,25 @@ begin
 
   if ClipartInspectorFrame.pcAtrInspector.Activepageindex=1 then
     aClipartPreview.Execute;
+end;
+
+procedure TMainForm.CopySelection1Click(Sender: TObject);
+var i,j: integer;
+    s: string;
+begin
+  s := '';
+  for i := sgText.Selection.Top to sgText.Selection.Bottom do
+  begin
+    if i > sgText.Selection.Top then
+      s := s + #13#10;
+    for j := sgText.Selection.Left to sgText.Selection.Right do
+    begin
+      if j > sgText.Selection.Left then
+        s := s + #9;
+      s := s + sgText.Cells[j,i];
+    end;
+  end;
+   Clipboard.AsText := s;
 end;
 
 procedure TMainForm.Createcontent1Click(Sender: TObject);
@@ -1550,6 +1657,32 @@ begin
   seTo.Value := sgText.RowCount-1;
 end;
 
+procedure TMainForm.DeleteRow1Click(Sender: TObject);
+var i, r, n: Integer;
+begin
+
+  if MessageDlg('Delete row ['+IntToStr(sgText.Row)+']?',mtConfirmation,[mbYes, mbNo],0) = mrYes then
+  begin
+     if sgText.RowCount=2 then
+       sgText.Rows[1].Text:='1'
+     else
+     begin
+       r := sgText.Row;
+       n := StrToIntDef(sgText.Cells[0,r] ,0);
+       THackGrid(sgText).DeleteRow(sgText.Row);
+       if r<sgText.RowCount then
+         sgText.Row := r;
+
+       for i := 1 to sgText.RowCount do
+         if StrToIntDef(sgText.Cells[0,i] ,0) >= n then
+            sgText.Cells[0,i]  := IntToStr(StrToIntDef(sgText.Cells[0,i] ,0)-1)
+
+
+     end;
+  end;
+
+end;
+
 procedure TMainForm.dlgTextFindClose(Sender: TObject);
 begin
   Application.MainForm.SetFocus;
@@ -1633,6 +1766,65 @@ begin
 
 end;
 
+procedure TMainForm.FillSelection1Click(Sender: TObject);
+var
+   s: string;
+   sl: TStringList;
+   i, j, n: Integer;
+begin
+  if (sgText.Selection.Bottom<>sgText.Selection.Top) or (sgText.Selection.Left<>sgText.Selection.Right) then
+     if MessageDlg(Format('Fill text area[%d/%d - %d/%d]?',
+        [sgText.Selection.Left, sgText.Selection.Top, sgText.Selection.Right, sgText.Selection.Bottom]),
+        mtConfirmation, [mbYes, mbNo], 0)<> mrYes
+     then
+       exit;
+
+  sl := TStringList.Create;
+  try
+    sl.Text := Clipboard.AsText;
+    if (sl.Count>1) and (sl.Count<>sgText.Selection.Bottom-sgText.Selection.Top+1) then
+    begin
+      MessageDlg('Stored buffer does not match selection rows.', mtError, [mbOk], 0);
+      exit;
+    end;
+    for i := 0 to sl.Count-1 do
+    begin
+      n := 1;
+      s := sl[i];
+      while pos(#9, s)>0 do
+      begin
+        inc(n);
+        Delete(s,1,pos(#9, s))
+      end;
+      if (n>1) and (n<>sgText.Selection.Right-sgText.Selection.Left+1) then
+      begin
+        MessageDlg('Stored buffer does not match selection columns.', mtError, [mbOk], 0);
+        exit;
+      end;
+    end;
+    for i := sgText.Selection.Top to sgText.Selection.Bottom do
+    begin
+      if (sl.Count=1) then
+        s := sl[0]
+      else
+        s := sl[i - sgText.Selection.Top];
+      for j := sgText.Selection.Left to sgText.Selection.Right do
+      begin
+        sgText.Cells[j,i] := Copy(s,1,Pos(#9,s+#9)-1);
+        if pos(#9,s)>0 then
+          Delete(s,1,pos(#9, s))
+      end;
+    end;
+
+
+
+  finally
+    sl.free;
+  end;
+
+
+end;
+
 procedure TMainForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
   CanClose := MessageDlg('Exit program?', mtConfirmation, [mbYes, mbNo], 0)= mrYes;
@@ -1651,10 +1843,10 @@ begin
   ZoomFactor := 1;
   ZoomPreview:= 1;
 
-  sgText.cells[0,0]:='¹';
+  sgText.cells[0,0]:='[0] ¹';
   sgText.cells[1,0]:='[1]';
   sgText.cells[0,1]:='1';
-  sgText.ColWidths[0]:=40;
+  sgText.ColWidths[0]:=56;
 
   sgText.col := 1;
   sgText.row := 1;
@@ -1804,6 +1996,11 @@ begin
 
 end;
 
+procedure TMainForm.FormResize(Sender: TObject);
+begin
+DrawSheet;
+end;
+
 procedure TMainForm.FormShow(Sender: TObject);
 begin
   InspectorFrame.Initialize;
@@ -1822,13 +2019,82 @@ begin
 end;
 
 
+procedure TMainForm.GridSort(ACol: integer; Srt: boolean);
+var
+  i,j:integer;
+  sl:TStringList;
+  s:string;
+  num:boolean;
+begin
+  sl:=TStringList.Create;
+  sl.Sorted := True;
+  sl.Duplicates := dupAccept;
+
+  for I := 1 to sgText.RowCount - 1 do
+  begin
+    s := sgText.Cells[Acol, i];
+    num := (s='') or (StrToIntDef(s,-1)>=0);
+    if not num then break;
+  end;
+
+  for I := 1 to sgText.ColCount - 1 do
+  begin
+    sgText.Cells[i, 0] := StringReplace(sgText.Cells[i, 0], '^[', '[', [rfReplaceAll]);
+    sgText.Cells[i, 0] := StringReplace(sgText.Cells[i, 0], 'v[', '[', [rfReplaceAll]);
+  end;
+  sgText.Cells[0, 0] := '[0] ¹';
+
+  if Srt then
+  begin
+    for i := 1 to sgText.RowCount - 1 do
+    begin
+      S := sgText.Cells[ACol, i];
+      if (ACol = 0)or num then
+        S := RightStr('000000000000' + S, 12);
+      j := sl.Add(S);
+      while (j < sl.Count - 1) and (sl[j] = sl[j + 1]) do
+        inc(j);
+
+      if j + 1 <> i then
+        THackGrid(sgText).MoveRow(i, j + 1);
+    end;
+    if (ACol<>0) then
+      sgText.Cells[ACol, 0] := '^' + sgText.Cells[ACol, 0];
+  end
+  else
+  begin
+    for i := sgText.RowCount - 1 downto 1 do
+    begin
+      S := sgText.Cells[ACol, i];
+      if (ACol = 0)or num then
+        S := RightStr('000000000000' + S, 12);
+      j := sl.Add(S);
+      // while (j<sl.Count-1) and (sl[j]=sl[j+1]) do inc(j);
+
+      if sgText.RowCount - j - 1 <> i then
+        THackGrid(sgText).MoveRow(i, sgText.RowCount - j - 1);
+    end;
+    if (ACol<>0) then
+      sgText.Cells[ACol, 0] := 'v' + sgText.Cells[ACol, 0];
+  end;
+
+  if sgText.Row < sgText.TopRow then
+    sgText.TopRow := sgText.Row;
+  if sgText.Row > sgText.TopRow + sgText.VisibleRowCount then
+    sgText.TopRow := sgText.Row - sgText.VisibleRowCount + 1;
+
+  sl.Destroy;
+
+end;
+
 procedure TMainForm.ImportSVG1Click(Sender: TObject);
-var TMP:TXML_Doc;
-  i:integer;
+var
+  TMP: TXML_Doc;
+  i: Integer;
 begin
   MainData.dlgOpenSVG.Title := 'Add SVG-files to clipart';
-  ChDir(edCfgRoot.text);
-  MainData.dlgOpenSVG.InitialDir := edCfgRoot.text;
+  ChDir(edCfgRoot.Text);
+  MainData.dlgOpenSVG.InitialDir := edCfgRoot.Text;
   MainData.dlgOpenSVG.FileName := '';
   MainData.dlgOpenSVG.Options :=  MainData.dlgOpenSVG.Options+ [ofAllowMultiSelect];
   if MainData.dlgOpenSVG.Execute then
@@ -1876,6 +2142,15 @@ begin
   InspectorFrame.SetSize(FSel);
 end;
 
+procedure TMainForm.miApplysortingClick(Sender: TObject);
+var i:integer;
+begin
+  if MessageDlg('Apply current sorting as default?',mtConfirmation,[mbOk, mbCancel],0) <> mrOk then Exit;
+
+  for i:= 1 to sgText.RowCount-1 do
+    sgText.Cells[0,i]:= IntToStr(i);
+end;
+
 procedure TMainForm.miTableHeadClick(Sender: TObject);
 var i:integer;
 begin
@@ -1885,7 +2160,7 @@ begin
   XMLEditForm.SynEditFrame.SynEditor.Lines.Delete(0);
   if XMLEditForm.ShowModal=mrOk then
   begin
-    sgText.Rows[0].Text := Trim('¹'^M+XMLEditForm.SynEditFrame.SynEditor.Text);
+    sgText.Rows[0].Text := Trim('[0] ¹'^M+XMLEditForm.SynEditFrame.SynEditor.Text);
     for i := 1 to sgText.ColCount-1 do
     begin
       if (pos('[', sgText.Cells[i,0])=1) and (pos(']', sgText.Cells[i,0])<6) then
@@ -1898,83 +2173,165 @@ begin
 
 end;
 
-procedure TMainForm.PaintBoxMouseDown(Sender: TObject; Button: TMouseButton;
-  Shift: TShiftState; X, Y: Integer);
+procedure TMainForm.PaintBoxDblClick(Sender: TObject);
+var i:integer;
 begin
   PaintBox.Visible := True;
-  GridMouse := True;
-
-  shpSelection.Visible := (ssLeft in Shift);
-
-  if ((seGridX.Value=0) and (seGridY.Value=0)) then
-  begin
-    FSel.Left :=  Round(x /  ZoomFactor) ;
-    FSel.Top :=  Round(y /  ZoomFactor) ;
-
-    FSel.Width := 10;
-    FSel.Height := 10;
-    if FSel.Left > imgPreview.Picture.Width-2*seFrame.Value then
-       FSel.Left := seFrame.Value + imgPreview.Picture.Width-2*seFrame.Value;
-    if FSel.top > imgPreview.Picture.Height-2*seFrame.Value then
-       FSel.top := imgPreview.Picture.Height-2*seFrame.Value
-
-  end
-  else  begin
-    FSelCel.Left := trunc( (X / ZoomFactor - seFrame.Value) / Cell.x);
-    FSelCel.Top := trunc( (y / ZoomFactor- seFrame.Value) / Cell.y);
-    FSelCel.Width := 0;
-    FSelCel.Height := 0;
+//  for i := SVGFrame.treeTemplate.In
 
 
-
-
-    FSel.Left := Round(( Round(ZoomFactor
-      * (seFrame.Value + Cell.x * FSelCel.Left))) / ZoomFactor);
-
-    FSel.Top := Round((Round(ZoomFactor
-      * (seFrame.Value + Cell.y * FSelCel.Top))) / ZoomFactor);
-
-    FSel.Width := Round(Cell.x);
-    FSel.Height := Round(Cell.y);
-
-    if FSel.Left > imgPreview.Picture.Width-seFrame.Value-Cell.x/2 then
-       FSel.Left := seFrame.Value + round(Cell.x * Trunc((imgPreview.Picture.Width-2*seFrame.Value - 5) / Cell.x));
-    if FSel.top > imgPreview.Picture.Height-seFrame.Value-Cell.y/2 then
-       FSel.top := seFrame.Value + round(Cell.y * Trunc((imgPreview.Picture.Height-2*seFrame.Value - 5) / Cell.x));
-  end;
-
-  if FSel.Left < seFrame.Value then
-    FSel.Left := seFrame.Value;
-
-  if FSel.Top < seFrame.Value then
-    FSel.Top := seFrame.Value;
-
-
-
-
-  if (FSel.Right > imgPreview.Picture.Width-seFrame.Value)
-    or (FSelCel.Right+1= seGridX.Value)
-  then
-     FSel.Right := imgPreview.Picture.Width-seFrame.Value;
-
-  if (FSel.Bottom > imgPreview.Picture.Height-seFrame.Value)
-    or (FSelCel.Bottom+1= seGridY.Value)
-  then
-     FSel.Bottom := imgPreview.Picture.Height-seFrame.Value;
-
-  shpSelection.Left :=  imgPreview.Left + Round(FSel.Left * ZoomFactor);
-  shpSelection.Top :=  imgPreview.top +  Round(FSel.Top * ZoomFactor);
-  shpSelection.Width := Round(FSel.Width * ZoomFactor);
-  shpSelection.Height := Round(FSel.Height * ZoomFactor);
 end;
 
-procedure TMainForm.PaintBoxMouseMove(Sender: TObject; Shift: TShiftState; X,
-  Y: Integer);
+procedure TMainForm.PaintBoxMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+var
+  r:TTetra;
+  TmpRgn: HRGN;
+  TreeNod:TTreeNode;
+begin
+  if shpSelection.Visible and (ssRight in Shift) then
+    shpSelection.Visible := False
+  else
+  if (ssRight in Shift) then
+  begin
+//    PaintBox.Visible := True;
+
+    if SVGFrame.treeTemplate.Items[0].Count=0 then exit;
+
+    TreeNod := SVGFrame.FocusedNode;
+
+    repeat
+
+      if (ssCtrl in Shift) then
+      begin
+        TreeNod := TreeNod.GetPrev;
+
+        if (SVGFrame.FocusedNode = TreeNod) then exit;
+
+        if TreeNod = nil then
+        begin
+          TreeNod := SVGFrame.treeTemplate.Items[0].GetNext;
+          while TreeNod.GetNext<> nil do
+             TreeNod := TreeNod.GetNext;
+        end;
+      end
+      else
+      begin
+        TreeNod := TreeNod.GetNext;
+        if TreeNod = nil then
+        begin
+          if (SVGFrame.FocusedNode = SVGFrame.treeTemplate.Items[0]) then exit;
+           TreeNod := SVGFrame.treeTemplate.Items[0];
+        end;
+      end;
+
+
+      if TreeNod = SVGFrame.FocusedNode then exit;
+
+
+      r:= NodeRect(TreeNod.Data);
+      TmpRgn := CreatePolygonRgn(r,4, WINDING);
+      try
+        if PtInRegion(TmpRgn, Round(x /  ZoomFactor), Round(Y / ZoomFactor)) then
+        begin
+
+          TreeNod.Selected := True;
+          TreeNod.Focused := True;
+          TreeNod.MakeVisible;
+
+          exit;
+        end;
+
+
+      finally
+        DeleteObject(TmpRgn)
+      end;
+
+    until TreeNod = SVGFrame.FocusedNode;
+
+
+
+  end
+  else
+  if (ssLeft in Shift) then
+  begin
+    PaintBox.Visible := True;
+
+    GridMouse := True;
+
+    shpSelection.Visible := (ssLeft in Shift);
+
+    if ((seGridX.Value=0) and (seGridY.Value=0)) then
+    begin
+      FSel.Left :=  Round(x /  ZoomFactor) ;
+      FSel.Top := Round(Y / ZoomFactor);
+
+      FSel.Width := 10;
+      FSel.Height := 10;
+      if FSel.Left > imgPreview.Picture.Width - 2 * seFrame.Value then
+        FSel.Left := seFrame.Value + imgPreview.Picture.Width - 2 *
+          seFrame.Value;
+      if FSel.Top > imgPreview.Picture.Height - 2 * seFrame.Value then
+        FSel.Top := imgPreview.Picture.Height - 2 * seFrame.Value
+
+    end
+    else
+    begin
+      FSelCel.Left := trunc((X / ZoomFactor - seFrame.Value) / Cell.X);
+      FSelCel.Top := trunc((Y / ZoomFactor - seFrame.Value) / Cell.Y);
+      FSelCel.Width := 0;
+      FSelCel.Height := 0;
+
+      FSel.Left :=
+        Round((Round(ZoomFactor * (seFrame.Value + Cell.X * FSelCel.Left))) /
+        ZoomFactor);
+
+      FSel.Top :=
+        Round((Round(ZoomFactor * (seFrame.Value + Cell.Y * FSelCel.Top))) /
+        ZoomFactor);
+
+      FSel.Width := Round(Cell.X);
+      FSel.Height := Round(Cell.Y);
+
+      if FSel.Left > imgPreview.Picture.Width - seFrame.Value - Cell.X / 2 then
+        FSel.Left := seFrame.Value +
+          Round(Cell.X * trunc((imgPreview.Picture.Width - 2 * seFrame.Value -
+          5) / Cell.X));
+      if FSel.Top > imgPreview.Picture.Height - seFrame.Value - Cell.Y / 2 then
+        FSel.Top := seFrame.Value +
+          Round(Cell.Y * trunc((imgPreview.Picture.Height - 2 * seFrame.Value -
+          5) / Cell.X));
+    end;
+
+    if FSel.Left < seFrame.Value then
+      FSel.Left := seFrame.Value;
+
+    if FSel.Top < seFrame.Value then
+      FSel.Top := seFrame.Value;
+
+    if (FSel.Right > imgPreview.Picture.Width - seFrame.Value) or
+      (FSelCel.Right + 1 = seGridX.Value) then
+      FSel.Right := imgPreview.Picture.Width - seFrame.Value;
+
+    if (FSel.Bottom > imgPreview.Picture.Height - seFrame.Value) or
+      (FSelCel.Bottom + 1 = seGridY.Value) then
+      FSel.Bottom := imgPreview.Picture.Height - seFrame.Value;
+
+    shpSelection.Left := imgPreview.Left + Round(FSel.Left * ZoomFactor);
+    shpSelection.Top := imgPreview.Top + Round(FSel.Top * ZoomFactor);
+    shpSelection.Width := Round(FSel.Width * ZoomFactor);
+    shpSelection.Height := Round(FSel.Height * ZoomFactor);
+  end;
+end;
+
+procedure TMainForm.PaintBoxMouseMove(Sender: TObject; Shift: TShiftState;
+  X, Y: Integer);
 begin
 
-  if not (ssLeft in Shift) then exit;
+  if not(ssLeft in Shift) then
+    exit;
 
-  if ((seGridX.Value=0) and (seGridY.Value=0)) then
+  if ((seGridX.Value = 0) and (seGridY.Value = 0)) then
   begin
     FSel.Width := Round(x/ZoomFactor) - FSel.Left ;
     FSel.Height := Round(y/ZoomFactor) - FSel.Top;
@@ -2330,8 +2687,8 @@ var sl:TStringList;
 
 
     seFrom.MaxValue := sl.Count;
-    seTo.MaxValue := sl.Count;
-    seTo.Value := sl.Count;
+    seTo.MaxValue := sl.Count-1;
+    seTo.Value := sl.Count-1;
     sgText.RowCount:=2;
     sgText.ColCount:=2;
     sgText.Rows[0].Clear;
@@ -2359,12 +2716,12 @@ var sl:TStringList;
       sl.Delete(0);
     end;
     sgText.RowCount := sl.Count+1;
-    sgText.Cells[0,0] := '¹';
+    sgText.Cells[0,0] := '[0] ¹';
 
     for i:=1 to sl.Count do
     begin
       sgText.Rows[i].Clear;
-      sgText.Cells[0,i+1]:=IntToStr(I+1);
+      sgText.Cells[0,i]:=IntToStr(I);
       s:=sl[i-1];
       j:=0;
       while s<>'' do
@@ -2511,7 +2868,9 @@ procedure TMainForm.SaveTable(AFileName: string);
 var i,j:Integer;
   s: string;
 begin
-  sgTextFixedCellClick(nil,0,-1);
+  GridSort(0, True);
+  sgText.Cells[0,0]:='[0] ¹';
+
   with TStringList.Create do
   try
     for i := 0 to sgText.RowCount-1 do
@@ -2666,9 +3025,16 @@ end;
 
 procedure TMainForm.sgTextDrawCell(Sender: TObject; ACol, ARow: Integer;
   Rect: TRect; State: TGridDrawState);
+var s: string;
 begin
   if (ACol=0)and (Arow>0) then
-    sgText.Canvas.TextRect(Rect, Rect.Left, Rect.Top+2, IntToStr(Arow));
+  begin
+    s:= IntToStr(Arow);
+    if s<>sgText.Cells[Acol,Arow] then
+     s:= s + ' /' + sgText.Cells[Acol,Arow];
+
+    sgText.Canvas.TextRect(Rect, Rect.Left+2, Rect.Top+2, s);
+  end;
 
   if ARow=sgText.Row then
   begin
@@ -2689,69 +3055,7 @@ var
 
 begin
   if Arow=0 then
-  begin
-     sl:=TStringList.Create;
-     sl.Sorted := True;
-     sl.Duplicates := dupAccept;
-     Srt := True;
-
-     if (ARow=-1)or(ACol=0) then
-       Srt := True
-     else
-       Srt := copy(sgText.Cells[Acol,0],1,1)<>'^';
-
-
-
-     for I := 0 to sgText.ColCount-1 do
-     begin
-       sgText.Cells[i,0]:=Stringreplace(sgText.Cells[i,0], '^[','[',[rfReplaceAll]);
-       sgText.Cells[i,0]:=Stringreplace(sgText.Cells[i,0], 'v[','[',[rfReplaceAll]);
-       sgText.Cells[i,0]:=Stringreplace(sgText.Cells[i,0], '^¹','¹',[rfReplaceAll]);
-       sgText.Cells[i,0]:=Stringreplace(sgText.Cells[i,0], 'v¹','¹',[rfReplaceAll]);
-     end;
-
-     if Srt then
-     begin
-       for I := 1 to sgText.RowCount-1 do
-       begin
-         s:=sgText.Cells[Acol,i];
-         if ACol=0 then
-           s:=RightStr('00000'+s,5);
-         j := sl.Add(s);
-         while (j<sl.Count-1) and (sl[j]=sl[j+1]) do inc(j);
-
-         if j+1 <> i then
-           THackGrid(sgText).MoveRow(i, j+1);
-       end;
-       if (ARow<>-1)and(ACol<>0) then
-        sgText.Cells[Acol,0] := '^'+sgText.Cells[Acol,0];
-     end
-     else
-     begin
-       for I := sgText.RowCount-1 downto 1 do
-       begin
-         s:=sgText.Cells[Acol,i];
-         if ACol=0 then
-           s:=RightStr('00000'+s,5);
-         j := sl.Add(s);
-//         while (j<sl.Count-1) and (sl[j]=sl[j+1]) do inc(j);
-
-         if sgText.RowCount -j-1 <> i then
-           THackGrid(sgText).MoveRow(i, sgText.RowCount-j-1);
-       end;
-       if (ACol<>0) then
-         sgText.Cells[Acol,0] := 'v'+sgText.Cells[Acol,0];
-     end;
-
-     if sgText.Row  <sgText.TopRow then
-       sgText.TopRow := sgText.Row;
-     if sgText.Row > sgText.TopRow+sgText.VisibleRowCount  then
-       sgText.TopRow := sgText.Row-sgText.VisibleRowCount+1;
-
-
-
-     sl.Destroy;
-  end;
+     GridSort(Acol, copy(sgText.Cells[Acol,0],1,1)<>'^')
 end;
 
 procedure TMainForm.sgTextKeyPress(Sender: TObject; var Key: Char);
@@ -3111,7 +3415,7 @@ var i,j:Integer;
 begin
   for i:= 0 to sgText.ColCount-1 do
   begin
-    sgText.ColWidths[i] := 40;
+    sgText.ColWidths[i] := 56;
     for j:=0 to sgText.RowCount-1 do
     begin
       if sgText.ColWidths[i] < sgText.Canvas.TextWidth(sgText.cells[i,j])+10 then
@@ -3170,6 +3474,7 @@ begin
       cbCount.Text := Attribute['CntColumn'];
       cbPaper.ItemIndex := StrToIntDef(Attribute['Paper'],0);
       cbDPI.Text :=Attribute['DPI'];
+      cbOutFormat.ItemIndex := StrToIntDef(Attribute['OutFormat'], 1);
 
 
       if cbDPI.Text='' then cbDPI.Text := '300';
@@ -3428,6 +3733,8 @@ begin
       Attribute['PageLimit'] := edPageLimit.Text;
       Attribute['LocalFonts'] := edCfgTTF.Text;
       Attribute['Engine'] :=  IntToStr(cbEngine.ItemIndex);
+      Attribute['OutFormat'] :=  IntToStr(cbOutFormat.ItemIndex);
+
 
     end;
 
@@ -3512,7 +3819,7 @@ begin
   r2.Right := r2.Left + s2.X;
   r2.Bottom := r2.Top + s2.Y;
 
-  imgSheet.Picture.Bitmap.Width := trunc(s0.X*k);
+  imgSheet.Picture.Bitmap.Width := Min(trunc(s0.X*k), gbSheet.Width);
   imgSheet.Picture.Bitmap.Height := imgSheet.Height;
 
   imgSheet.Width := imgSheet.Picture.Bitmap.Width;

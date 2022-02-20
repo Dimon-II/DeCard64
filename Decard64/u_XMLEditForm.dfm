@@ -88,7 +88,7 @@ object XMLEditForm: TXMLEditForm
         ExplicitWidth = 622
       end
     end
-    object seTags: TSynMemo
+    object seTags: TSynEdit
       Left = 1
       Top = 249
       Width = 622
@@ -100,12 +100,9 @@ object XMLEditForm: TXMLEditForm
       Font.Height = -13
       Font.Name = 'Courier New'
       Font.Style = []
+      Font.Quality = fqClearTypeNatural
       TabOrder = 1
-      CodeFolding.CollapsedLineColor = clGrayText
-      CodeFolding.FolderBarLinesColor = clGrayText
       CodeFolding.ShowCollapsedLine = True
-      CodeFolding.IndentGuidesColor = clGray
-      CodeFolding.IndentGuides = True
       UseCodeFolding = False
       Gutter.Font.Charset = DEFAULT_CHARSET
       Gutter.Font.Color = clWindowText
@@ -119,7 +116,7 @@ object XMLEditForm: TXMLEditForm
         '<p>...</p> <br/> <hr/>'
         
           '<div align="left / center/ right / width" line-height="normal / ' +
-          'pixels / %">...</div>'
+          'pixels / %" html-width='#39'pixels'#39'>...</div>'
         
           '<font size="1..7" face="Arial / Comic Sans MS / ..." color="" te' +
           'xt-indent="">...</font>'
@@ -128,7 +125,6 @@ object XMLEditForm: TXMLEditForm
         '<use src="clipart.svg#ref" width="xxx" height="yyy"  dy='#39'...'#39'/>'
         '<bkg src="bitmap file" or any rect attributes />')
       ReadOnly = True
-      FontSmoothing = fsmNone
     end
   end
 end

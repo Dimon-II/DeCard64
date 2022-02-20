@@ -29,12 +29,12 @@ object SvgTreeFrame: TSvgTreeFrame
     object tbrTemplate: TToolBar
       Left = 0
       Top = 0
-      Width = 304
-      Height = 49
+      Width = 264
+      Height = 46
       Align = alNone
       AutoSize = True
-      ButtonHeight = 47
-      ButtonWidth = 37
+      ButtonHeight = 44
+      ButtonWidth = 32
       Caption = 'tbrTemplate'
       EdgeBorders = [ebBottom]
       Images = MainData.ilDecard
@@ -50,7 +50,7 @@ object SvgTreeFrame: TSvgTreeFrame
         MenuItem = File1
       end
       object ToolButton3: TToolButton
-        Left = 37
+        Left = 32
         Top = 0
         Width = 8
         Caption = 'ToolButton3'
@@ -58,7 +58,7 @@ object SvgTreeFrame: TSvgTreeFrame
         Style = tbsSeparator
       end
       object btnNewObject: TToolButton
-        Left = 45
+        Left = 40
         Top = 0
         Hint = 'Add new object'
         Caption = ' Add '
@@ -66,7 +66,7 @@ object SvgTreeFrame: TSvgTreeFrame
         ImageIndex = 42
       end
       object tbCopyTag: TToolButton
-        Left = 82
+        Left = 72
         Top = 0
         Hint = 'Remember selected object'
         Caption = 'Copy'
@@ -74,7 +74,7 @@ object SvgTreeFrame: TSvgTreeFrame
         OnClick = tbCopyTagClick
       end
       object btn10: TToolButton
-        Left = 119
+        Left = 104
         Top = 0
         Hint = 'Delete object'
         Caption = 'Del'
@@ -82,7 +82,7 @@ object SvgTreeFrame: TSvgTreeFrame
         OnClick = btn10Click
       end
       object btnUp: TToolButton
-        Left = 156
+        Left = 136
         Top = 0
         Hint = 'Move up (Z-order)'
         Caption = 'Up'
@@ -90,7 +90,7 @@ object SvgTreeFrame: TSvgTreeFrame
         OnClick = btnUpClick
       end
       object btnDown: TToolButton
-        Left = 193
+        Left = 168
         Top = 0
         Hint = 'Move down (Z-order)'
         Caption = 'Dn'
@@ -98,7 +98,7 @@ object SvgTreeFrame: TSvgTreeFrame
         OnClick = btnDownClick
       end
       object btnSearch1: TToolButton
-        Left = 230
+        Left = 200
         Top = 0
         Hint = 'Search element'
         Caption = 'Find'
@@ -106,7 +106,7 @@ object SvgTreeFrame: TSvgTreeFrame
         OnClick = btnSearch1Click
       end
       object tbXML: TToolButton
-        Left = 267
+        Left = 232
         Top = 0
         Hint = 'XML-SVG editor'
         Caption = 'XML'

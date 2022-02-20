@@ -15,6 +15,36 @@ type
     function IsIdentChar(AChar: WideChar): Boolean;override;
   end;
 
+  TSynEdit = class(SynEdit.TSynEdit)
+  private
+    FActnList: TActionList;
+    FPopupMenu : TPopupMenu;
+    procedure CreateActns;
+    procedure FillPopupMenu(APopupMenu : TPopupMenu);
+    procedure CutExecute(Sender: TObject);
+    procedure CutUpdate(Sender: TObject);
+    procedure CopyExecute(Sender: TObject);
+    procedure CopyUpdate(Sender: TObject);
+    procedure PasteExecute(Sender: TObject);
+    procedure PasteUpdate(Sender: TObject);
+    procedure DeleteExecute(Sender: TObject);
+    procedure DeleteUpdate(Sender: TObject);
+    procedure SelectAllExecute(Sender: TObject);
+    procedure SelectAllUpdate(Sender: TObject);
+    procedure RedoExecute(Sender: TObject);
+    procedure RedoUpdate(Sender: TObject);
+    procedure UndoExecute(Sender: TObject);
+    procedure UndoUpdate(Sender: TObject);
+    procedure SetPopupMenu_(const Value: TPopupMenu);
+    function  GetPopupMenu_: TPopupMenu;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+  published
+    property PopupMenu: TPopupMenu read GetPopupMenu_ write SetPopupMenu_;
+  end;
+
+
 
   TSynEditFrame = class(TFrame)
     actlMain: TActionList;
@@ -31,16 +61,6 @@ type
     actSearchReplace: TAction;
     SynEditor: TSynEdit;
     SynXMLSyn1: TSynXMLSyn;
-    pmnuEditor: TPopupMenu;
-    lmiEditUndo: TMenuItem;
-    lmiEditRedo: TMenuItem;
-    N2: TMenuItem;
-    lmiEditCut: TMenuItem;
-    lmiEditCopy: TMenuItem;
-    lmiEditPaste: TMenuItem;
-    lmiEditDelete: TMenuItem;
-    N1: TMenuItem;
-    lmiEditSelectAll: TMenuItem;
     SynEditSearch1: TSynEditSearch;
     ReplaceDialog: TReplaceDialog;
     FindDialog: TFindDialog;
@@ -60,6 +80,8 @@ type
     tbSpec: TToolButton;
     tbGlyph: TToolButton;
     ToolButton3: TToolButton;
+    tbColorDialog: TToolButton;
+    btnPipe: TToolButton;
     procedure actEditCutExecute(Sender: TObject);
     procedure actEditCutUpdate(Sender: TObject);
     procedure actEditCopyExecute(Sender: TObject);
@@ -93,6 +115,9 @@ type
     procedure tbGlyphClick(Sender: TObject);
     procedure FindDialogShow(Sender: TObject);
     procedure ReplaceDialogShow(Sender: TObject);
+    procedure tbColorDialogClick(Sender: TObject);
+    procedure btnPipeClick(Sender: TObject);
+    procedure SynEditorKeyPress(Sender: TObject; var Key: Char);
   private
     gsSearchText: string;
     gsReplaceText: string;
@@ -111,7 +136,19 @@ implementation
 {$R *.DFM}
 
 uses
-   u_MainData, SynEditTypes, frmGlyph, u_ThreadRender;
+   u_MainData, SynEditTypes, frmGlyph, u_ThreadRender, u_PipeForm;
+
+function HexColor(Color:TColor):string;
+var
+  C: Longint;
+  r, g, b: Byte;
+begin
+    C := ColorToRGB(Color);
+    r := C;
+    g := C shr 8;
+    b := C shr 16;
+    Result := IntToHex(r,2)+IntToHex(g ,2)+ IntToHex(b ,2);
+end;
 
 
 
@@ -237,13 +274,21 @@ begin
     SVGNode.Attribute['dekart:replace'] := SynEditor.Text
 End;
 
+procedure TSynEditFrame.btnPipeClick(Sender: TObject);
+begin
+  btnPipe.Down := True;
+  if PipeForm.ShowModal=mrOk then
+    SynEditor.SelText := '#'+HexColor(PipeForm.AColor);
+  SetForegroundWindow(Application.MainForm.Handle);
+  btnPipe.Down := False;
+end;
+
 procedure TSynEditFrame.DoSearchReplaceText(AReplace: boolean;
   ABackwards: boolean);
 var
   Options: TSynSearchOptions;
   DlgOptions: TFindOptions;
 begin
-
   if AReplace then
   begin
     Options := [ssoPrompt, ssoReplace];
@@ -255,23 +300,18 @@ begin
   end;
   if frReplaceAll in DlgOptions then
     Include(Options, ssoReplaceAll);
-
   if ABackwards then
     Include(Options, ssoBackwards);
-
   if  (frMatchCase in DlgOptions) then
     Include(Options, ssoMatchCase);
-
   if frWholeWord in DlgOptions then
     Include(Options, ssoWholeWord);
-
 //  if not fSearchFromCaret then
 //    Include(Options, ssoEntireScope);
 //  if gbSearchSelectionOnly then
  //   Include(Options, ssoSelectedOnly);
   if frWholeWord in DlgOptions  then
     Include(Options, ssoWholeWord);
-
   if SynEditor.SearchReplace(gsSearchText, gsReplaceText, Options) = 0 then
   begin
     MessageBeep(MB_ICONASTERISK);
@@ -281,7 +321,6 @@ begin
       SynEditor.BlockBegin := SynEditor.BlockEnd;
     SynEditor.CaretXY := SynEditor.BlockBegin;
   end;
-
 end;
 
 procedure TSynEditFrame.FindDialogClose(Sender: TObject);
@@ -302,6 +341,7 @@ begin
   GetWindowText(FindDialog.Handle, Buffer, SizeOf(Buffer));
   SetWindowText(FindDialog.Handle, PChar(@Buffer)+Findcaption);
 end;
+
 
 procedure TSynEditFrame.ReplaceDialogFind(Sender: TObject);
 begin
@@ -346,11 +386,23 @@ begin
   ReplaceDialog.ReplaceText := gsReplaceText;
   dlg.Execute();
 end;
-
 procedure TSynEditFrame.SynEditorExit(Sender: TObject);
 begin
   Apply;
 end;
+
+procedure TSynEditFrame.SynEditorKeyPress(Sender: TObject; var Key: Char);
+begin
+  if Key < #32 then Key:=#0;
+  
+end;
+
+procedure TSynEditFrame.tbColorDialogClick(Sender: TObject);
+begin
+  if MainData.dlgColor.Execute then
+    SynEditor.SelText := '#'+HexColor(MainData.dlgColor.Color)
+end;
+
 
 procedure TSynEditFrame.tbGlyphClick(Sender: TObject);
 begin
@@ -368,11 +420,162 @@ begin
     SynEditor.Options := SynEditor.Options - [eoShowSpecialChars]
 end;
 
+
 { TSynXMLSyn }
 
 function TSynXMLSyn.IsIdentChar(AChar: WideChar): Boolean;
 begin
   Result := AChar > #32;
+end;
+const
+ MenuName='uSynEditPopupMenu';
+
+procedure TSynEdit.CopyExecute(Sender: TObject);
+begin
+  Self.CopyToClipboard;
+end;
+
+procedure TSynEdit.CopyUpdate(Sender: TObject);
+begin
+  TAction(Sender).Enabled :=Self.SelAvail;
+end;
+
+procedure TSynEdit.CutExecute(Sender: TObject);
+begin
+  Self.CutToClipboard;
+end;
+
+procedure TSynEdit.CutUpdate(Sender: TObject);
+begin
+  TAction(Sender).Enabled :=Self.SelAvail and not Self.ReadOnly;
+end;
+
+procedure TSynEdit.DeleteExecute(Sender: TObject);
+begin
+  Self.SelText := '';
+end;
+
+procedure TSynEdit.DeleteUpdate(Sender: TObject);
+begin
+  TAction(Sender).Enabled :=Self.SelAvail and not Self.ReadOnly;
+end;
+
+procedure TSynEdit.PasteExecute(Sender: TObject);
+begin
+ Self.PasteFromClipboard;
+end;
+
+procedure TSynEdit.PasteUpdate(Sender: TObject);
+begin
+ TAction(Sender).Enabled :=Self.CanPaste;
+end;
+
+procedure TSynEdit.RedoExecute(Sender: TObject);
+begin
+ Self.Redo;
+end;
+
+procedure TSynEdit.RedoUpdate(Sender: TObject);
+begin
+ TAction(Sender).Enabled :=Self.CanRedo;
+end;
+
+procedure TSynEdit.SelectAllExecute(Sender: TObject);
+begin
+ Self.SelectAll;
+end;
+
+procedure TSynEdit.SelectAllUpdate(Sender: TObject);
+begin
+ TAction(Sender).Enabled :=Self.Lines.Text<>'';
+end;
+
+procedure TSynEdit.UndoExecute(Sender: TObject);
+begin
+ Self.Undo;
+end;
+
+procedure TSynEdit.UndoUpdate(Sender: TObject);
+begin
+ TAction(Sender).Enabled :=Self.CanUndo;
+end;
+
+constructor TSynEdit.Create(AOwner: TComponent);
+begin
+  inherited;
+  FActnList:=TActionList.Create(Self);
+  FPopupMenu:=TPopupMenu.Create(Self);
+  FPopupMenu.Name:=MenuName;
+  CreateActns;
+  FillPopupMenu(FPopupMenu);
+  PopupMenu:=FPopupMenu;
+end;
+
+procedure TSynEdit.CreateActns;
+
+ procedure AddActItem(const AText:string;AShortCut : TShortCut;AEnabled:Boolean;OnExecute,OnUpdate:TNotifyEvent);
+ Var
+    ActionItem  : TAction;
+  begin
+    ActionItem:=TAction.Create(FActnList);
+    ActionItem.ActionList:=FActnList;
+    ActionItem.Caption:=AText;
+    ActionItem.ShortCut:=AShortCut;
+    ActionItem.Enabled :=AEnabled;
+    ActionItem.OnExecute :=OnExecute;
+    ActionItem.OnUpdate  :=OnUpdate;
+  end;
+
+begin
+  AddActItem('&Undo',ShortCut(Word('Z'), [ssCtrl]),False,UndoExecute, UndoUpdate);
+  AddActItem('&Redo',ShortCut(Word('Z'), [ssCtrl,ssShift]),False,RedoExecute, RedoUpdate);
+  AddActItem('-',0,False,nil,nil);
+  AddActItem('Cu&t',ShortCut(Word('X'), [ssCtrl]),False,CutExecute, CutUpdate);
+  AddActItem('&Copy',ShortCut(Word('C'), [ssCtrl]),False,CopyExecute, CopyUpdate);
+  AddActItem('&Paste',ShortCut(Word('V'), [ssCtrl]),False,PasteExecute, PasteUpdate);
+  AddActItem('De&lete',0,False,DeleteExecute, DeleteUpdate);
+  AddActItem('-',0,False,nil,nil);
+  AddActItem('Select &All',ShortCut(Word('A'), [ssCtrl]),False,SelectAllExecute, SelectAllUpdate);
+end;
+
+procedure TSynEdit.SetPopupMenu_(const Value: TPopupMenu);
+Var
+  MenuItem : TMenuItem;
+begin
+  SynEdit.TSynEdit(Self).PopupMenu:=Value;
+  if CompareText(MenuName,Value.Name)<>0 then
+  begin
+   MenuItem:=TMenuItem.Create(Value);
+   MenuItem.Caption:='-';
+   Value.Items.Add(MenuItem);
+   FillPopupMenu(Value);
+  end;
+end;
+
+function TSynEdit.GetPopupMenu_: TPopupMenu;
+begin
+  Result:=SynEdit.TSynEdit(Self).PopupMenu;
+end;
+
+destructor TSynEdit.Destroy;
+begin
+  FPopupMenu.Free;
+  FActnList.Free;
+  inherited;
+end;
+
+procedure TSynEdit.FillPopupMenu(APopupMenu : TPopupMenu);
+var
+  i        : integer;
+  MenuItem : TMenuItem;
+begin
+  if Assigned(FActnList) then
+  for i := 0 to FActnList.ActionCount-1 do
+  begin
+    MenuItem:=TMenuItem.Create(APopupMenu);
+    MenuItem.Action  :=FActnList.Actions[i];
+    APopupMenu.Items.Add(MenuItem);
+  end;
 end;
 
 end.

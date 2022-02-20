@@ -4,7 +4,7 @@ object CellEditForm: TCellEditForm
   BorderStyle = bsSizeToolWin
   Caption = 'CellEditForm'
   ClientHeight = 280
-  ClientWidth = 622
+  ClientWidth = 784
   Color = clBtnFace
   Constraints.MinHeight = 240
   Constraints.MinWidth = 480
@@ -21,24 +21,23 @@ object CellEditForm: TCellEditForm
   PixelsPerInch = 96
   TextHeight = 13
   object Splitter2: TSplitter
-    Left = 434
+    Left = 492
     Top = 0
     Height = 238
     Align = alRight
-    ExplicitLeft = 8
-    ExplicitTop = 49
-    ExplicitHeight = 199
+    ExplicitLeft = 336
+    ExplicitTop = 3
   end
   object pnBottom: TPanel
     Left = 0
     Top = 238
-    Width = 622
+    Width = 784
     Height = 42
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
     DesignSize = (
-      622
+      784
       42)
     object sbaLeftCell: TSpeedButton
       Left = 3
@@ -205,7 +204,7 @@ object CellEditForm: TCellEditForm
       ParentFont = False
     end
     object btnApply: TButton
-      Left = 458
+      Left = 620
       Top = 9
       Width = 75
       Height = 25
@@ -222,7 +221,7 @@ object CellEditForm: TCellEditForm
       OnClick = btnApplyClick
     end
     object btnCancel: TButton
-      Left = 539
+      Left = 701
       Top = 9
       Width = 75
       Height = 25
@@ -255,22 +254,22 @@ object CellEditForm: TCellEditForm
   inline CellEditFrame: TSynEditFrame
     Left = 0
     Top = 0
-    Width = 434
+    Width = 492
     Height = 238
     Align = alClient
     TabOrder = 1
-    ExplicitWidth = 434
+    ExplicitWidth = 492
     ExplicitHeight = 238
     inherited SynEditor: TSynEdit
-      Width = 434
+      Width = 492
       Height = 210
       OnChange = CellEditFrameSynEditorChange
-      ExplicitWidth = 434
+      ExplicitWidth = 492
       ExplicitHeight = 210
     end
     inherited pscrSysEdit: TPageScroller
-      Width = 434
-      ExplicitWidth = 434
+      Width = 492
+      ExplicitWidth = 492
       inherited tbrEditor: TToolBar
         inherited ToolButton3: TToolButton
           Hint = 'Add selected to [Common]'
@@ -280,60 +279,125 @@ object CellEditForm: TCellEditForm
       end
     end
   end
-  object pnRight: TPanel
-    Left = 437
+  object pcHelpher: TPageControl
+    Left = 495
     Top = 0
-    Width = 185
+    Width = 289
     Height = 238
+    ActivePage = tsCommon
     Align = alRight
-    BevelOuter = bvNone
     TabOrder = 2
-    object Splitter1: TSplitter
-      Left = 0
-      Top = 129
-      Width = 185
-      Height = 3
-      Cursor = crVSplit
-      Align = alBottom
-      ExplicitTop = 0
-      ExplicitWidth = 93
+    object tsCommon: TTabSheet
+      Caption = 'Common'
+      object lbCommon: TListBox
+        Left = 41
+        Top = 0
+        Width = 240
+        Height = 210
+        Align = alClient
+        ItemHeight = 13
+        TabOrder = 0
+        OnDblClick = lbCommonDblClick
+      end
+      object lbCommonIdx: TListBox
+        Left = 0
+        Top = 0
+        Width = 41
+        Height = 210
+        Align = alLeft
+        Color = clBtnFace
+        Enabled = False
+        ItemHeight = 13
+        Items.Strings = (
+          'Ctrl-1'
+          'Ctrl-2'
+          'Ctrl-3'
+          'Ctrl-4'
+          'Ctrl-5'
+          'Ctrl-6'
+          'Ctrl-7'
+          'Ctrl-8'
+          'Ctrl-9')
+        TabOrder = 1
+      end
     end
-    object gbMacros: TGroupBox
-      Left = 0
-      Top = 132
-      Width = 185
-      Height = 106
-      Align = alBottom
+    object tsMacros: TTabSheet
       Caption = 'Macros'
-      TabOrder = 0
+      ImageIndex = 1
       object lbMacros: TListBox
-        Left = 2
-        Top = 15
-        Width = 181
-        Height = 89
+        Left = 41
+        Top = 0
+        Width = 240
+        Height = 210
         Align = alClient
         ItemHeight = 13
         TabOrder = 0
         OnDblClick = lbMacrosDblClick
       end
-    end
-    object gbCommon: TGroupBox
-      Left = 0
-      Top = 0
-      Width = 185
-      Height = 129
-      Align = alClient
-      Caption = 'Common'
-      TabOrder = 1
-      object lbCommon: TListBox
-        Left = 2
-        Top = 15
-        Width = 181
-        Height = 112
-        Align = alClient
+      object lbMacrosIdx: TListBox
+        Left = 0
+        Top = 0
+        Width = 41
+        Height = 210
+        Align = alLeft
+        Color = clBtnFace
+        Enabled = False
         ItemHeight = 13
+        Items.Strings = (
+          'Ctrl-1'
+          'Ctrl-2'
+          'Ctrl-3'
+          'Ctrl-4'
+          'Ctrl-5'
+          'Ctrl-6'
+          'Ctrl-7'
+          'Ctrl-8'
+          'Ctrl-9')
+        TabOrder = 1
+      end
+    end
+    object tsHTMS: TTabSheet
+      Caption = 'Tags'
+      ImageIndex = 2
+      object seTags: TSynEdit
+        Left = 0
+        Top = 0
+        Width = 281
+        Height = 210
+        Align = alClient
+        Color = clBtnFace
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'Courier New'
+        Font.Style = []
+        Font.Quality = fqClearTypeNatural
         TabOrder = 0
-        OnDblClick = lbCommonDblClick
+        CodeFolding.ShowCollapsedLine = True
+        UseCodeFolding = False
+        Gutter.Font.Charset = DEFAULT_CHARSET
+        Gutter.Font.Color = clWindowText
+        Gutter.Font.Height = -11
+        Gutter.Font.Name = 'Courier New'
+        Gutter.Font.Style = []
+        Gutter.Width = 0
+        Highlighter = CellEditFrame.SynXMLSyn1
+        Lines.Strings = (
+          'Known tags:'
+          '<b>...</b> <i>...</i> <u>...</u>'
+          '<p>...</p> <br/> <hr/>'
+          
+            '<div align="left / center/ right / width" line-height="normal / ' +
+            'pixels / %" html-width='#39'pixels'#39'>...</div>'
+          
+            '<font size="1..7" face="Arial / Comic Sans MS / ..." color="" te' +
+            'xt-indent="">...</font>'
+          '<img src="bitmap file" width="xxx" height="yyy" dy='#39'...'#39'/>'
+          '<use src="#defs ref" width="xxx" height="yyy"  dy='#39'...'#39'/>'
+          '<use src="clipart.svg#ref" width="xxx" height="yyy"  dy='#39'...'#39'/>'
+          '<bkg src="bitmap file" or any rect attributes />')
+        Options = [eoAutoIndent, eoEnhanceEndKey, eoGroupUndo, eoScrollPastEol, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
+        ReadOnly = True
       end
     end
   end
@@ -376,6 +440,75 @@ object CellEditForm: TCellEditForm
       Caption = 'Replaces F9'
       ShortCut = 120
       OnExecute = aChkReplExecute
+    end
+    object Action1: TAction
+      Tag = 1
+      Category = 'Common Ctrl-#'
+      Caption = 'Action1'
+      ShortCut = 16433
+      OnExecute = Action1Execute
+    end
+    object Action2: TAction
+      Tag = 2
+      Category = 'Common Ctrl-#'
+      Caption = 'Action2'
+      ShortCut = 16434
+      OnExecute = Action1Execute
+    end
+    object Action3: TAction
+      Tag = 3
+      Category = 'Common Ctrl-#'
+      Caption = 'Action3'
+      ShortCut = 16435
+      OnExecute = Action1Execute
+    end
+    object Action4: TAction
+      Tag = 4
+      Category = 'Common Ctrl-#'
+      Caption = 'Action4'
+      ShortCut = 16436
+      OnExecute = Action1Execute
+    end
+    object Action5: TAction
+      Tag = 5
+      Category = 'Common Ctrl-#'
+      Caption = 'Action5'
+      ShortCut = 16437
+      OnExecute = Action1Execute
+    end
+    object Action6: TAction
+      Tag = 6
+      Category = 'Common Ctrl-#'
+      Caption = 'Action6'
+      ShortCut = 16438
+      OnExecute = Action1Execute
+    end
+    object Action7: TAction
+      Tag = 7
+      Category = 'Common Ctrl-#'
+      Caption = 'Action7'
+      ShortCut = 16439
+      OnExecute = Action1Execute
+    end
+    object Action8: TAction
+      Tag = 8
+      Category = 'Common Ctrl-#'
+      Caption = 'Action8'
+      ShortCut = 16440
+      OnExecute = Action1Execute
+    end
+    object Action9: TAction
+      Tag = 9
+      Category = 'Common Ctrl-#'
+      Caption = 'Action9'
+      ShortCut = 16441
+      OnExecute = Action1Execute
+    end
+    object Action10: TAction
+      Category = 'Common Ctrl-#'
+      Caption = 'Action10'
+      ShortCut = 16432
+      OnExecute = CellEditFrameToolButton3Click
     end
   end
 end

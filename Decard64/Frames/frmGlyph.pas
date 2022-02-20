@@ -4,7 +4,7 @@ interface
 
 uses
   Windows, Messages, system.SysUtils, system.Variants, system.Classes, vcl.Graphics, vcl.Controls, vcl.Forms,
-  vcl.Dialogs, vcl.ExtCtrls, vcl.StdCtrls, SynEdit, vcl.Grids, SynUnicode, SynMemo, vcl.Buttons, vcl.Clipbrd,
+  vcl.Dialogs, vcl.ExtCtrls, vcl.StdCtrls, SynEdit, vcl.Grids, SynUnicode, vcl.Buttons, vcl.Clipbrd,
   vcl.Menus;
 
 type

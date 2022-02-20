@@ -16,7 +16,8 @@ uses
   SynPdf in 'SynPDF\SynPdf.pas',
   frmGlyph in 'Frames\frmGlyph.pas' {formGlyph},
   u_CalcSVG in 'src\u_CalcSVG.pas',
-  UMatrix in 'src\UMatrix.pas';
+  UMatrix in 'src\UMatrix.pas',
+  u_PipeForm in 'u_PipeForm.pas' {PipeForm};
 
 {$R *.res}
 
@@ -28,5 +29,6 @@ begin
   Application.CreateForm(TCellEditForm, CellEditForm);
   Application.CreateForm(TXMLEditForm, XMLEditForm);
   Application.CreateForm(TformGlyph, formGlyph);
+  Application.CreateForm(TPipeForm, PipeForm);
   Application.Run;
 end.

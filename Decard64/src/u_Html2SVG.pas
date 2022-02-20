@@ -186,7 +186,7 @@ begin
   try
     s := txt;
 
-    for i:=1 to row.Count-1 do
+    for i:=0 to row.Count-1 do
       if Pos('['+IntToStr(i)+']',s) >0 then
       begin
         s := StringReplace(s,'['+IntToStr(i)+']', row[i],[rfReplaceAll]);
@@ -1162,10 +1162,10 @@ var
     x := StrToIntDef(nod.Attribute['x'],0);
 
     if n1.Attribute['align']='right' then
-      x := x + round(StrToIntDef(nod.Attribute['width'],0)/ZoomValue) - StrToIntDef(n1.Attribute['width'],0)
+      x := x + round(StrToIntDef(ParentStyle(n1,'html-width', nod.Attribute['width']),0)/ZoomValue) - StrToIntDef(n1.Attribute['width'],0)
     else
     if n1.Attribute['align']='center' then
-      x := x + (round(StrToIntDef(nod.Attribute['width'],0)/ZoomValue) - StrToIntDef(n1.Attribute['width'],0)) div 2
+      x := x + (round(StrToIntDef(ParentStyle(n1,'html-width', nod.Attribute['width']),0)/ZoomValue) - StrToIntDef(n1.Attribute['width'],0)) div 2
     else
     if Align and (n1.Attribute['align']='width')  then
     begin
@@ -1173,7 +1173,7 @@ var
       begin
         if n1.Nodes.Count > 1 then
         begin
-           w := (round(StrToIntDef(nod.Attribute['width'],0)/ZoomValue) - StrToIntDef(n1.Attribute['width'],0)) / (n1.Nodes.Count-1);
+           w := (round(StrToIntDef(ParentStyle(n1,'html-width', nod.Attribute['width']),0)/ZoomValue) - StrToIntDef(n1.Attribute['width'],0)) / (n1.Nodes.Count-1);
            for i := 1 to n1.Nodes.Count-1 do
 
              n1.Nodes[i].Attribute['x'] := IntToStr(Round(StrToIntDef(n1.Nodes[i].Attribute['x'],0) + i*w));
@@ -1195,7 +1195,7 @@ var
         if err> 1 then
           err:= err - 1;
 
-        sp := sp + (round(StrToIntDef(nod.Attribute['width'],0)/ZoomValue) - StrToIntDef(n1.Attribute['width'],0))/(err);
+        sp := sp + (round(StrToIntDef(ParentStyle(n1,'html-width', nod.Attribute['width']),0)/ZoomValue) - StrToIntDef(n1.Attribute['width'],0))/(err);
         Str(sp:0:3,s);
         n1.Attribute['letter-spacing'] := s;
         err := 0;
@@ -1240,6 +1240,8 @@ var
     n1.Attribute['align'] := ParentStyle(xn,'align','left');
     n1.Attribute['letter-spacing'] := ParentStyle(xn,'letter-spacing','0');
     n1.Attribute['line-height'] := ParentStyle(xn,'line-height','');
+
+    n1.Attribute['html-width'] := ParentStyle(xn,'html-width','');
 
     indent :=  StrToIntDef(ParentStyle(xn,'text-indent','0'), 0);
 
@@ -1596,11 +1598,11 @@ bkg := nil;
            w2 := SizeParse(xn.Attribute['id']+'Z').Right+SizeParse(xn.Attribute['id']+'Z').Left;
            w2 := round(w2 + (w2-2*w1)* WordSpacing);
 
-           if {(n1.Attribute['width'] = '0') and} (w1 > (StrToIntDef(RST.Attribute['width'],0)/ZoomValue)) then
-              addzoom := min(addzoom,StrToIntDef(RST.Attribute['width'],0)/ZoomValue / w1);
+           if {(n1.Attribute['width'] = '0') and} (w1 > (StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)) then
+              addzoom := min(addzoom,StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue / w1);
 
            if (n1.Attribute['width'] <> '0') and
-              (StrToIntDef(n1.Attribute['width'],0) + w5 + w1 > StrToIntDef(RST.Attribute['width'],0)/ZoomValue)
+              (StrToIntDef(n1.Attribute['width'],0) + w5 + w1 > StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)
            then NewRow(True, 0,0);
            w5 := w5 - SizeParse(xn.Attribute['id']).Left;
 
@@ -1655,12 +1657,12 @@ bkg := nil;
           if n1= nil then NewRow(False, 0,0);
             w1 := StrToIntDef(xn.Attribute['width'],0);
 
-          if {(n1.Attribute['width'] = '0') and} (w1 > (StrToIntDef(RST.Attribute['width'],0)/ZoomValue)) then
-            addzoom := min(addzoom,StrToIntDef(RST.Attribute['width'],0)/ZoomValue / w1);
+          if {(n1.Attribute['width'] = '0') and} (w1 > (StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)) then
+            addzoom := min(addzoom,StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue / w1);
 
 
           if (n1.Attribute['width'] <> '0') and
-            (StrToIntDef(n1.Attribute['width'],0) + w5 + w1 > StrToIntDef(RST.Attribute['width'],0)/ZoomValue)
+            (StrToIntDef(n1.Attribute['width'],0) + w5 + w1 > StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)
           then NewRow(True, 0,0);
 
           n2 := n1.Add('rect');
@@ -1695,12 +1697,12 @@ bkg := nil;
           if n1= nil then NewRow(False, 0,0);
             w1 := StrToIntDef(xn.Attribute['width'],0);
 
-          if {(n1.Attribute['width'] = '0') and} (w1 > (StrToIntDef(RST.Attribute['width'],0)/ZoomValue)) then
-            addzoom := min(addzoom,StrToIntDef(RST.Attribute['width'],0)/ZoomValue / w1);
+          if {(n1.Attribute['width'] = '0') and} (w1 > (StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)) then
+            addzoom := min(addzoom,StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue / w1);
 
 
           if (n1.Attribute['width'] <> '0') and
-            (StrToIntDef(n1.Attribute['width'],0) + w5 + w1 > StrToIntDef(RST.Attribute['width'],0)/ZoomValue)
+            (StrToIntDef(n1.Attribute['width'],0) + w5 + w1 > StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)
           then NewRow(True, 0,0);
 
           n2 := n1.Add('image');
@@ -1768,12 +1770,12 @@ bkg := nil;
            if (xn.Attribute['width']='')or(xn.Attribute['height']='') then
              SvgUseWidth(xn.Attribute['src'], MainSvg, Clipart, w1, w2);
 
-           if {(n1.Attribute['width'] = '0') and} (w1 > (StrToIntDef(RST.Attribute['width'],0)/ZoomValue)) then
-              addzoom := min(addzoom, StrToIntDef(RST.Attribute['width'],0)/ZoomValue / w1);
+           if {(n1.Attribute['width'] = '0') and} (w1 > (StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)) then
+              addzoom := min(addzoom, StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue / w1);
 
 
            if (n1.Attribute['width'] <> '0') and
-              (StrToIntDef(n1.Attribute['width'],0) + w5 + w1 > StrToIntDef(RST.Attribute['width'],0)/ZoomValue)
+              (StrToIntDef(n1.Attribute['width'],0) + w5 + w1 > StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)
            then NewRow(True, 0,0);
 
            n2 := n1.Add('use');
@@ -1793,7 +1795,7 @@ bkg := nil;
            w1 := StrToIntDef(n2.Attribute['width'],0);
 
            if (n1.Attribute['width'] <> '0') and
-              (StrToIntDef(n1.Attribute['width'],0) + w5 + w1 > StrToIntDef(RST.Attribute['width'],0)/ZoomValue)
+              (StrToIntDef(n1.Attribute['width'],0) + w5 + w1 > StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)
            then NewRow(True, 0,0);
 
 

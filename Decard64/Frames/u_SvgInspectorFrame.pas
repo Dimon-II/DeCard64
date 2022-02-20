@@ -25,13 +25,15 @@ type
     ReplaceFrame: TSynEditFrame;
     alInspector: TActionList;
     aEdit: TAction;
-    pscrInspector: TPageScroller;
-    tbrInspector: TToolBar;
+    Panel1: TPanel;
+    Panel2: TPanel;
     cbAtrShow: TComboBox;
+    tbrInspector: TToolBar;
     tbResize: TToolButton;
     tbEdit: TToolButton;
     ToolButton16: TToolButton;
     tbSetColor: TToolButton;
+    tbPipe: TToolButton;
     tbFont: TToolButton;
     tbFileXlink: TToolButton;
     ToolButton28: TToolButton;
@@ -50,6 +52,7 @@ type
     procedure tsAtrResize(Sender: TObject);
     procedure sgAttrTopLeftChanged(Sender: TObject);
     procedure sgAttrKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure tbPipeClick(Sender: TObject);
   private
     FSVGNode: TXML_Nod;
     FEditNode: TXML_Nod;
@@ -76,7 +79,7 @@ implementation
 
 
 uses u_MainData, Vcl.Themes, u_XMLEditForm, u_MainForm, u_ThreadRender,
-  u_Html2SVG ;
+  u_Html2SVG , u_PipeForm;
 
 
 
@@ -191,6 +194,39 @@ begin
   ReplaceFrame.SynEditor.ReadOnly := pcAtrInspector.ActivePage<>tsReplace;
 end;
 
+
+procedure TSvgInspectorFrame.tbPipeClick(Sender: TObject);
+var dkr:string;
+begin
+  tbPipe.Down := True;
+  PipeForm.ShowModal;
+  tbPipe.Down := False;
+  SetForegroundWindow(Application.MainForm.Handle);
+  if PipeForm.Modalresult<>mrOk then exit;
+
+  if sgAttr.col=3 then
+    dkr:='dekart:'
+  else
+    dkr:='';
+
+  MainData.dlgColor.Color := PipeForm.AColor;
+
+  if MainData.dlgColor.Execute then
+  begin
+    if (SVGNode.LocalName='feFlood')or(sgAttr.Cells[0,sgAttr.Row]='flood-color') then
+      SVGNode.Attribute[dkr + 'flood-color'] := '#'+HexColor(MainData.dlgColor.Color)
+    else
+    if  SVGNode.LocalName='stop' then
+      SVGNode.Attribute[dkr + 'stop-color'] := '#'+HexColor(MainData.dlgColor.Color)
+    else
+    if sgAttr.Cells[0,sgAttr.Row]='stroke' then
+      SVGNode.Attribute[dkr + 'stroke'] := '#'+HexColor(MainData.dlgColor.Color)
+    else
+      SVGNode.Attribute[dkr + 'fill'] := '#'+HexColor(MainData.dlgColor.Color);
+
+    cbAtrShowClick(nil);
+  end;
+end;
 
 procedure TSvgInspectorFrame.SetSize(ARect: TRect);
 begin
@@ -631,6 +667,7 @@ begin
     cbAtrShowClick(nil);
   end;
 end;
+
 
 procedure TSvgInspectorFrame.tsAtrResize(Sender: TObject);
 var w:integer;

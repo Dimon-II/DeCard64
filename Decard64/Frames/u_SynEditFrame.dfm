@@ -15,14 +15,11 @@ object SynEditFrame: TSynEditFrame
     Font.Height = -13
     Font.Name = 'Courier New'
     Font.Style = []
-    PopupMenu = pmnuEditor
+    Font.Quality = fqClearTypeNatural
     TabOrder = 0
     OnExit = SynEditorExit
-    CodeFolding.CollapsedLineColor = clGrayText
-    CodeFolding.FolderBarLinesColor = clGrayText
+    OnKeyPress = SynEditorKeyPress
     CodeFolding.ShowCollapsedLine = True
-    CodeFolding.IndentGuidesColor = clGray
-    CodeFolding.IndentGuides = True
     UseCodeFolding = False
     Gutter.Font.Charset = DEFAULT_CHARSET
     Gutter.Font.Color = clWindowText
@@ -34,7 +31,6 @@ object SynEditFrame: TSynEditFrame
     Options = [eoAutoIndent, eoDragDropEditing, eoGroupUndo, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
     SearchEngine = SynEditSearch1
     WordWrap = True
-    FontSmoothing = fsmNone
     RemovedKeystrokes = <
       item
         Command = ecDeleteLastChar
@@ -62,7 +58,7 @@ object SynEditFrame: TSynEditFrame
     object tbrEditor: TToolBar
       Left = 0
       Top = 0
-      Width = 376
+      Width = 440
       Height = 28
       Align = alLeft
       AutoSize = True
@@ -130,8 +126,24 @@ object SynEditFrame: TSynEditFrame
         Top = 0
         Action = actSearchReplace
       end
-      object ToolButton2: TToolButton
+      object tbColorDialog: TToolButton
         Left = 272
+        Top = 0
+        Hint = 'Color dialog'
+        Caption = 'tbColorDialog'
+        ImageIndex = 53
+        OnClick = tbColorDialogClick
+      end
+      object btnPipe: TToolButton
+        Left = 304
+        Top = 0
+        Hint = 'Color picker'
+        Caption = 'btnPipe'
+        ImageIndex = 52
+        OnClick = btnPipeClick
+      end
+      object ToolButton2: TToolButton
+        Left = 336
         Top = 0
         Width = 8
         Caption = 'ToolButton2'
@@ -139,7 +151,7 @@ object SynEditFrame: TSynEditFrame
         Style = tbsSeparator
       end
       object tbSpec: TToolButton
-        Left = 280
+        Left = 344
         Top = 0
         Hint = 'Show special chars'
         Caption = 'tbSpec'
@@ -148,7 +160,7 @@ object SynEditFrame: TSynEditFrame
         OnClick = tbSpecClick
       end
       object tbGlyph: TToolButton
-        Left = 312
+        Left = 376
         Top = 0
         Hint = 'Choose glyph'
         Caption = 'Glyph'
@@ -156,7 +168,7 @@ object SynEditFrame: TSynEditFrame
         OnClick = tbGlyphClick
       end
       object ToolButton3: TToolButton
-        Left = 344
+        Left = 408
         Top = 0
         Caption = 'ToolButton3'
         ImageIndex = 22
@@ -173,7 +185,6 @@ object SynEditFrame: TSynEditFrame
       Enabled = False
       Hint = 'Cut'
       ImageIndex = 0
-      ShortCut = 16472
       OnExecute = actEditCutExecute
       OnUpdate = actEditCutUpdate
     end
@@ -183,7 +194,6 @@ object SynEditFrame: TSynEditFrame
       Enabled = False
       Hint = 'Copy'
       ImageIndex = 1
-      ShortCut = 16451
       OnExecute = actEditCopyExecute
       OnUpdate = actEditCopyUpdate
     end
@@ -193,7 +203,6 @@ object SynEditFrame: TSynEditFrame
       Enabled = False
       Hint = 'Paste'
       ImageIndex = 2
-      ShortCut = 16470
       OnExecute = actEditPasteExecute
       OnUpdate = actEditPasteUpdate
     end
@@ -280,38 +289,6 @@ object SynEditFrame: TSynEditFrame
     WantBracesParsed = False
     Left = 272
     Top = 56
-  end
-  object pmnuEditor: TPopupMenu
-    Images = MainData.ilEditor
-    Left = 76
-    Top = 52
-    object lmiEditUndo: TMenuItem
-      Action = actEditUndo
-    end
-    object lmiEditRedo: TMenuItem
-      Action = actEditRedo
-    end
-    object N2: TMenuItem
-      Caption = '-'
-    end
-    object lmiEditCut: TMenuItem
-      Action = actEditCut
-    end
-    object lmiEditCopy: TMenuItem
-      Action = actEditCopy
-    end
-    object lmiEditPaste: TMenuItem
-      Action = actEditPaste
-    end
-    object lmiEditDelete: TMenuItem
-      Action = actEditDelete
-    end
-    object N1: TMenuItem
-      Caption = '-'
-    end
-    object lmiEditSelectAll: TMenuItem
-      Action = actEditSelectAll
-    end
   end
   object SynEditSearch1: TSynEditSearch
     Left = 372

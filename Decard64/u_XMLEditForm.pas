@@ -5,16 +5,18 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, u_SvgTreeFrame, u_SynEditFrame,
-  Vcl.StdCtrls, Vcl.ExtCtrls, SynEdit, SynMemo;
+  Vcl.StdCtrls, Vcl.ExtCtrls, SynEdit;
 
 type
+  TSynEdit = class(u_SynEditFrame.TSynEdit);
+
   TXMLEditForm = class(TForm)
     pnBottom: TPanel;
     btnApply: TButton;
     btnCancel: TButton;
     pnEdit: TPanel;
     SynEditFrame: TSynEditFrame;
-    seTags: TSynMemo;
+    seTags: TSynEdit;
     splTags: TSplitter;
     procedure FormCreate(Sender: TObject);
   private
