@@ -17,7 +17,8 @@ uses
   frmGlyph in 'Frames\frmGlyph.pas' {formGlyph},
   u_CalcSVG in 'src\u_CalcSVG.pas',
   UMatrix in 'src\UMatrix.pas',
-  u_PipeForm in 'u_PipeForm.pas' {PipeForm};
+  u_PipeForm in 'u_PipeForm.pas' {PipeForm},
+  u_PathEdit in 'src\u_PathEdit.pas' {frmPathEdit};
 
 {$R *.res}
 
@@ -30,5 +31,7 @@ begin
   Application.CreateForm(TXMLEditForm, XMLEditForm);
   Application.CreateForm(TformGlyph, formGlyph);
   Application.CreateForm(TPipeForm, PipeForm);
+  Application.CreateForm(TfrmPathEdit, frmPathEdit);
+  Application.CreateForm(TfrmPathEdit, frmPathEdit);
   Application.Run;
 end.

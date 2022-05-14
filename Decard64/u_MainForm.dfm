@@ -26,7 +26,7 @@ object MainForm: TMainForm
     Top = 0
     Width = 1097
     Height = 624
-    ActivePage = tsProject
+    ActivePage = tsDesigner
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -1513,15 +1513,15 @@ object MainForm: TMainForm
       end
       object gbRendering: TGroupBox
         Left = 0
-        Top = 544
+        Top = 545
         Width = 1089
-        Height = 52
+        Height = 51
         Align = alBottom
         Caption = 'Rendering'
         TabOrder = 3
         DesignSize = (
           1089
-          52)
+          51)
         object lblEngine: TLabel
           Left = 167
           Top = 21
@@ -1529,9 +1529,81 @@ object MainForm: TMainForm
           Height = 13
           Caption = 'Engine'
         end
+        object Label7: TLabel
+          Left = 342
+          Top = 21
+          Width = 52
+          Height = 13
+          Caption = 'Page blank'
+        end
+        object sbPageBlank: TSpeedButton
+          Left = 655
+          Top = 17
+          Width = 25
+          Height = 25
+          Flat = True
+          Glyph.Data = {
+            F6060000424DF606000000000000360000002800000018000000180000000100
+            180000000000C006000000000000000000000000000000000000FF0080FF0080
+            FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF00
+            80FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF
+            0080FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF0080
+            FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF00
+            80FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF
+            0080FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF0080
+            FF0080FF0080FF0080FF0080FF0080FF0080FF0080A0A0A00000000000000000
+            0000000000000000000000000000000000000000000000000000000000000000
+            0000000000000000000000000000000000000000000000FF0080FF0080A0A0A0
+            F0F0F0FFFFFFF0F0F0FFFFFFF0F0F0FFFFFFF0F0F0FFFFFFF0F0F0FFFFFFF0F0
+            F0FFFFFFF0F0F0FFFFFFF0F0F0FFFFFFF0F0F0FFFFFFF0F0F0FFFFFF000000FF
+            0080FF0080A0A0A0FFFFFFF0F0F0FFFFFFF0F0F0FFFFFFF0F0F0FFFFFFF0F0F0
+            FFFFFFF0F0F0FFFFFFF0F0F0FFFFFFF0F0F0FFFFFFF0F0F0FFFFFFF0F0F0FFFF
+            FFF0F0F0000000FF0080FF0080A0A0A0F0F0F0FFFFFFF0F0F000000000000000
+            0000000000000000000000000000000000000000000000000000000000FFFFFF
+            F0F0F0FFFFFFF0F0F0FFFFFF000000FF0080FF0080A0A0A0FFFFFFF0F0F00000
+            0000000000FFFFF0F0F000FFFFF0F0F000FFFFF0F0F000FFFFF0F0F000FFFFF0
+            F0F000FFFF000000FFFFFFF0F0F0FFFFFFF0F0F0000000FF0080FF0080A0A0A0
+            F0F0F0FFFFFF00000000FFFF00000000FFFFF0F0F000FFFFF0F0F000FFFFF0F0
+            F000FFFFF0F0F000FFFFF0F0F000FFFF000000000000000000FFFFFF000000FF
+            0080FF0080A0A0A0FFFFFFF0F0F0000000FFFFFF000000F0F0F000FFFFF0F0F0
+            00FFFFF0F0F000FFFFF0F0F000FFFFF0F0F000FFFFF0F0F0000000FF00000000
+            00F0F0F0000000FF0080FF0080A0A0A0F0F0F0FFFFFF00000000FFFFFFFFFF00
+            0000F0F0F000FFFFF0F0F000FFFFF0F0F000FFFFF0F0F000FFFFF0F0F000FFFF
+            F0F0F0000000000000FFFFFF000000FF0080FF0080A0A0A0FFFFFFF0F0F00000
+            00FFFFFF00FFFFFFFFFF000000000000000000000000000000F0F0F000FFFFF0
+            F0F000FFFFF0F0F000FFFF000000000000F0F0F0000000FF0080FF0080A0A0A0
+            F0F0F0FFFFFF00000000FFFFFFFFFF00FFFFA0A0A0FFFFFFFFFF00FFFFFFFFFF
+            00000000000000000000000000000000000000000000000000FFFFFF000000FF
+            0080FF0080A0A0A0FFFFFFF0F0F0000000FFFFFF00FFFFFFFFFFA0A0A0FFFFFF
+            FFFFFFFFFF00FFFFFFFFFF00FFFFFFFFFF00FFFFFFFFFF000080000080000000
+            00F0F0F0000000FF0080FF0080A0A0A0F0F0F0FFFFFF00000000FFFFFFFFFF00
+            FFFFA0A0A0FFFFFFFFFF00F0F0F0FFFF00FFFFFFFFFF00FFFFFFFFFF00FFFFFF
+            FFFF00008000000000FFFFFF000000FF0080FF0080A0A0A0FFFFFFF0F0F00000
+            00FFFFFF00FFFFFFFFFFA0A0A0FFFFFFF0F0F000FFFFF0F0F0FFFF00FFFFFFFF
+            FF00FFFFFFFFFF00FFFFFFFFFF00000000F0F0F0000000FF0080FF0080A0A0A0
+            F0F0F0FFFFFF00000000FFFFFFFFFF00FFFFA0A0A0FFFFFFFFFF00F0F0F0FFFF
+            00FFFFFFFFFF00FFFFFFFFFF00FFFFFFFFFF00FFFFFF000000FFFFFF000000FF
+            0080FF0080A0A0A0FFFFFFF0F0F0FFFFFF000000000000000000A0A0A0FFFFFF
+            FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000
+            00F0F0F0000000FF0080FF0080A0A0A0F0F0F0FFFFFFF0F0F0FFFFFFF0F0F0FF
+            FFFFA0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0
+            A0A0A0A0A0A0A0A0A0FFFFFF000000FF0080FF0080A0A0A0FFFFFFF0F0F0FFFF
+            FFF0F0F0FFFFFFF0F0F0FFFFFFF0F0F0FFFFFFF0F0F0FFFFFFF0F0F0FFFFFFF0
+            F0F0FFFFFFF0F0F0FFFFFFF0F0F0FFFFFFF0F0F0000000FF0080FF0080A0A0A0
+            0000000000000000000000000000000000000000000000000000000000000000
+            00000000000000000000000000000000000000000000000000000000000000FF
+            0080FF0080A0A0A0FFFFFF000000FF0000FF0000FF0000FF0000FF0000FF0000
+            FF0000FF0000FF0000FF0000FF0000FF0000FF0000FF0000000000FFFFFF0000
+            00FFFFFF000000FF0080FF0080A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0
+            A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0
+            A0A0A0A0A0A0A0A0A0A0A0A0A0A0A0FF0080FF0080FF0080FF0080FF0080FF00
+            80FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF
+            0080FF0080FF0080FF0080FF0080FF0080FF0080FF0080FF0080}
+          OnClick = sbPageBlankClick
+        end
         object chbSaveTemp: TCheckBox
           Left = 93
-          Top = 20
+          Top = 18
           Width = 68
           Height = 20
           Caption = 'Init log'
@@ -1540,7 +1612,7 @@ object MainForm: TMainForm
         end
         object btnResetlog: TButton
           Left = 8
-          Top = 17
+          Top = 14
           Width = 75
           Height = 25
           Anchors = [akLeft, akBottom]
@@ -1563,11 +1635,18 @@ object MainForm: TMainForm
             'Resvg: Skia, exe')
         end
         object chbTextLayer: TCheckBox
-          Left = 336
-          Top = 21
+          Left = 686
+          Top = 19
           Width = 97
           Height = 17
           Caption = 'Text search PDF'
+          TabOrder = 4
+        end
+        object edPageBlank: TEdit
+          Left = 405
+          Top = 18
+          Width = 252
+          Height = 21
           TabOrder = 3
         end
       end
@@ -1575,7 +1654,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 392
         Width = 417
-        Height = 152
+        Height = 153
         Align = alLeft
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -1588,7 +1667,7 @@ object MainForm: TMainForm
         Left = 417
         Top = 392
         Width = 672
-        Height = 152
+        Height = 153
         Align = alClient
         BorderStyle = bsNone
         Color = clBtnFace
@@ -1651,14 +1730,14 @@ object MainForm: TMainForm
           TabOrder = 0
           ExplicitLeft = 2
           ExplicitTop = 15
-          ExplicitWidth = 276
+          ExplicitWidth = 281
           ExplicitHeight = 358
           inherited treeTemplate: TTreeView
             Width = 281
             Height = 309
             OnChange = SvgTreeFrame1treeTemplateChange
             OnExit = SVGFrametreeTemplateExit
-            ExplicitWidth = 276
+            ExplicitWidth = 281
             ExplicitHeight = 309
           end
           inherited pscrTemplate: TPageScroller
@@ -1667,7 +1746,7 @@ object MainForm: TMainForm
           end
           inherited pnFindRemind: TPanel
             Width = 281
-            ExplicitWidth = 276
+            ExplicitWidth = 281
           end
           inherited pmFileSVG: TPopupMenu
             inherited File1: TMenuItem
@@ -1688,7 +1767,6 @@ object MainForm: TMainForm
           Align = alBottom
           Control = tbrCellGrid
           TabOrder = 1
-          ExplicitWidth = 276
           object tbrCellGrid: TToolBar
             Left = 0
             Top = 0
@@ -1811,14 +1889,8 @@ object MainForm: TMainForm
             inherited Panel1: TPanel
               Width = 315
               ExplicitWidth = 315
-              inherited Panel2: TPanel
-                ExplicitLeft = 0
-                ExplicitTop = 0
-                ExplicitHeight = 36
-              end
               inherited tbrInspector: TToolBar
                 Width = 227
-                ExplicitLeft = 88
                 ExplicitWidth = 227
                 inherited tbResize: TToolButton
                   OnClick = InspectorFrametbResizeClick
@@ -1838,8 +1910,6 @@ object MainForm: TMainForm
         Constraints.MinHeight = 200
         Constraints.MinWidth = 50
         TabOrder = 2
-        ExplicitLeft = 285
-        ExplicitWidth = 470
         object Panel3: TPanel
           Left = 2
           Top = 15
@@ -1849,7 +1919,6 @@ object MainForm: TMainForm
           AutoSize = True
           BevelOuter = bvNone
           TabOrder = 0
-          ExplicitWidth = 466
           object Label1: TLabel
             Left = 110
             Top = 4
@@ -1988,7 +2057,6 @@ object MainForm: TMainForm
           Height = 355
           Align = alClient
           TabOrder = 1
-          ExplicitWidth = 466
           object shpBkg: TShape
             Left = 0
             Top = 0
@@ -2189,14 +2257,8 @@ object MainForm: TMainForm
             inherited Panel1: TPanel
               Width = 634
               ExplicitWidth = 634
-              inherited Panel2: TPanel
-                ExplicitLeft = 0
-                ExplicitTop = 0
-                ExplicitHeight = 36
-              end
               inherited tbrInspector: TToolBar
                 Width = 546
-                ExplicitLeft = 88
                 ExplicitWidth = 546
               end
             end
