@@ -87,9 +87,6 @@ object SvgInspectorFrame: TSvgInspectorFrame
           Align = alLeft
           BevelOuter = bvNone
           TabOrder = 0
-          ExplicitLeft = -5
-          ExplicitTop = -4
-          ExplicitHeight = 35
           object cbAtrShow: TComboBox
             Left = 3
             Top = 6
@@ -119,8 +116,6 @@ object SvgInspectorFrame: TSvgInspectorFrame
           ShowCaptions = True
           TabOrder = 1
           Wrapable = False
-          ExplicitLeft = 0
-          ExplicitWidth = 232
           object tbResize: TToolButton
             Left = 0
             Top = 0

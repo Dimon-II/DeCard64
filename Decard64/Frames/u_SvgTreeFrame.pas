@@ -58,6 +58,8 @@ type
     tbXML: TToolButton;
     pnFindRemind: TPanel;
     pnRemindDialog: TPanel;
+    Pathpathd1: TMenuItem;
+    Embossing1: TMenuItem;
     procedure treeTemplateCollapsing(Sender: TObject; Node: TTreeNode;
       var AllowCollapse: Boolean);
     procedure tbXMLClick(Sender: TObject);
@@ -93,6 +95,8 @@ type
     procedure miInnerCrssClick(Sender: TObject);
     procedure miPattertClick(Sender: TObject);
     procedure svgFindDialogShow(Sender: TObject);
+    procedure Pathpathd1Click(Sender: TObject);
+    procedure Embossing1Click(Sender: TObject);
   private
     { Private declarations }
     FSVG: TXML_Doc;
@@ -303,6 +307,17 @@ begin
     OnResizeClick(Sender);
 end;
 
+procedure TSvgTreeFrame.Embossing1Click(Sender: TObject);
+begin
+  InsertTag('<filter id="fltEmboss"><feGaussianBlur stdDeviation="1.01" result="result0" in="SourceAlpha"/>'
+		+'<feOffset in="result0" result="result3" dx="2" dy="2" stdDeviation="0.40000000000000002"/>'
+		+'<feSpecularLighting lighting-color="rgb(217,217,217)" specularConstant="1.05" result="result1" specularExponent="35" in="result0" surfaceScale="0.75">'
+		+'<fePointLight y="-10000" x="-5000" z="20000"/></feSpecularLighting>'
+		+'<feComposite operator="in" result="result2" in2="SourceAlpha" in="result1"/>'
+		+'<feComposite k3="0.99999999999999989" k2="0.99999999999999989" result="result4" in="SourceGraphic" operator="arithmetic"/>'
+		+'<feMerge><feMergeNode  in="result3"/><feMergeNode  in="result4"/></feMerge></filter>');
+end;
+
 function TSvgTreeFrame.GetFocusedNode: TTreeNode;
 begin
   Result := treeTemplate.Selected
@@ -511,6 +526,13 @@ end;
 procedure TSvgTreeFrame.miUseClick(Sender: TObject);
 begin
   InsertTag('<use/>');
+  if @FOnResizeClick<>nil then
+    OnResizeClick(Sender);
+end;
+
+procedure TSvgTreeFrame.Pathpathd1Click(Sender: TObject);
+begin
+  InsertTag('<path/>');
   if @FOnResizeClick<>nil then
     OnResizeClick(Sender);
 end;

@@ -169,6 +169,11 @@ object SvgTreeFrame: TSvgTreeFrame
       ImageIndex = 2
       OnClick = miImageClick
     end
+    object Pathpathd1: TMenuItem
+      Caption = 'Path <path d="..."/>'
+      ImageIndex = 1
+      OnClick = Pathpathd1Click
+    end
     object miUse: TMenuItem
       Caption = 'Linked object <&use/>'
       ImageIndex = 3
@@ -240,6 +245,11 @@ object SvgTreeFrame: TSvgTreeFrame
         Caption = 'Turbulence'
         ImageIndex = 11
         OnClick = miTurbulenceClick
+      end
+      object Embossing1: TMenuItem
+        Caption = 'Embossing'
+        ImageIndex = 12
+        OnClick = Embossing1Click
       end
     end
     object N1: TMenuItem

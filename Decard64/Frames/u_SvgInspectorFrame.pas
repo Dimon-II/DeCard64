@@ -79,7 +79,7 @@ implementation
 
 
 uses u_MainData, Vcl.Themes, u_XMLEditForm, u_MainForm, u_ThreadRender,
-  u_Html2SVG , u_PipeForm;
+  u_Html2SVG , u_PipeForm, u_PathEdit;
 
 
 
@@ -145,6 +145,21 @@ begin
 
 
   XMLEditForm.Caption := '<'+SVGNode.LocalName+'>.'+s;
+
+  if sgAttr.Cells[0,sgAttr.Row]='d' then
+  begin
+    frmPathEdit.CardSize := Point(MainForm.seWidth.Value,MainForm.seHeight.Value);
+    frmPathEdit.FrameSize := MainForm.seFrame.Value;
+    frmPathEdit.UndoList.Clear;
+    frmPathEdit.mePATH.Lines.Text :=sgAttr.Cells[sgAttr.Col,sgAttr.Row];
+    frmPathEdit.Caption := XMLEditForm.Caption;
+    if frmPathEdit.ShowModal=mrOk then
+    begin
+      sgAttr.Cells[sgAttr.Col,sgAttr.Row] := StringReplace(frmPathEdit.mePATH.Lines.Text,#13#10,' ',[rfReplaceAll]);
+      sgAttrSetEditText(sgAttr,sgAttr.Col, sgAttr.Row,sgAttr.Cells[sgAttr.Col,sgAttr.Row] );
+    end;
+  end
+  else
   if XMLEditForm.ShowModal=mrOk then
   begin
     if sgAttr.Cells[0,sgAttr.Row]='body' then
@@ -231,6 +246,11 @@ end;
 procedure TSvgInspectorFrame.SetSize(ARect: TRect);
 begin
    if SVGNode.LocalName='svg' then exit;
+
+   if (SVGNode.LocalName='path') and (SVGNode.Attribute['d']='') then
+   begin
+     SVGNode.Attribute['d'] := Format('M %d %d H %d V %d H %d Z', [ARect.Left, ARect.Top, ARect.Right, ARect.Bottom, ARect.Left]);
+   end;
 
    if SVGNode.LocalName='text' then
    begin
@@ -375,7 +395,10 @@ procedure TSvgInspectorFrame.SetSVGNode(const Value: TXML_Nod);
       en:=UrlList('mask',en)
     else
     if (Aname='filter') then
+    begin
       en:=UrlList('filter',en);
+      en := en + ',blur(3),brightness(100%),contrast(100%),drop-shadow(10 10 1.5 black),grayscale(100%),hue-rotate(30deg),invert(100%),opacity(50%),sepia(100%),saturate(100%)';
+    end;
 
 
 
