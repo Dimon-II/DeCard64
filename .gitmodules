@@ -1,3 +1,6 @@
 [submodule "Decard64/SynPDF"]
 	path = Decard64/SynPDF
 	url = https://github.com/synopse/SynPDF
+[submodule "Decard64/regexp"]
+	path = Decard64/regexp
+	url = https://github.com/lakeofsoft/regexp.git
