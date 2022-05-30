@@ -298,6 +298,7 @@ object frmPathEdit: TfrmPathEdit
         Font.Height = -13
         Font.Name = 'Tahoma'
         Font.Style = []
+        ModalResult = 2
         ParentFont = False
         TabOrder = 1
       end
@@ -331,7 +332,6 @@ object frmPathEdit: TfrmPathEdit
       OnDblClick = DrawDblClick
       OnDragOver = shDot1DragOver
       OnMouseDown = DrawMouseDown
-      OnMouseMove = DrawMouseMove
       OnPaint = DrawPaint
       OnStartDrag = DrawStartDrag
       ExplicitLeft = 10
@@ -348,21 +348,6 @@ object frmPathEdit: TfrmPathEdit
       DragCursor = crCross
       DragMode = dmAutomatic
       Pen.Color = clRed
-      Shape = stCircle
-      OnDragDrop = shAng1DragDrop
-      OnDragOver = shDot1DragOver
-      OnMouseDown = shDot2MouseDown
-    end
-    object shDot2: TShape
-      Left = 152
-      Top = 192
-      Width = 16
-      Height = 16
-      Brush.Style = bsClear
-      DragCursor = crCross
-      DragMode = dmAutomatic
-      Pen.Color = clBlue
-      Pen.Width = 2
       Shape = stCircle
       OnDragDrop = shAng1DragDrop
       OnDragOver = shDot1DragOver
@@ -393,6 +378,21 @@ object frmPathEdit: TfrmPathEdit
       Pen.Color = clRed
       Shape = stCircle
       Visible = False
+      OnDragDrop = shAng1DragDrop
+      OnDragOver = shDot1DragOver
+      OnMouseDown = shDot2MouseDown
+    end
+    object shDot2: TShape
+      Left = 152
+      Top = 192
+      Width = 16
+      Height = 16
+      Brush.Style = bsClear
+      DragCursor = crCross
+      DragMode = dmAutomatic
+      Pen.Color = clBlue
+      Pen.Width = 2
+      Shape = stCircle
       OnDragDrop = shAng1DragDrop
       OnDragOver = shDot1DragOver
       OnMouseDown = shDot2MouseDown

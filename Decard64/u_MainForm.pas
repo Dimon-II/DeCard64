@@ -221,6 +221,9 @@ type
     ClerrSelection1: TMenuItem;
     N2: TMenuItem;
     btnBleed2mm: TButton;
+    Label7: TLabel;
+    edPageBlank: TEdit;
+    sbPageBlank: TSpeedButton;
     procedure sbOpenRootClick(Sender: TObject);
     procedure sbOpenTextClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -325,6 +328,7 @@ type
     procedure ClerrSelection1Click(Sender: TObject);
     procedure FillSelection1Click(Sender: TObject);
     procedure btnBleed2mmClick(Sender: TObject);
+    procedure sbPageBlankClick(Sender: TObject);
   private
     { Private declarations }
     FSel:TRect;
@@ -685,7 +689,7 @@ begin
 end;
 
 procedure TMainForm.btnProcessClick(Sender: TObject);
-var i,j,cnt,n, w, h:Integer;
+var i, j, k, cnt, n, w, h:Integer;
   x1,x2:TXML_Doc;
   s,sx1,sxb1, fmt, fn, DPI,ZM :string;
   f:TFileStream;
@@ -748,6 +752,9 @@ var
   end;
 
   procedure SaveRender;
+  var
+    ii: Integer;
+    s: string;
   begin
 
     fn := ResultName(cbFileName.Text, sgText.RowCount - 1, i, j) + '.SVG';
@@ -980,6 +987,15 @@ begin
       Attribute['height'] := '100%';
     end;
 
+    if edPageBlank.Text<>'' then
+      with x1.Nodes.Last.Add('image') do
+      begin
+        Attribute['id'] := 'imgPageBack';
+        Attribute['preserveAspectRatio'] := 'xMinYMin meet';
+        Attribute['width'] := '100%';
+        Attribute['height'] := '100%';
+      end;
+
     // AddBack(x1,0);
 
     S := x1.Nodes.Last.Attribute['fill'];
@@ -1064,6 +1080,14 @@ begin
             Attribute['height'] := '100%';
           end;
         end;
+      if edPageBlank.Text<>'' then
+        with x1bk.Nodes.Last.Add('image') do
+        begin
+          Attribute['id'] := 'imgPageBack';
+          Attribute['preserveAspectRatio'] := 'xMinYMin meet';
+          Attribute['width'] := '100%';
+          Attribute['height'] := '100%';
+        end;
 
       sxb1 := x1bk.xml;
     end;
@@ -1120,6 +1144,16 @@ begin
 
       for j := 1 to Cnt do
       begin
+
+        if (n=0) and (x1.Nodes.Last.Nodes.ByID('imgPageBack')<>nil) then
+        begin
+          s := edPageBlank.Text;
+          for k :=0 to sgText.ColCount-1 do
+            s := StringReplace(s, '[' + IntToStr(k)+']', sgText.Cells[k, i], [rfReplaceAll, rfIgnoreCase]);
+          x1.Nodes.Last.Nodes.ByID('imgPageBack').Attribute['xlink:href'] := s;
+          if edBackTemplate.Text <> '' then
+            x1bk.Nodes.Last.Nodes.ByID('imgPageBack').Attribute['xlink:href'] := s;
+        end;
 
         if chbMirror.Checked then
           x2.Nodes.Last.Attribute['transform'] := 'translate(' +
@@ -3146,6 +3180,17 @@ begin
 
     edCfgCardsFile.Text := ExtractRelativePath(edCfgRoot.Text, MainData.dlgOpenText.FileName);
     ReadGrid(MainData.dlgOpenText.FileName);
+  end;
+end;
+
+procedure TMainForm.sbPageBlankClick(Sender: TObject);
+begin
+  ChDir(edCfgRoot.text);
+  MainData.dlgOpenPicture.InitialDir := edCfgRoot.Text;
+  MainData.dlgOpenPicture.FileName := edPageBlank.Text;
+  if MainData.dlgOpenPicture.Execute then
+  begin
+    edPageBlank.Text := ExtractRelativePath(edCfgRoot.text, MainData.dlgOpenPicture.FileName);
   end;
 end;
 

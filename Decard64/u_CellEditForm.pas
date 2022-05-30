@@ -94,7 +94,7 @@ implementation
 
 {$R *.dfm}
 
-uses u_MainData, u_MainForm, u_XMLEditForm, Clipbrd;
+uses u_MainData, u_MainForm, u_XMLEditForm, Clipbrd, unaRe;
 
 { TCellEditForm }
 
@@ -108,16 +108,18 @@ begin
   for i:=0 to FRepl.Count-1 do
     if Pos('=', FRepl[i])>0 then
     begin
-        n:=Copy(FRepl[i], 1, Pos('=', FRepl[i])-1);
-
-        if Pos(WideUpperCase(WideString(n)), WideUpperCase(s)) >0 then
-        begin
-          r := copy(FRepl[i],length(n)+2, Length(FRepl[i]));
-          if copy(r,1,1)='=' then
-            s := StringReplace(s, n, copy(r,2,length(r)) ,[rfReplaceAll])
-          else
-            s := StringReplace(s, n, r ,[rfReplaceAll, rfIgnoreCase]);
-        end;
+      n:=Copy(FRepl[i], 1, Pos('=', FRepl[i])-1);
+      r := copy(FRepl[i],length(n)+2, Length(FRepl[i]));
+      if Pos(WideUpperCase(WideString(n)), WideUpperCase(s)) >0 then
+      begin
+        if copy(r,1,1)='=' then
+          s := StringReplace(s, n, copy(r,2,length(r)) ,[rfReplaceAll])
+        else
+          s := StringReplace(s, n, r ,[rfReplaceAll, rfIgnoreCase]);
+        end
+      else
+      if copy(r,1,1)='$' then
+        s := unaRe.replace(s,n,copy(r,2,length(r)),1,True);
     end;
   s := StringReplace(s, '>', '>'#13#10 ,[rfReplaceAll, rfIgnoreCase]);
   XMLEditForm.XML := s;

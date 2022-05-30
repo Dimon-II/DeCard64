@@ -111,7 +111,6 @@ type
     procedure btnApplyClick(Sender: TObject);
     procedure DrawStartDrag(Sender: TObject; var DragObject: TDragObject);
     procedure seGridChange(Sender: TObject);
-    procedure DrawMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
     procedure DrawDblClick(Sender: TObject);
   private
     { Private declarations }
@@ -352,6 +351,9 @@ procedure TfrmPathEdit.DrawMouseDown(Sender: TObject; Button: TMouseButton;
 var
   i,j,l,d:Integer;
 begin
+  if (ssRight in Shift)  then
+    Draw.BeginDrag(True)
+  else
   if Button = mbLeft then
   begin
     sgDots.SetFocus;
@@ -369,20 +371,12 @@ begin
   end
 end;
 
-procedure TfrmPathEdit.DrawMouseMove(Sender: TObject; Shift: TShiftState; X,
-  Y: Integer);
-begin
-  if (ssLeft in Shift) or  (ssRight in Shift)  then
-    Draw.BeginDrag(True);
-
-end;
-
 procedure TfrmPathEdit.DrawPaint(Sender: TObject);
 var
   p:array of TPoint;
   i,j:Integer;
   p0, p1, pz, pq, mx, MinXY: tpoint;
-
+  Rx, Ry: double;
 begin
 
   mx:=point(0,0);
@@ -699,6 +693,26 @@ begin
      begin
         p1.X := Round(zm*StrToFloatDef(sgDots.Cells[7,i],0));
         p1.Y := Round(zm*StrToFloatDef(sgDots.Cells[8,i],0));
+
+        Rx:=zm*StrToFloatDef(sgDots.Cells[2,i],0);
+        Ry:=zm*StrToFloatDef(sgDots.Cells[3,i],0);
+ {
+        if sqr(Rx) + sqr(Ry) < sqr(p0.x - p1.x)+sqr(p0.y - p1.y)  then
+        begin
+          Rx := sqrt(sqr(p0.x - p1.x)+sqr(p0.y - p1.y))/2;
+          Ry:=Rx;
+        end;
+}
+        if sgDots.Cells[5,i]='0' then
+          Rx := -Rx;
+        if sgDots.Cells[6,i]='0' then
+          Ry := -Ry;
+
+        p[0].x := Round(p0.X + Cos(pi/180  * StrToFloatDef(sgDots.Cells[4,i],0))*Rx);
+        p[0].y := Round(p0.y + Sin(pi/180  * StrToFloatDef(sgDots.Cells[4,i],0))*Rx);
+        p[1].x := Round(p0.X - Sin(pi/180  * StrToFloatDef(sgDots.Cells[4,i],0))*Ry);
+        p[1].y := Round(p0.y - Cos(pi/180  * StrToFloatDef(sgDots.Cells[4,i],0))*Ry);
+
 //        Pen.Style := psDot;
         SvgArcTo(p0,
            Round(zm*StrToFloatDef(sgDots.Cells[2,i],0)),
@@ -735,6 +749,25 @@ begin
      begin
         p1.X := p0.X + Round(zm*StrToFloatDef(sgDots.Cells[7,i],0));
         p1.Y := p0.y + Round(zm*StrToFloatDef(sgDots.Cells[8,i],0));
+
+        Rx:=zm*StrToFloatDef(sgDots.Cells[2,i],0);
+        Ry:=zm*StrToFloatDef(sgDots.Cells[3,i],0);
+{
+        if sqr(Rx) + sqr(Ry) < sqr(p0.x - p1.x)+sqr(p0.y - p1.y)  then
+        begin
+          Rx := sqrt(sqr(p0.x - p1.x)+sqr(p0.y - p1.y))/2;
+          Ry:=Rx;
+        end;
+}
+        if sgDots.Cells[5,i]='0' then
+          Rx := -Rx;
+        if sgDots.Cells[6,i]='0' then
+          Ry := -Ry;
+
+        p[0].x := Round(p0.X + Cos(pi/180  * StrToFloatDef(sgDots.Cells[4,i],0))*Rx);
+        p[0].y := Round(p0.y + Sin(pi/180  * StrToFloatDef(sgDots.Cells[4,i],0))*Rx);
+        p[1].x := Round(p0.X - Sin(pi/180  * StrToFloatDef(sgDots.Cells[4,i],0))*Ry);
+        p[1].y := Round(p0.y - Cos(pi/180  * StrToFloatDef(sgDots.Cells[4,i],0))*Ry);
 
         SvgArcTo(p0,
            Round(zm*StrToFloatDef(sgDots.Cells[2,i],0)),
@@ -783,14 +816,19 @@ begin
        shDot2.top := p0.y - ZeroXY.y;
 
 //       shDot1.Visible := Pos(sgDots.Cells[1,i],'AaLVHCSQTZmlvhcsqtz')>0;
-       shAng1.Visible := Pos(sgDots.Cells[1,i],'Cc')>0;
-       shAng2.Visible := Pos(sgDots.Cells[1,i],'CSQcsq')>0;
+       shAng1.Visible := Pos(sgDots.Cells[1,i],'CcAa')>0;
+       shAng2.Visible := Pos(sgDots.Cells[1,i],'CSQcsqAa')>0;
 
        Pen.Color := $FF;
        Pen.Width:=1;
-         MoveTo(shDot1.left, shDot1.Top);
-       if Pos(sgDots.Cells[1,i],'CcTtSsQq')>0 then
+       MoveTo(shDot1.left, shDot1.Top);
+
+       if Pos(sgDots.Cells[1,i],'CcTtSsQqAa')>0 then
          LineTo(p[0].x-ZeroXY.x ,p[0].y-ZeroXY.y);
+       MoveTo(shDot1.left, shDot1.Top);
+       if Pos(sgDots.Cells[1,i],'Aa')>0 then
+         LineTo(p[1].x-ZeroXY.x ,p[1].y-ZeroXY.y);
+
        MoveTo(p[1].x-ZeroXY.x,p[1].y-ZeroXY.y);
        if Pos(sgDots.Cells[1,i],'CSQTcsqt')>0 then
          LineTo(p0.x-ZeroXY.x,p0.y-ZeroXY.y);
@@ -994,6 +1032,11 @@ begin
 
       if Source=shAng2 then
       case sgDots.Cells[1,sgDots.Row][1] of
+        'A','a':
+        Begin
+//          sgDots.Cells[3,sgDots.Row]:=FloatToStr(RoundTo(pnt.x/zm, -3));
+        End;
+
         'C','c':
         Begin
           sgDots.Cells[4,sgDots.Row]:=FloatToStr(RoundTo(pnt.x/zm, -3));
@@ -1016,6 +1059,7 @@ begin
       end;
 
       Draw.Invalidate;
+      sgDots.Invalidate;
     end;
   end
   else
@@ -1081,7 +1125,7 @@ procedure TfrmPathEdit.ToolButton1Click(Sender: TObject);
 var i:Integer;
  s:string;
 begin
-  ZeroXY := Point(0,0);
+//  ZeroXY := Point(0,0);
   for i:= 1 to sgDots.RowCount-1 do
     PathAbs(i);
   ResetCaption(sgDots.Row);
@@ -1101,7 +1145,7 @@ procedure TfrmPathEdit.ToolButton2Click(Sender: TObject);
 var i:Integer;
 s:string;
 begin
-  ZeroXY := Point(0,0);
+//  ZeroXY := Point(0,0);
   for i:= 1 to sgDots.RowCount-1 do
     PathRel(i);
   ResetCaption(sgDots.Row);
@@ -1235,9 +1279,10 @@ begin
        s[i]:=#32;
   s:=StringReplace(s,',',' ',[rfReplaceAll]);
   s:=trim(StringReplace(s,'-',' -',[rfReplaceAll]));
-  s:=StringReplace(s,'  ',' ',[rfReplaceAll]);
-  s:=StringReplace(s,'  ',' ',[rfReplaceAll]);
-  s:=StringReplace(s,'  ',' ',[rfReplaceAll]);
+  s:=trim(StringReplace(s,'E -','E-',[rfReplaceAll]));
+  s:=trim(StringReplace(s,'e -','E-',[rfReplaceAll]));
+  while pos('  ', s)>0 do
+    s:=StringReplace(s,'  ',' ',[rfReplaceAll]);
 
   n:=0;
   for i := 1 to Length(s) do
@@ -1258,10 +1303,10 @@ begin
       continue;
     end
     else
-    if (s[i]='.')and(pos('.',sgDots.Cells[j,n])>0) then
+    if (s[i]='.')and(pos('.',sgDots.Cells[j,n],Pos('E',sgDots.Cells[j,n])+1)>0) then
       inc(j)
     else
-    if (s[i]='-')and(sgDots.Cells[j,n]<>'') then
+    if (s[i]='-')and(sgDots.Cells[j,n]<>'')and(s[i-1]<>'E') then
       inc(j);
 
     if (((sgDots.Cells[1,n]='C')or(sgDots.Cells[1,n]='c'))and (j=8))
@@ -1279,6 +1324,10 @@ begin
       sgDots.Rows[n].text := IntToStr(n);
       sgDots.Cells[1,n]:=sgDots.Cells[1,n-1];
     end;
+
+    if ((sgDots.Cells[1,n]='A')or(sgDots.Cells[1,n]='a'))and (j in [5,6]) and (sgDots.Cells[j,n]<>'')
+    then
+      inc(j);
 
     if (sgDots.Cells[1,n]='M') and (j=4)
     then
@@ -1413,6 +1462,7 @@ begin
     'a': sgDots.Rows[0].CommaText := '¹,Cmd,rx,ry,ax,(C,(/),dx,dy';
     'z': sgDots.Rows[0].CommaText := '¹,Cmd';
   end;
+  sgDots.Invalidate;
 end;
 
 end.

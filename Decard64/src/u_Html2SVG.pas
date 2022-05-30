@@ -1,4 +1,4 @@
-    unit u_Html2SVG;
+unit u_Html2SVG;
 
 interface
 
@@ -15,7 +15,7 @@ implementation
 {$WARN IMPLICIT_STRING_CAST OFF}
 
 uses system.sysutils, system.strutils, System.Types, system.Math, Vcl.Graphics,
-u_ThreadRender, VCL.Forms, u_MainForm, Winapi.Windows;
+u_ThreadRender, VCL.Forms, u_MainForm, Winapi.Windows, unaRE;
 
 var   FBufXml:TStringList;
 
@@ -23,6 +23,7 @@ var   FBufXml:TStringList;
 function SvgFloat(d:double):string;
 begin
   str(d:0:4,result);
+
 end;
 
 function FontSizeConv(const Str: string; OldSize: double; DPI:string): double;
@@ -224,14 +225,21 @@ begin
         if idx.IndexOf(n)=-1 then
         begin
           idx.Add(n);
+
+
+          r := copy(sn[i],length(n)+2, Length(sn[i]));
           if Pos(WideUpperCase(WideString(n)), WideUpperCase(s)) >0 then
           begin
-            r := copy(sn[i],length(n)+2, Length(sn[i]));
             if copy(r,1,1)='=' then
               s := StringReplace(s, n, copy(r,2,length(r)) ,[rfReplaceAll])
             else
               s := StringReplace(s, n, r ,[rfReplaceAll, rfIgnoreCase]);
-          end;
+          end
+          else
+          if copy(r,1,1)='$' then
+            s := unaRe.replace(s,n,copy(r,2,length(r)),1,True);
+
+
         end;
 
       end;
@@ -1083,6 +1091,24 @@ var
 
   LineUp, LineDn: integer;
 
+  function PercentWidth(AVal: string; ADef: integer):Integer;
+  begin
+    if pos('%', AVal) > 0 then
+      Result := Round(StrToFloatDef(NOD.Attribute['width'],ADef) / 100
+              * StrToIntDef(StringReplace(AVal,'%','',[]), ADef) / ZoomValue)
+    else
+      Result := Round(StrToFloatDef(AVal, ADef))
+  end;
+
+  function PercentWidth0(AVal: string; ADef: integer):Integer;
+  begin
+    if pos('%', AVal) > 0 then
+      Result := Round(StrToFloatDef(NOD.Attribute['width'],ADef) / 100
+              * StrToIntDef(StringReplace(AVal,'%','',[]), ADef) )
+    else
+      Result := Round(StrToFloatDef(AVal, ADef))
+  end;
+
 
 
 
@@ -1162,10 +1188,10 @@ var
     x := StrToIntDef(nod.Attribute['x'],0);
 
     if n1.Attribute['align']='right' then
-      x := x + round(StrToIntDef(ParentStyle(n1,'html-width', nod.Attribute['width']),0)/ZoomValue) - StrToIntDef(n1.Attribute['width'],0)
+      x := x + round(PercentWidth0(ParentStyle(n1,'html-width', nod.Attribute['width']),0)/ZoomValue) - PercentWidth(n1.Attribute['width'],0)
     else
     if n1.Attribute['align']='center' then
-      x := x + (round(StrToIntDef(ParentStyle(n1,'html-width', nod.Attribute['width']),0)/ZoomValue) - StrToIntDef(n1.Attribute['width'],0)) div 2
+      x := x + (round(PercentWidth0(ParentStyle(n1,'html-width', nod.Attribute['width']),0)/ZoomValue) - PercentWidth(n1.Attribute['width'],0)) div 2
     else
     if Align and (n1.Attribute['align']='width')  then
     begin
@@ -1173,7 +1199,7 @@ var
       begin
         if n1.Nodes.Count > 1 then
         begin
-           w := (round(StrToIntDef(ParentStyle(n1,'html-width', nod.Attribute['width']),0)/ZoomValue) - StrToIntDef(n1.Attribute['width'],0)) / (n1.Nodes.Count-1);
+           w := (round(PercentWidth0(ParentStyle(n1,'html-width', nod.Attribute['width']),0)/ZoomValue) - PercentWidth(n1.Attribute['width'],0)) / (n1.Nodes.Count-1);
            for i := 1 to n1.Nodes.Count-1 do
 
              n1.Nodes[i].Attribute['x'] := IntToStr(Round(StrToIntDef(n1.Nodes[i].Attribute['x'],0) + i*w));
@@ -1195,7 +1221,7 @@ var
         if err> 1 then
           err:= err - 1;
 
-        sp := sp + (round(StrToIntDef(ParentStyle(n1,'html-width', nod.Attribute['width']),0)/ZoomValue) - StrToIntDef(n1.Attribute['width'],0))/(err);
+        sp := sp + (round(PercentWidth0(ParentStyle(n1,'html-width', nod.Attribute['width']),0)/ZoomValue) - PercentWidth(n1.Attribute['width'],0))/(err);
         Str(sp:0:3,s);
         n1.Attribute['letter-spacing'] := s;
         err := 0;
@@ -1243,7 +1269,7 @@ var
 
     n1.Attribute['html-width'] := ParentStyle(xn,'html-width','');
 
-    indent :=  StrToIntDef(ParentStyle(xn,'text-indent','0'), 0);
+    indent :=  PercentWidth(ParentStyle(xn,'text-indent','0'), 0);
 
     if Align and (indent>=0) then
       n1.Attribute['width'] := IntToStr(dx)
@@ -1449,10 +1475,8 @@ bkg := nil;
                xn.Attribute['stroke'] := xn.Attribute['color'];
 //               xn.Attributes.ByName('color').Free;
              end;
-             xn.Attribute['baselile-shift'] := xn.Attribute['dy'];
-             xn.Attribute['dy'] :='';
-
-
+//             xn.Attribute['baselile-shift'] := xn.Attribute['dy'];
+//             xn.Attribute['dy'] :='';
            end;
         end;
         j:=i+1;
@@ -1539,14 +1563,14 @@ bkg := nil;
 
         if xn.LocalName='br' then
         begin
-          NewRow(true, StrToIntDef(xn.Attribute['dx'],0), StrToIntDef(xn.Attribute['dy'],0));
+          NewRow(true, PercentWidth(xn.Attribute['dx'],0), StrToIntDef(xn.Attribute['dy'],0));
         end;
 
         if xn.LocalName='p' then
-          NewRow(false,StrToIntDef(xn.Attribute['dx'],0),StrToIntDef(xn.Attribute['dy'],0));
+          NewRow(false,PercentWidth(xn.Attribute['dx'],0),StrToIntDef(xn.Attribute['dy'],0));
 
         if (xn.LocalName='div') then
-          NewRow(false, StrToIntDef(xn.Attribute['dx'],0),StrToIntDef(xn.Attribute['dy'],0));
+          NewRow(false, PercentWidth(xn.Attribute['dx'],0),StrToIntDef(xn.Attribute['dy'],0));
 
         if (xn.LocalName='space')and (n1<>nil) then
         begin
@@ -1598,11 +1622,11 @@ bkg := nil;
            w2 := SizeParse(xn.Attribute['id']+'Z').Right+SizeParse(xn.Attribute['id']+'Z').Left;
            w2 := round(w2 + (w2-2*w1)* WordSpacing);
 
-           if {(n1.Attribute['width'] = '0') and} (w1 > (StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)) then
-              addzoom := min(addzoom,StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue / w1);
+           if {(n1.Attribute['width'] = '0') and} (w1 > (PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)) then
+              addzoom := min(addzoom,PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue / w1);
 
            if (n1.Attribute['width'] <> '0') and
-              (StrToIntDef(n1.Attribute['width'],0) + w5 + w1 > StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)
+              (PercentWidth(n1.Attribute['width'],0) + w5 + w1 > PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)
            then NewRow(True, 0,0);
            w5 := w5 - SizeParse(xn.Attribute['id']).Left;
 
@@ -1623,10 +1647,15 @@ bkg := nil;
 //           n2.Attribute['baseline-shift'] := ParentStyle(xn, 'baseline-shift');
            n2.Attribute['width'] := IntToStr(w1);
 
-           n2.Attribute['x'] := IntToStr(StrToIntDef(n1.Attribute['width'],0) + w5);
+           n2.Attribute['x'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5);
 
            n2.Attribute['height'] := ParentStyle(xn,'font-size');
-           n2.Attribute['y'] := ParentStyle(xn, 'baselile-shift');
+           n2.Attribute['dy'] := ParentStyle(xn, 'baselile-shift');
+//          if ParentStyle(xn, 'baselile-shift')<>'' then
+//           n2.Attribute['dy'] := ParentStyle(xn, 'baselile-shift');
+
+
+//           n2.Attribute['baselile-shift'] := '0';
            n2.Attribute['filter'] := ParentStyle(xn, 'filter');
 //           n2.Attribute['filter'] := xn.Attribute['filter'];
 
@@ -1638,7 +1667,7 @@ bkg := nil;
              n2.Attribute['height'] := IntToStr( Round(StrToIntDef(n2.Attribute['height'],0) / 100 * r)) ;
            end;
 
-           n1.Attribute['width'] := IntToStr(StrToIntDef(n1.Attribute['width'],0) + w5 + w1);
+           n1.Attribute['width'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + w1);
 
            if StrToIntDef(n2.Attribute['y'],0)>0 then
              n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),StrToIntDef(n2.Attribute['height'],0)-StrToIntDef(n2.Attribute['y'],0)) )
@@ -1655,24 +1684,24 @@ bkg := nil;
         if xn.LocalName='rect' then
         begin
           if n1= nil then NewRow(False, 0,0);
-            w1 := StrToIntDef(xn.Attribute['width'],0);
+            w1 := PercentWidth(xn.Attribute['width'],0);
 
-          if {(n1.Attribute['width'] = '0') and} (w1 > (StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)) then
-            addzoom := min(addzoom,StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue / w1);
+          if {(n1.Attribute['width'] = '0') and} (w1 > (PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)) then
+            addzoom := min(addzoom,PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue / w1);
 
 
           if (n1.Attribute['width'] <> '0') and
-            (StrToIntDef(n1.Attribute['width'],0) + w5 + w1 > StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)
+            (PercentWidth(n1.Attribute['width'],0) + w5 + w1 > PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)
           then NewRow(True, 0,0);
 
           n2 := n1.Add('rect');
           n2.ResetXml(xn.xml);
 
-          n2.Attribute['x'] := IntToStr(StrToIntDef(n1.Attribute['width'],0) + w5  + StrToIntDef(xn.Attribute['dx'],0));
+          n2.Attribute['x'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5  + PercentWidth(xn.Attribute['dx'],0));
           n2.Attribute['y'] := IntToStr(-StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
 
 
-          n1.Attribute['width'] := IntToStr(StrToIntDef(n1.Attribute['width'],0) + w5 + w1 + StrToIntDef(xn.Attribute['dx'],0));
+          n1.Attribute['width'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + w1 + PercentWidth(xn.Attribute['dx'],0));
           n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),
             StrToIntDef(n2.Attribute['height'],0) - abs(StrToIntDef(xn.Attribute['dy'],0))));
 
@@ -1695,14 +1724,14 @@ bkg := nil;
         if xn.LocalName='img' then
         begin
           if n1= nil then NewRow(False, 0,0);
-            w1 := StrToIntDef(xn.Attribute['width'],0);
+            w1 := PercentWidth(xn.Attribute['width'],0);
 
-          if {(n1.Attribute['width'] = '0') and} (w1 > (StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)) then
-            addzoom := min(addzoom,StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue / w1);
+          if {(n1.Attribute['width'] = '0') and} (w1 > (PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)) then
+            addzoom := min(addzoom,PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue / w1);
 
 
           if (n1.Attribute['width'] <> '0') and
-            (StrToIntDef(n1.Attribute['width'],0) + w5 + w1 > StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)
+            (PercentWidth(n1.Attribute['width'],0) + w5 + w1 > PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)
           then NewRow(True, 0,0);
 
           n2 := n1.Add('image');
@@ -1711,12 +1740,12 @@ bkg := nil;
           n2.Attribute['filter'] := xn.Attribute['filter'];
           n2.Attribute['width'] := xn.Attribute['width'];
           n2.Attribute['height'] := xn.Attribute['height'];
-          n2.Attribute['x'] := IntToStr(StrToIntDef(n1.Attribute['width'],0) + w5  + StrToIntDef(xn.Attribute['dx'],0));
+          n2.Attribute['x'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5  + PercentWidth(xn.Attribute['dx'],0));
           n2.Attribute['y'] := IntToStr(-StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
 
 
           n2.Attribute['xlink:href'] := xn.Attribute['src'];
-          n1.Attribute['width'] := IntToStr(StrToIntDef(n1.Attribute['width'],0) + w5 + w1+ StrToIntDef(xn.Attribute['dx'],0));
+          n1.Attribute['width'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + w1+ PercentWidth(xn.Attribute['dx'],0));
 //         n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),-StrToIntDef(n2.Attribute['y'],0)) )
           n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),
           StrToIntDef(n2.Attribute['height'],0) - abs(StrToIntDef(xn.Attribute['dy'],0))));
@@ -1733,7 +1762,7 @@ bkg := nil;
           ImgRect.Left := StrToIntDef(xn.Attribute['x1'],0);
           ImgRect.Top := StrToIntDef(xn.Attribute['y1'],0);
           if xn.Attribute['x2']='' then
-            ImgRect.Right := StrToIntDef(n2.Attribute['width'],0) + ImgRect.Left
+            ImgRect.Right := PercentWidth(n2.Attribute['width'],0) + ImgRect.Left
           else
             ImgRect.Right := StrToIntDef(xn.Attribute['x2'],0);
 
@@ -1764,18 +1793,18 @@ bkg := nil;
         begin
           if n1= nil then NewRow(False, 0,0);
 
-           w1 := StrToIntDef(xn.Attribute['width'],0);
+           w1 := PercentWidth(xn.Attribute['width'],0);
            w2 := StrToIntDef(xn.Attribute['height'],0);
 
            if (xn.Attribute['width']='')or(xn.Attribute['height']='') then
              SvgUseWidth(xn.Attribute['src'], MainSvg, Clipart, w1, w2);
 
-           if {(n1.Attribute['width'] = '0') and} (w1 > (StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)) then
-              addzoom := min(addzoom, StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue / w1);
+           if {(n1.Attribute['width'] = '0') and} (w1 > (PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)) then
+              addzoom := min(addzoom, PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue / w1);
 
 
            if (n1.Attribute['width'] <> '0') and
-              (StrToIntDef(n1.Attribute['width'],0) + w5 + w1 > StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)
+              (PercentWidth(n1.Attribute['width'],0) + w5 + w1 > PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)
            then NewRow(True, 0,0);
 
            n2 := n1.Add('use');
@@ -1792,18 +1821,18 @@ bkg := nil;
 
            n2.Attribute['filter'] := xn.Attribute['filter'];
 
-           w1 := StrToIntDef(n2.Attribute['width'],0);
+           w1 := PercentWidth(n2.Attribute['width'],0);
 
            if (n1.Attribute['width'] <> '0') and
-              (StrToIntDef(n1.Attribute['width'],0) + w5 + w1 > StrToIntDef(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)
+              (PercentWidth(n1.Attribute['width'],0) + w5 + w1 > PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)
            then NewRow(True, 0,0);
 
 
-           n2.Attribute['x'] := IntToStr(StrToIntDef(n1.Attribute['width'],0) + w5 + StrToIntDef(xn.Attribute['dx'],0));
+           n2.Attribute['x'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + PercentWidth(xn.Attribute['dx'],0));
            n2.Attribute['y'] := IntToStr(-StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
 
            n2.Attribute['xlink:href'] := xn.Attribute['src'];
-           n1.Attribute['width'] := IntToStr(StrToIntDef(n1.Attribute['width'],0) + w5 + w1 + StrToIntDef(xn.Attribute['dx'],0));
+           n1.Attribute['width'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + w1 + PercentWidth(xn.Attribute['dx'],0));
            n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),
            StrToIntDef(n2.Attribute['height'],0) - abs(StrToIntDef(xn.Attribute['dy'],0))));
 
@@ -1875,6 +1904,20 @@ bkg := nil;
 
     if (ParentStyle(NOD, 'decard-baseline','80%')<>'100%')  then
       nody:= nody - Round(Row1*ZoomValue);
+
+    n1 := RST;
+
+    while n1<>nil do
+    begin
+      if pos('%', n1.Attribute['width'])>0 then
+      begin
+        if (ZoomValue<>1)and (ZoomValue<>0) then
+          n1.Attribute['width'] := IntToStr(PercentWidth(n1.Attribute['width'],0))
+        else
+          n1.Attribute['width'] := IntToStr(PercentWidth(n1.Attribute['width'],0));
+      end;
+      n1 := n1.Next;
+    end;
 
 
     if pos('valign:',nod.Attribute['decard-format'])>0 then

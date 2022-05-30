@@ -191,8 +191,8 @@ object CellEditForm: TCellEditForm
       ParentFont = False
     end
     object sbChkRepl: TSpeedButton
-      Left = 308
-      Top = 9
+      Left = 301
+      Top = 6
       Width = 110
       Height = 27
       Action = aChkRepl
