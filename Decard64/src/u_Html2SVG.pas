@@ -806,7 +806,7 @@ begin
   j:=0;
   for i:=ANod.Nodes.Count-1 downto 0 do
   begin
-     if (ANod.Nodes[i+j].LocalName='use') or (ANod.Nodes[i+j].LocalName='image')
+     if (ANod.Nodes[i+j].LocalName='use') or (ANod.Nodes[i+j].LocalName='image')or (ANod.Nodes[i+j].LocalName='rect')
      then begin
        ANod.Nodes.Move(i+j,0);
        inc(j);
@@ -1034,88 +1034,47 @@ function GetSVGSize(const FileName, ID: string): string;
 var CairoThread:TSkiaThread;
   sl:TStringList;
 begin
-//  Result := GetSVGSize1(FileName, ID);
-
   if ID='' then Exit;
   sl:=TStringList.Create;
-
   sl.CommaText := ID;
-//    Main.StartAnalitics('Sizing');
-//  NonThread(Nil, FileName, FBufXml.Text,'','', 1, 300, sl);
-
-
   CairoThread :=  TSkiaThread.Create(Nil, FileName, FBufXml.Text,'','', 1, 300, sl, 100);
-
   try
-
-//    while  WaitForSingleObject(CairoThread.Handle, 100)=WAIT_TIMEOUT	 do
     repeat
-{
-         if MilliSecondOf(time)< 500 then
-           Main.Rendering1.Font.Color := clNavy
-         else
-           Main.Rendering1.Font.Color := clHighlight;
-
-         Main.Rendering2.Font.Color := Main.Rendering1.Font.Color;
-         Main.Rendering3.Font.Color := Main.Rendering1.Font.Color;
-         Main.Rendering3.Invalidate;
- }
       Application.ProcessMessages;
       if MainForm.StopFlag then CairoThread.Terminate;
     until WaitForSingleObject(CairoThread.Handle, 10) <> WAIT_TIMEOUT
-
-
-
   finally
     CairoThread.Destroy;
-//    Main.StopAnalitics('Sizing');
     Result := sl.Text;
     sl.Free;
-//    ShowAnalitics;
   end;
-
-
 end;
 
 function html2svg(ASvg,DPI,AFilter, TopStyle:string; NOD:TXML_Nod; Clipart:TXML_Doc; AClipartName, ARootName:string):string;
+
 var
+  sl:TStringList;
+  XML, rst, MainSVG, xn:TXML_Nod;
+  i,j, nodx,nody, npp, err:integer;
+  WordSpacing, SZ:double;
+  s, s1,zz:string;
+  Z:Char;
+  RootSize:TPoint;
+{
   XML,xn,n1,n2, RST, Bkg, MainSVG:TXML_Nod;
   s,s1:String;
   i,j,err,npp,Row1:Integer;
   Z:Char;
   sz:Double;
-  sl:TStringList;
   w4, zz:string;
   w1, w2, w3, w5, w_dy, hgh, RowFont:Integer;
   ZoomValue,r, WordSpacing:double;
 
   LineUp, LineDn: integer;
-
-  function PercentWidth(AVal: string; ADef: integer):Integer;
-  begin
-    if pos('%', AVal) > 0 then
-      Result := Round(StrToFloatDef(NOD.Attribute['width'],ADef) / 100
-              * StrToIntDef(StringReplace(AVal,'%','',[]), ADef) / ZoomValue)
-    else
-      Result := Round(StrToFloatDef(AVal, ADef))
-  end;
-
-  function PercentWidth0(AVal: string; ADef: integer):Integer;
-  begin
-    if pos('%', AVal) > 0 then
-      Result := Round(StrToFloatDef(NOD.Attribute['width'],ADef) / 100
-              * StrToIntDef(StringReplace(AVal,'%','',[]), ADef) )
-    else
-      Result := Round(StrToFloatDef(AVal, ADef))
-  end;
-
-
-
-
+}
 
   function SizeParse(id:string):TRect;
-  var
-    s:string;
+  var s:string;
     err:Integer;
   begin
     s:='';
@@ -1136,11 +1095,123 @@ var
   end;
 
 
+  procedure SvgUseWidth(Atext:string; SVG:TXML_Nod; Clipart:TXML_Doc; var H,V:integer);
+  var s:string;
+      i:Integer;
+  begin
+    H:=0;
+    V:=0;
+    if Atext = '' then  Exit;
+    s := SVG.xml;
+
+    if Clipart.Nodes.count > 0 then
+      s := SVG.xml + StringReplace(StringReplace(Clipart.Nodes.Last.xml
+         , ' id="',  ' id="clipart',[rfReplaceAll])
+         , AClipartName+'#', '#clipart', [rfReplaceAll])
+    else
+      s := SVG.xml;
+
+    s := StringReplace(s, AClipartName+'#', '#clipart', [rfReplaceAll, rfIgnoreCase]);
+    s := StringReplace(StringReplace(s, '</svg>','</defs>', [rfReplaceAll]), '<svg','<defs', [rfReplaceAll]);
+
+
+    FBufXml.Clear;
+    FBufXml.Add('<?xml version="1.0" encoding="UTF-8"?>');
+    FBufXml.Add('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">');
+    FBufXml.Add('<svg xmlns:template="127.0.0.1" xmlns:dekart="http://127.0.0.1"  xmlns:xlink="http://www.w3.org/1999/xlink" fill="black" font-weight="normal" stroke-width="1"  xmlns="http://www.w3.org/2000/svg" font-size="12" image-rendering="auto" width="1" height="1">');
+    FBufXml.Add('<use y="0" id="txt" xlink:href="' + StringReplace(Atext, AClipartName +'#', '#clipart', [rfReplaceAll, rfIgnoreCase])+'"/>');
+    FBufXml.Add(S);
+    FBufXml.Add('<rect id="dummy" width="100" height="100"/></svg>');
+
+    s := GetSVGSize(ARootName + '###.svg','txt');
+
+    Delete(s,1,Pos(',',s));
+    Delete(s,1,Pos(',',s));
+    Delete(s,1,Pos(',',s));
+    val(Copy(s,1,Pos(',',s)-1),h,i);
+    val(Copy(s,Pos(',',s)+1,Length(s)),v,i);
+  end;
+
+
+function ParseHtml(NOD, XML:TXML_Nod; nodx,nody, lvl:integer; zm:double):string;
+var
+  ZoomValue: double;
+  npp, hgh, Row1, w_dy,
+  w1, w2, w3, w5, RowFont, dx,
+
+  LineUp, LineDn: integer;
+  w4:string;
+  n1, n2, Bkg, rst:TXML_Nod;
+
+  function ParentStyle(ANod:TXML_Nod;aAttr:string;Def:string=''):string;
+  var Nod:TXML_Nod;
+  begin
+    Nod := ANod;
+    if (lvl=1)or(aAttr<>'right') then
+
+    repeat
+       result := Nod.Attribute[aAttr];
+       Nod := Nod.parent;
+    until (Result<>'') or (Nod = nil) ;
+
+    if Result='' then Result := Def;
+
+  end;
+
+  function ParentRight(ANod:TXML_Nod;Def:string=''):string;
+  var Nod:TXML_Nod;
+  begin
+    Nod := ANod;
+    repeat
+       result := Nod.Attribute['right'];
+       Nod := Nod.parent;
+    until (Result<>'') or (Nod = nil) ;
+
+    if Result='' then Result := Def;
+  end;
+
+
+
+//  Percent Width * zoom
+  function PercentWidth(AVal: string; ADef: integer):Integer;
+  begin
+    if pos('%', AVal) > 0 then
+    begin
+      Result := Round(RootSize.X / 100 * StrToIntDef(StringReplace(AVal,'%','',[]), ADef));
+
+      if (xn = nil) and (Result>RootSize.X) then
+        Result := RootSize.X
+      else
+      if (xn<>nil) and (Result>StrToFloatDef(ParentRight(xn),RootSize.X)) then
+          Result := Round(StrToFloatDef(ParentRight(xn),RootSize.X));
+
+      Result := Round(Result / ZoomValue /zm);
+    end
+    else
+      Result := Round(StrToFloatDef(AVal, ADef))
+  end;
+
+// no-zoom  Percent Width
+  function PercentWidth0(AVal: string; ADef: integer):Integer;
+  begin
+    if pos('%', AVal) > 0 then
+    begin
+      Result := Round(RootSize.X / 100 * StrToIntDef(StringReplace(AVal,'%','',[]), ADef));
+      if (xn = nil) and (Result>RootSize.X) then
+        Result := RootSize.X
+      else
+      if (xn<>nil) and (Result>StrToFloatDef(ParentRight(xn),RootSize.X)) then
+          Result := Round(StrToFloatDef(ParentRight(xn),RootSize.X));
+      Result := Round(Result / zm);
+    end
+    else
+      Result := Round(StrToFloatDef(AVal, ADef))
+  end;
+
   procedure ResetRow(Align:boolean);
   var i, x, dl, err:integer;
-     w,sp: Double;
-     s: String;
-
+      w, sp: Double;
+      s: String;
   begin
     if (npp=1) then
     begin
@@ -1174,24 +1245,20 @@ var
       n1.Attribute['height'] := ParentStyle(n1,'line-height','');
       LineUp := round(-StrToIntDef(n1.Attribute['height'],0)) ;
       LineDn := 0;
-
-//      LineUp := round(-StrToIntDef(n1.Attribute['height'],0)*0.8) ;
-//      LineDn := round(StrToIntDef(n1.Attribute['height'],0)*0.2) ;
-
     end;
 
     if (ParentStyle(NOD, 'decard-baseline','80%')<>'100%')  then
       hgh := hgh  - LineUp
     else
-     hgh := hgh + StrToIntDef(n1.Attribute['height'],0);
+      hgh := hgh + StrToIntDef(n1.Attribute['height'],0);
 
     x := StrToIntDef(nod.Attribute['x'],0);
 
     if n1.Attribute['align']='right' then
-      x := x + round(PercentWidth0(ParentStyle(n1,'html-width', nod.Attribute['width']),0)/ZoomValue) - PercentWidth(n1.Attribute['width'],0)
+      x := x + round(PercentWidth0(ParentStyle(n1,'right', nod.Attribute['width']),0)/ZoomValue) - PercentWidth(n1.Attribute['width'],0)
     else
     if n1.Attribute['align']='center' then
-      x := x + (round(PercentWidth0(ParentStyle(n1,'html-width', nod.Attribute['width']),0)/ZoomValue) - PercentWidth(n1.Attribute['width'],0)) div 2
+      x := x + (round(PercentWidth0(ParentStyle(n1,'right', nod.Attribute['width']),0)/ZoomValue) - PercentWidth(n1.Attribute['width'],0)) div 2
     else
     if Align and (n1.Attribute['align']='width')  then
     begin
@@ -1199,7 +1266,7 @@ var
       begin
         if n1.Nodes.Count > 1 then
         begin
-           w := (round(PercentWidth0(ParentStyle(n1,'html-width', nod.Attribute['width']),0)/ZoomValue) - PercentWidth(n1.Attribute['width'],0)) / (n1.Nodes.Count-1);
+           w := (round(PercentWidth0(ParentStyle(n1,'right', nod.Attribute['width']),0)/ZoomValue) - PercentWidth(n1.Attribute['width'],0)) / (n1.Nodes.Count-1);
            for i := 1 to n1.Nodes.Count-1 do
 
              n1.Nodes[i].Attribute['x'] := IntToStr(Round(StrToIntDef(n1.Nodes[i].Attribute['x'],0) + i*w));
@@ -1208,8 +1275,6 @@ var
 
       end else
       begin
-//        if n1.Attribute['id']='ROW14' then
-//          ShowMessage('1');
         Val(n1.Attribute['letter-spacing'],sp,err);
         err:=0;
         for i := 0 to n1.Nodes.Count-1 do
@@ -1221,7 +1286,7 @@ var
         if err> 1 then
           err:= err - 1;
 
-        sp := sp + (round(PercentWidth0(ParentStyle(n1,'html-width', nod.Attribute['width']),0)/ZoomValue) - PercentWidth(n1.Attribute['width'],0))/(err);
+        sp := sp + (round(PercentWidth0(ParentStyle(n1,'right', nod.Attribute['width']),0)/ZoomValue) - PercentWidth(n1.Attribute['width'],0))/(err);
         Str(sp:0:3,s);
         n1.Attribute['letter-spacing'] := s;
         err := 0;
@@ -1235,27 +1300,16 @@ var
           else
             err:= err + 1;
         end;
-
-        if n1.Nodes.Last.LocalName='text' then
-        begin
-//            n1.Nodes.Last.Attribute['x'] := IntToStr(Round(StrToIntDef( nod.Attribute['width'],0) - sp*( ) ));
-//          n1.Nodes.Last.Attribute['text-anchor'] := 'end'
-        end;
-
       end;
-
-
     end;
 
     n1.Attribute['transform'] := 'translate('+IntToStr(x)+','+IntToStr(hgh+StrToIntDef(nod.Attribute['y'],0))+')';
     hgh := hgh + dl;
-
-
   end;
 
 
   procedure NewRow(Align:boolean; dx,dy:Integer);
-  var indent:Integer;
+  var indent, Left:Integer;
   begin
     if n1 <> nil then
       ResetRow(Align);
@@ -1267,17 +1321,21 @@ var
     n1.Attribute['letter-spacing'] := ParentStyle(xn,'letter-spacing','0');
     n1.Attribute['line-height'] := ParentStyle(xn,'line-height','');
 
-    n1.Attribute['html-width'] := ParentStyle(xn,'html-width','');
+    if lvl=1 then
+      n1.Attribute['right'] := ParentStyle(xn,'right','')
+    else
+      n1.Attribute['right'] := ParentStyle(xn,'width','');
 
     indent :=  PercentWidth(ParentStyle(xn,'text-indent','0'), 0);
+    Left :=  PercentWidth(ParentStyle(xn,'left','0'), 0);
 
     if Align and (indent>=0) then
-      n1.Attribute['width'] := IntToStr(dx)
+      n1.Attribute['width'] := IntToStr(dx + Left)
     else
     if NOT Align and (indent<=0) then
-      n1.Attribute['width'] := IntToStr(dx)
+      n1.Attribute['width'] := IntToStr(dx + Left)
     else
-      n1.Attribute['width'] := IntToStr(Abs(indent) + dx);
+      n1.Attribute['width'] := IntToStr(Abs(indent) + dx + Left);
 
 
     n1.Attribute['height'] := '0';
@@ -1292,80 +1350,516 @@ var
     hgh := hgh + dy;
   end;
 
- procedure SvgUseWidth(Atext:string; SVG:TXML_Nod; Clipart:TXML_Doc; var H,V:integer);
- var
-  s:string;
-  i:Integer;
- begin
-    H:=0;
-    V:=0;
-  if Atext = '' then
-    Exit;
-//  Main.StartAnalitics('Sizing');
-  s := SVG.xml;
-
-
-  if Clipart.Nodes.count >0 then
-    s := SVG.xml +
-         StringReplace(StringReplace(Clipart.Nodes.Last.xml
-         , ' id="',  ' id="clipart',[rfReplaceAll])
-         , AClipartName+'#', '#clipart', [rfReplaceAll])
-  else
-    s := SVG.xml;
-
-
-  s := StringReplace(s, AClipartName+'#', '#clipart', [rfReplaceAll, rfIgnoreCase]);
-  s := StringReplace(StringReplace(s, '</svg>','</defs>', [rfReplaceAll]), '<svg','<defs', [rfReplaceAll]);
-
-
-  FBufXml.Clear;
-  FBufXml.Add('<?xml version="1.0" encoding="UTF-8"?>');
-  FBufXml.Add('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">');
-  FBufXml.Add('<svg xmlns:template="127.0.0.1" xmlns:dekart="http://127.0.0.1"  xmlns:xlink="http://www.w3.org/1999/xlink" fill="black" font-weight="normal" stroke-width="1"  xmlns="http://www.w3.org/2000/svg" font-size="12" image-rendering="auto" width="1" height="1">');
-  FBufXml.Add('<use y="0" id="txt" xlink:href="'
-     + StringReplace(Atext, AClipartName +'#', '#clipart', [rfReplaceAll, rfIgnoreCase])+'"/>');
-  FBufXml.Add(S);
-
-  FBufXml.Add('<rect id="dummy" width="100" height="100"/></svg>');
-
-
-  s := GetSVGSize(ARootName + '###.svg','txt');
-
-  Delete(s,1,Pos(',',s));
-  Delete(s,1,Pos(',',s));
-  Delete(s,1,Pos(',',s));
-
-  val(Copy(s,1,Pos(',',s)-1),h,i);
-  val(Copy(s,Pos(',',s)+1,Length(s)),v,i);
-
-
-//  DeleteFile(Main.edCfgRoot.Text + Main.edCfgTemp.Text + '###.svg');
-//  DeleteFile(Main.edCfgRoot.Text + Main.edCfgTemp.Text + '###.txt');
-//  Main.StopAnalitics('Sizing');
- end;
-
 var
   DoZoom:boolean;
-  nodx,nody:integer;
-  AddZoom :Double;
+  AddZoom, r :Double;
   ImgRect: TRect;
+  i:integer;
+  fmt:string;
+
 begin
-bkg := nil;
-//  if Pos('ÁËÀÃÎ', ASVG)> 0 then
-//    ShowMessage('1');
+  bkg := nil;
+  RST:=TXML_Nod.Create(nil);
+  try
+    ZoomValue := 1;
+    fmt := nod.Attribute['decard-format'];
+    if (lvl>1) and (fmt='') then
+      fmt := 'valign:middle;zoom';
+
+    addzoom := 1;
+    repeat
+      DoZoom:=True;
+
+      n1 := nil;
+      xn := XML;
+      rst.Nodes.Clear;
+
+    RST.Attribute['font-size'] := ParentStyle(NOD, 'font-size');
+    RST.Attribute['font-family'] := ParentStyle(NOD, 'font-family');
+    RST.Attribute['font-weight'] := ParentStyle(NOD, 'font-weight');
+    RST.Attribute['text-decoration'] := ParentStyle(NOD, 'text-decoration');
+    RST.Attribute['fill'] := ParentStyle(NOD, 'fill');
+    RST.Attribute['stroke'] := ParentStyle(NOD, 'stroke');
+    RST.Attribute['lengthAdjust'] := ParentStyle(NOD, 'lengthAdjust');
+    RST.Attribute['letter-spacing'] := ParentStyle(NOD, 'letter-spacing','0');
+    RST.Attribute['font-variant'] := ParentStyle(NOD, 'font-variant','normal');
+    RST.Attribute['id'] := NOD.Attribute['id'];
+    RST.Attribute['x'] := '0';
+    RST.Attribute['y'] := '0';
+    RST.Attribute['width'] :=  NOD.Attribute['width'];
+    RST.Attribute['height'] := NOD.Attribute['height'];
+    RST.Attribute['transform'] := NOD.Attribute['transform'];
+
+      npp:=0;
+      w4 := ParentStyle(nod,'font-size');
+      w3 := 0;
+      hgh := 0;
+      LineUp:=0;
+      LineDn:=0;
+
+      repeat
+
+        if xn.LocalName='br' then
+        begin
+          NewRow(true, PercentWidth(xn.Attribute['dx'],0), StrToIntDef(xn.Attribute['dy'],0));
+        end;
+
+        if xn.LocalName='p' then
+          NewRow(false,PercentWidth(xn.Attribute['dx'],0),StrToIntDef(xn.Attribute['dy'],0));
+
+        if (xn.LocalName='div') then
+          NewRow(false, PercentWidth(xn.Attribute['dx'],0),StrToIntDef(xn.Attribute['dy'],0));
+
+        if (xn.LocalName='space')and (n1<>nil) then
+        begin
+          n1.Add('use').Attribute['class']:='space';
+          w5 := w3;
+        end;
+
+        if xn.LocalName='bkg' then
+        begin
+          bkg := TXML_Nod.Create(nil);
+          if (xn.Attribute['img'] <> '') then
+          begin
+            bkg.LocalName:='image';
+            bkg.Attribute['xlink:href'] := xn.Attribute['img'];
+            bkg.index := 0;
+          end
+          else
+          if (xn.Attribute['src'] <> '') then
+          begin
+             bkg.LocalName:='use';
+             bkg.Attribute['xlink:href'] := xn.Attribute['src'];
+             bkg.index := 0;
+          end
+          else
+            bkg.LocalName:='rect';
+          bkg.index := 0;
+
+          bkg.Attribute['width'] := Nod.Attribute['width'];
+          bkg.Attribute['height'] := Nod.Attribute['height'];
+          bkg.Attribute['x'] := Nod.Attribute['x'];
+          bkg.Attribute['y'] := Nod.Attribute['y'];
+
+          for i := 0 to xn.Attributes.Count-1 do
+          if (xn.Attributes.Items[i].name<>'src') and (xn.Attributes.Items[i].name<>'img') then
+             bkg.Attribute[xn.Attributes.Items[i].name] := xn.Attributes.Items[i].value;
+
+
+        end;
+
+        if xn.LocalName='text' then
+        begin
+          if n1= nil then NewRow(false, 0,0);
+
+
+           w1 := SizeParse(xn.Attribute['id']).Right+SizeParse(xn.Attribute['id']).Left;;
+           w2 := SizeParse(xn.Attribute['id']+'Z').Right+SizeParse(xn.Attribute['id']+'Z').Left;
+           w2 := round(w2 + (w2-2*w1)* WordSpacing);
+
+           if (w1 > (PercentWidth0(ParentStyle(xn, 'right', RST.Attribute['width']),0)/ZoomValue)) then
+              addzoom := min(addzoom,PercentWidth0(ParentStyle(xn, 'right', RST.Attribute['width']),0)/ZoomValue / w1);
+
+           if (n1.Attribute['width'] <> '0') and
+              (PercentWidth(n1.Attribute['width'],0) + w5 + w1 > PercentWidth0(ParentStyle(xn, 'right', RST.Attribute['width']),0)/ZoomValue)
+           then NewRow(True, 0,0);
+           w5 := w5 - SizeParse(xn.Attribute['id']).Left;
+
+           n2 := n1.Add('text');
+           n2.ResetXml(xn.xml);
+
+           n2.Attribute['font-size'] := ParentStyle(xn, 'font-size');
+           n2.Attribute['font-family'] := ParentStyle(xn, 'font-family');
+           n2.Attribute['font-weight'] := ParentStyle(xn, 'font-weight');
+           if ParentStyle(xn, 'align')<>'width' then
+             n2.Attribute['letter-spacing'] := ParentStyle(xn, 'letter-spacing');
+           n2.Attribute['text-decoration'] := ParentStyle(xn, 'text-decoration');
+           n2.Attribute['font-style'] := ParentStyle(xn, 'font-style');
+           n2.Attribute['fill'] := ParentStyle(xn, 'fill');
+           n2.Attribute['stroke'] := ParentStyle(xn, 'stroke');
+           n2.Attribute['stroke-width'] := ParentStyle(xn, 'stroke-width');
+           n2.Attribute['width'] := IntToStr(w1);
+
+           n2.Attribute['x'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5);
+
+           n2.Attribute['height'] := ParentStyle(xn,'font-size');
+           n2.Attribute['dy'] := ParentStyle(xn, 'baselile-shift');
+           n2.Attribute['filter'] := ParentStyle(xn, 'filter');
+
+           if pos('%', ParentStyle(xn,'line-height',''))>0 then
+           begin
+             Val(ParentStyle(xn,'line-height',''),r,err);
+             if r=0 then
+               r:=100;
+             n2.Attribute['height'] := IntToStr( Round(StrToIntDef(n2.Attribute['height'],0) / 100 * r)) ;
+           end;
+
+           n1.Attribute['width'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + w1);
+
+           if StrToIntDef(n2.Attribute['y'],0)>0 then
+             n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),StrToIntDef(n2.Attribute['height'],0)-StrToIntDef(n2.Attribute['y'],0)) )
+           else
+             n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),StrToIntDef(n2.Attribute['height'],0)) );
+
+           w3 := w2-2*w1;
+           w5 := 0;
+
+           LineUp:=Min(LineUp, -round(StrToIntDef(n2.Attribute['height'],12)*0.8) + StrToIntDef(n2.Attribute['y'],0));
+           LineDn:=Max(LineDn, round(StrToIntDef(n2.Attribute['height'],12)*0.2 - StrToIntDef(n2.Attribute['y'],0)));
+        end;
+
+        if xn.LocalName='rect' then
+        begin
+          if n1= nil then NewRow(False, 0,0);
+            w1 := PercentWidth(xn.Attribute['width'],0);
+            dx := PercentWidth(xn.Attribute['dx'],0);
+
+
+          if (w1+dx > (PercentWidth0(ParentStyle(xn, 'right', RST.Attribute['width']),0)/ZoomValue)) then
+            addzoom := min(addzoom,PercentWidth0(ParentStyle(xn, 'right', RST.Attribute['width']),0)/ZoomValue / w1);
+
+
+          if (n1.Attribute['width'] <> '0') and
+            (PercentWidth(n1.Attribute['width'],0) + w5 + w1 +dx > PercentWidth0(ParentStyle(xn, 'right', RST.Attribute['width']),0)/ZoomValue)
+          then NewRow(True, 0,0);
+
+          n2 := n1.Add('rect');
+          n2.ResetXml(xn.xml);
+
+          n2.Attribute['x'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5  + PercentWidth(xn.Attribute['dx'],0));
+          n2.Attribute['y'] := IntToStr(-StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
+
+
+          n1.Attribute['width'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + w1 + PercentWidth(xn.Attribute['dx'],0));
+          n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),
+            StrToIntDef(n2.Attribute['height'],0) - abs(StrToIntDef(xn.Attribute['dy'],0))));
+
+          w_dy := Max(w_dy, StrToIntDef(xn.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
+
+          w5 := 0;
+
+
+          LineUp:=Min(LineUp, -StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
+          LineDn:=Max(LineDn, StrToIntDef(xn.Attribute['dy'],0));
+
+
+          if w3 =0 then
+          begin
+            Val(w4, w3, err);
+            w3 := w3 div 3;
+          end;
+        end;
+
+        if xn.LocalName='img' then
+        begin
+          if n1= nil then NewRow(False, 0,0);
+            w1 := PercentWidth(xn.Attribute['width'],0);
+            dx := PercentWidth(xn.Attribute['dx'],0);
+
+          if (w1 + dx > (PercentWidth0(ParentStyle(xn, 'right', RST.Attribute['width']),0)/ZoomValue)) then
+            addzoom := min(addzoom,PercentWidth0(ParentStyle(xn, 'right', RST.Attribute['width']),0)/ZoomValue / w1);
+
+
+          if (n1.Attribute['width'] <> '0') and
+            (PercentWidth(n1.Attribute['width'],0) + w5 + w1 + dx> PercentWidth0(ParentStyle(xn, 'right', RST.Attribute['width']),0)/ZoomValue)
+          then NewRow(True, 0,0);
+
+          n2 := n1.Add('image');
+
+
+          n2.Attribute['filter'] := xn.Attribute['filter'];
+          n2.Attribute['width'] := xn.Attribute['width'];
+          n2.Attribute['height'] := xn.Attribute['height'];
+          n2.Attribute['x'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5  + PercentWidth(xn.Attribute['dx'],0));
+          n2.Attribute['y'] := IntToStr(-StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
+
+
+          n2.Attribute['xlink:href'] := xn.Attribute['src'];
+          n1.Attribute['width'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + w1+ PercentWidth(xn.Attribute['dx'],0));
+          n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),
+          StrToIntDef(n2.Attribute['height'],0) - abs(StrToIntDef(xn.Attribute['dy'],0))));
+
+          w_dy := Max(w_dy, StrToIntDef(xn.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
+
+          w5 := 0;
+
+          ImgRect.Left := StrToIntDef(xn.Attribute['x1'],0);
+          ImgRect.Top := StrToIntDef(xn.Attribute['y1'],0);
+          if xn.Attribute['x2']='' then
+            ImgRect.Right := PercentWidth(n2.Attribute['width'],0) + ImgRect.Left
+          else
+            ImgRect.Right := StrToIntDef(xn.Attribute['x2'],0);
+
+          if xn.Attribute['y2']='' then
+            ImgRect.Bottom := StrToIntDef(xn.Attribute['height'],0) + ImgRect.Top
+          else
+            ImgRect.Bottom := StrToIntDef(xn.Attribute['y2'],0);
+
+          n2.Attribute['x'] := IntToStr(StrToIntDef(n2.Attribute['x'],0) + ImgRect.Left);
+          n2.Attribute['y'] := IntToStr(StrToIntDef(n2.Attribute['y'],0) + ImgRect.Top);
+          n2.Attribute['width'] := IntToStr( ImgRect.Right - ImgRect.Left);
+          n2.Attribute['height'] := IntToStr(ImgRect.Bottom - ImgRect.Top);
+
+          LineUp:=Min(LineUp, -StrToIntDef(xn.Attribute['height'],0));
+          LineDn:=Max(LineDn, 0);
+
+
+          if w3 =0 then
+          begin
+            Val(w4, w3, err);
+            w3 := w3 div 3;
+          end;
+
+        end;
+
+        if xn.LocalName='use' then
+        begin
+          if n1= nil then NewRow(False, 0,0);
+
+           w1 := PercentWidth(xn.Attribute['width'],0);
+           w2 := StrToIntDef(xn.Attribute['height'],0);
+           dx := PercentWidth(xn.Attribute['dx'],0);
+
+           if (xn.Attribute['width']='')or(xn.Attribute['height']='') then
+             SvgUseWidth(xn.Attribute['src'], MainSvg, Clipart, w1, w2);
+
+           if (w1 > (PercentWidth0(ParentStyle(xn, 'right', RST.Attribute['width']),0)/ZoomValue)) then
+              addzoom := min(addzoom, PercentWidth0(ParentStyle(xn, 'right', RST.Attribute['width']),0)/ZoomValue / w1);
+
+           if (n1.Attribute['width'] <> '0') and
+              (PercentWidth(n1.Attribute['width'],0) + w5 + w1 +dx> PercentWidth0(ParentStyle(xn, 'right', RST.Attribute['width']),0)/ZoomValue)
+           then NewRow(True, 0,0);
+
+           n2 := n1.Add('use');
+
+           if (xn.Attribute['width']='') then
+             n2.Attribute['width'] := IntToStr(w1)
+           else
+             n2.Attribute['width'] := xn.Attribute['width'];
+
+           if xn.Attribute['height']='' then
+             n2.Attribute['height'] := IntToStr(w2)
+           else
+             n2.Attribute['height'] := xn.Attribute['height'];
+
+           n2.Attribute['filter'] := xn.Attribute['filter'];
+
+           w1 := PercentWidth(n2.Attribute['width'],0);
+
+           if (n1.Attribute['width'] <> '0') and
+              (PercentWidth(n1.Attribute['width'],0) + w5 + w1 +dx> PercentWidth0(ParentStyle(xn, 'right', RST.Attribute['width']),0)/ZoomValue)
+           then NewRow(True, 0,0);
+
+
+           n2.Attribute['x'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + PercentWidth(xn.Attribute['dx'],0));
+           n2.Attribute['y'] := IntToStr(-StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
+
+           n2.Attribute['xlink:href'] := xn.Attribute['src'];
+           n1.Attribute['width'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + w1 + PercentWidth(xn.Attribute['dx'],0));
+           n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),
+           StrToIntDef(n2.Attribute['height'],0) - abs(StrToIntDef(xn.Attribute['dy'],0))));
+
+           if xn.Attribute['scale']<>'' then
+           begin
+             n2.Attribute['transform'] := 'translate(' +n2.Attribute['x'] +','+n2.Attribute['y']+ ') '
+                                         +'scale('+xn.Attribute['scale']+')';
+             n2.Attribute['x'] := '';
+             n2.Attribute['y'] := '';
+           end;
+
+
+
+           w_dy := Max(w_dy, StrToIntDef(xn.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
+           w5 := 0;
+
+          if w3 =0 then
+          begin
+            Val(w4, w3, err);
+            w3 := w3 div 3;
+          end;
+
+          LineUp:=Min(LineUp, -StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
+          LineDn:=Max(LineDn, StrToIntDef(xn.Attribute['dy'],0));
+        end;
+
+
+        if xn.LocalName='html' then
+        begin
+
+          if n1= nil then NewRow(False, 0,0);
+
+           w1 := PercentWidth(xn.Attribute['width'],0);
+           w2 := StrToIntDef(xn.Attribute['height'],0);
+           dx := PercentWidth(xn.Attribute['dx'],0);
+
+           if (w1+dx > (PercentWidth0(ParentStyle(xn, 'right', RST.Attribute['width']),0)/ZoomValue)) then
+              addzoom := min(addzoom, PercentWidth0(ParentStyle(xn, 'right', RST.Attribute['width']),0)/ZoomValue / w1);
+
+           if (n1.Attribute['width'] <> '0') and
+              (PercentWidth(n1.Attribute['width'],0) + w5 + w1+dx> PercentWidth0(ParentStyle(xn, 'right', RST.Attribute['width']),0)/ZoomValue)
+           then NewRow(True, 0,0);
+
+           n2 := n1.Add('g');
+
+           for i:= 0 to xn.Attributes.Count-1 do
+             n2.Attribute[xn.Attributes[i].Name] := xn.Attributes[i].value;
+
+           if (xn.Attribute['width']='') then
+             n2.Attribute['width'] := IntToStr(w1)
+           else
+             n2.Attribute['width'] := xn.Attribute['width'];
+
+           if xn.Attribute['height']='' then
+             n2.Attribute['height'] := IntToStr(w2)
+           else
+             n2.Attribute['height'] := xn.Attribute['height'];
+
+           n2.Attribute['filter'] := xn.Attribute['filter'];
+
+           w1 := PercentWidth(n2.Attribute['width'],0);
+
+           if (n1.Attribute['width'] <> '0') and
+              (PercentWidth(n1.Attribute['width'],0) + w5 + w1 + dx> PercentWidth0(ParentStyle(xn, 'right', RST.Attribute['width']),0)/ZoomValue)
+           then NewRow(True, 0,0);
+
+           n2.Attribute['x'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + PercentWidth(xn.Attribute['dx'],0));
+           n2.Attribute['y'] := IntToStr(-StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
+           n2.Attribute['transform']:='translate(' + n2.Attribute['x']+','+n2.Attribute['y']+')';
+
+
+           n1.Attribute['width'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + w1 + PercentWidth(xn.Attribute['dx'],0));
+
+
+           n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),
+           StrToIntDef(n2.Attribute['height'],0) - abs(StrToIntDef(xn.Attribute['dy'],0))));
+
+           w_dy := Max(w_dy, StrToIntDef(xn.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
+           w5 := 0;
+
+          if w3 =0 then
+          begin
+            Val(w4, w3, err);
+            w3 := w3 div 3;
+          end;
+
+          LineUp:=Min(LineUp, -StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
+          LineDn:=Max(LineDn, StrToIntDef(xn.Attribute['dy'],0));
+          n2.add('g').ResetXml(ParseHtml(xn, xn.Next, 0,0,lvl+1, ZoomValue));
+        end
+        else
+          xn := xn.Next;
+
+      until (xn = nil) or (xn.Level < XML.Level);
+
+      if n1 <> nil then
+        ResetRow(False);
+
+      if (Bkg <> nil)and(lvl=1) then
+      begin
+        if (hgh > StrToIntDef(NOD.Attribute['height'],0)) then
+          Bkg.Attribute['height'] := IntToStr(StrToIntDef(Bkg.Attribute['height'],0) +  hgh - StrToIntDef(NOD.Attribute['height'],0))
+        else
+        if (hgh > StrToIntDef(Bkg.Attribute['height'],0)) then
+          Bkg.Attribute['height'] := IntToStr(StrToIntDef(Bkg.Attribute['height'],0) +  hgh);
+      end;
+
+
+      if pos('zoom', fmt)> 0 then
+      begin
+        if (AddZoom > 0) and (AddZoom < 1) then
+        begin
+          ZoomValue := ZoomValue * AddZoom;
+          DoZoom := False;
+          addzoom := 1;
+        end
+        else
+        if (StrToIntDef(NOD.Attribute['height'],0)>0)
+          and (StrToIntDef(NOD.Attribute['height'],0)+1 < hgh * ZoomValue)
+        then begin
+          err := round(StrToIntDef(NOD.Attribute['height'],0) * ZoomValue);
+          ZoomValue := ZoomValue * 0.98;
+          DoZoom := err*100 = round(StrToIntDef(NOD.Attribute['height'],0) * ZoomValue*100);
+        end;
+
+      end;
+
+    until DoZoom;
+
+{
+    if (bkg<>nil) and (ZoomValue<>1)and (ZoomValue<>0) then
+        Bkg.Attribute['width'] := IntToStr(Round(StrToIntDef(Bkg.Attribute['width'],0)/ZoomValue ));
+}
+    if (ParentStyle(NOD, 'decard-baseline','80%')<>'100%')  then
+      nody:= nody - Round(Row1*ZoomValue);
+
+    n1 := RST;
+
+    while n1<>nil do
+    begin
+      if pos('%', n1.Attribute['width'])>0 then
+      begin
+        if (ZoomValue<>1)and (ZoomValue<>0) then
+          n1.Attribute['width'] := IntToStr(PercentWidth(n1.Attribute['width'],0))
+        else
+          n1.Attribute['width'] := IntToStr(PercentWidth(n1.Attribute['width'],0));
+      end;
+      n1 := n1.Next;
+    end;
+
+
+    if pos('valign:',fmt)>0 then
+    begin
+//  valign="top | middle | bottom | baseline"
+
+       if pos('valign:top', fmt)> 0 then
+       begin
+           Result := '<g transform="translate('+IntToStr(nodx)+','+IntToStr(nody)+') scale('+SvgFloat(ZoomValue)+')">' + RST.Nodes.xml + '</g>'
+       end
+       else
+       if pos('valign:middle', fmt)> 0 then
+       begin
+         Result := '<g transform="translate('+IntToStr(nodx)+','+IntToStr(nody+(StrToIntDef(NOD.Attribute['height'],0)-round(hgh*ZoomValue)) div 2)+')  scale('+SvgFloat(ZoomValue)+')">' + RST.Nodes.xml + '</g>'
+       end
+       else
+       if pos('valign:bottom', fmt)> 0 then
+       begin
+        Result := '<g transform="translate('+IntToStr(nodx)+','+IntToStr(nody+(StrToIntDef(NOD.Attribute['height'],0)-round(hgh*ZoomValue)) )+')  scale('+SvgFloat(ZoomValue)+')">' + RST.Nodes.xml + '</g>'
+       end
+    end
+    else
+    if  round(hgh*ZoomValue) > StrToIntDef(NOD.Attribute['height'],hgh) then
+      Result := '<g transform="translate('+IntToStr(nodx)+','+IntToStr(nody+(StrToIntDef(NOD.Attribute['height'],0)-round(hgh*ZoomValue)) div 2)+')  scale('+SvgFloat(ZoomValue)+')">' + RST.Nodes.xml + '</g>'
+    else
+      Result := '<g transform="translate('+IntToStr(nodx)+','+IntToStr(nody)+')  scale('+SvgFloat(ZoomValue)+')">' + RST.Nodes.xml + '</g>';
+
+    if Bkg<>nil then
+     begin
+//       Bkg.Attribute['transform'] := 'translate('+IntToStr(nodx)+','+IntToStr(nody)+') scale('+SvgFloat(ZoomValue)+')';
+       Bkg.Attribute['transform'] := 'translate('+IntToStr(nodx)+','+IntToStr(nody)+')';
+       Result := '<g>' +  bkg.xml + Result + '</g>';
+       Bkg.Free;
+     end;
+
+
+  finally
+    RST.Free;
+  end;
+end;
+
+
+begin
   MainSVG := NOD;
   while MainSVG.LocalName <> 'svg' do MainSVG:=MainSVG.parent;
 
   WordSpacing := StrToFloat(ParentStyle(NOD, 'word-spacing', '0'));
-  ZoomValue:=1;
   nodx:= StrToIntDef(NOD.Attribute['x'],0);
   nody:= StrToIntDef(NOD.Attribute['y'],0);
 
-
   nod.Attribute['x'] := '0';
   nod.Attribute['y'] := '0';
-//  nod_width := StrToIntDef(NOD.Attribute['width'],0);
-//  nod_height := StrToIntDef(NOD.Attribute['height'],0);
+  RootSize.X :=StrToIntDef(NOD.Attribute['width'],0);
+  RootSize.Y :=StrToIntDef(NOD.Attribute['height'],0);
+
 
 
   XML:=TXML_Nod.Create(nil);
@@ -1390,8 +1884,6 @@ bkg := nil;
     RST.Attribute['id'] := NOD.Attribute['id'];
     RST.Attribute['x'] := '0';
     RST.Attribute['y'] := '0';
-//    RST.Attribute['x'] := NOD.Attribute['x'];
-//    RST.Attribute['y'] := NOD.Attribute['y'];
     RST.Attribute['width'] := NOD.Attribute['width'];
     RST.Attribute['height'] := NOD.Attribute['height'];
     RST.Attribute['transform'] := NOD.Attribute['transform'];
@@ -1440,10 +1932,17 @@ bkg := nil;
         end
         else
         if s[i-1]='/' then
-          xn.Add('tag').ResetXml(Copy(s,j,i-j+1))
+        begin
+          xn.Add('tag').ResetXml(Copy(s,j,i-j+1));
+        end
         else begin
            xn := xn.Add('tag');
            xn.ResetXml(Copy(s,j,i-j)+'/>');
+
+           if xn.Attribute['html-width']<>'' then
+             xn.Attribute['right']:=xn.Attribute['html-width'];
+
+
            if xn.LocalName='b' then
              xn.ResetXml('<g font-weight="bold"/>');
            if xn.LocalName='i' then
@@ -1466,17 +1965,12 @@ bkg := nil;
                val(ParentStyle(xn, 'font-size', '14'), sz,err);
                Str(FontSizeConv(xn.Attribute['size'], sz, DPI):0:0,s1);
                xn.Attribute['font-size'] := s1;
-//               xn.Attributes.ByName('size').Free;
-
              end;
              if xn.Attribute['color'] <> '' then
              begin
                xn.Attribute['fill'] := xn.Attribute['color'];
                xn.Attribute['stroke'] := xn.Attribute['color'];
-//               xn.Attributes.ByName('color').Free;
              end;
-//             xn.Attribute['baselile-shift'] := xn.Attribute['dy'];
-//             xn.Attribute['dy'] :='';
            end;
         end;
         j:=i+1;
@@ -1511,7 +2005,7 @@ bkg := nil;
     FBufXml.Add('<?xml version="1.0" encoding="UTF-8"?>');
     FBufXml.Add('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">');
     FBufXml.Add('<svg xmlns:xlink="http://www.w3.org/1999/xlink" fill="black" font-weight="normal" stroke-width="1"  xmlns="http://www.w3.org/2000/svg" font-size="12" image-rendering="auto" width="1" height="1">');
-    n1:=nil;
+//    n1:=nil;
     xn := XML;
     zz:='';
     repeat
@@ -1543,410 +2037,10 @@ bkg := nil;
 
     sl.text := GetSVGSize(ARootName + '###.svg',zz);
 
+    Result := ParseHtml(nod, xml, nodx, nody,1,1);
 
-    addzoom := 1;
-    repeat
-      DoZoom:=True;
-
-      n1 := nil;
-      xn := XML;
-      rst.Nodes.Clear;
-
-      npp:=0;
-      w4 := ParentStyle(nod,'font-size');
-      w3 := 0;
-      hgh := 0;
-      LineUp:=0;
-      LineDn:=0;
-
-      repeat
-
-        if xn.LocalName='br' then
-        begin
-          NewRow(true, PercentWidth(xn.Attribute['dx'],0), StrToIntDef(xn.Attribute['dy'],0));
-        end;
-
-        if xn.LocalName='p' then
-          NewRow(false,PercentWidth(xn.Attribute['dx'],0),StrToIntDef(xn.Attribute['dy'],0));
-
-        if (xn.LocalName='div') then
-          NewRow(false, PercentWidth(xn.Attribute['dx'],0),StrToIntDef(xn.Attribute['dy'],0));
-
-        if (xn.LocalName='space')and (n1<>nil) then
-        begin
-          n1.Add('use').Attribute['class']:='space';
-          w5 := w3;
-        end;
-
-        if xn.LocalName='bkg' then
-        begin
-          if (xn.Attribute['img'] <> '') then
-          begin
-            bkg := rst.Add('image');
-            bkg.Attribute['xlink:href'] := xn.Attribute['img'];
-            bkg.index := 0;
-          end
-          else
-          if (xn.Attribute['src'] <> '') then
-          begin
-             bkg := rst.Add('use');
-             bkg.Attribute['xlink:href'] := xn.Attribute['src'];
-             bkg.index := 0;
-          end
-          else
-             bkg := rst.Add('rect');
-          bkg.index := 0;
-
-          bkg.Attribute['width'] := Nod.Attribute['width'];
-          bkg.Attribute['height'] := Nod.Attribute['height'];
-          bkg.Attribute['x'] := Nod.Attribute['x'];
-          bkg.Attribute['y'] := Nod.Attribute['y'];
-
-          for i := 0 to xn.Attributes.Count-1 do
-          if (xn.Attributes.Items[i].name<>'src') and (xn.Attributes.Items[i].name<>'img') then
-             bkg.Attribute[xn.Attributes.Items[i].name] := xn.Attributes.Items[i].value;
-
-
-        end;
-
-        if xn.LocalName='text' then
-        begin
-          if n1= nil then NewRow(false, 0,0);
-
-//           w5 := w5 - SizeParse(xn.Attribute['id']).Left;
-
-//           w1 := SizeParse(xn.Attribute['id']).Right;
-//           w2 := SizeParse(xn.Attribute['id']+'Z').Right;
-
-           w1 := SizeParse(xn.Attribute['id']).Right+SizeParse(xn.Attribute['id']).Left;;
-           w2 := SizeParse(xn.Attribute['id']+'Z').Right+SizeParse(xn.Attribute['id']+'Z').Left;
-           w2 := round(w2 + (w2-2*w1)* WordSpacing);
-
-           if {(n1.Attribute['width'] = '0') and} (w1 > (PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)) then
-              addzoom := min(addzoom,PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue / w1);
-
-           if (n1.Attribute['width'] <> '0') and
-              (PercentWidth(n1.Attribute['width'],0) + w5 + w1 > PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)
-           then NewRow(True, 0,0);
-           w5 := w5 - SizeParse(xn.Attribute['id']).Left;
-
-
-           n2 := n1.Add('text');
-           n2.ResetXml(xn.xml);
-
-           n2.Attribute['font-size'] := ParentStyle(xn, 'font-size');
-           n2.Attribute['font-family'] := ParentStyle(xn, 'font-family');
-           n2.Attribute['font-weight'] := ParentStyle(xn, 'font-weight');
-           if ParentStyle(xn, 'align')<>'width' then
-             n2.Attribute['letter-spacing'] := ParentStyle(xn, 'letter-spacing');
-           n2.Attribute['text-decoration'] := ParentStyle(xn, 'text-decoration');
-           n2.Attribute['font-style'] := ParentStyle(xn, 'font-style');
-           n2.Attribute['fill'] := ParentStyle(xn, 'fill');
-           n2.Attribute['stroke'] := ParentStyle(xn, 'stroke');
-           n2.Attribute['stroke-width'] := ParentStyle(xn, 'stroke-width');
-//           n2.Attribute['baseline-shift'] := ParentStyle(xn, 'baseline-shift');
-           n2.Attribute['width'] := IntToStr(w1);
-
-           n2.Attribute['x'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5);
-
-           n2.Attribute['height'] := ParentStyle(xn,'font-size');
-           n2.Attribute['dy'] := ParentStyle(xn, 'baselile-shift');
-//          if ParentStyle(xn, 'baselile-shift')<>'' then
-//           n2.Attribute['dy'] := ParentStyle(xn, 'baselile-shift');
-
-
-//           n2.Attribute['baselile-shift'] := '0';
-           n2.Attribute['filter'] := ParentStyle(xn, 'filter');
-//           n2.Attribute['filter'] := xn.Attribute['filter'];
-
-           if pos('%', ParentStyle(xn,'line-height',''))>0 then
-           begin
-             Val(ParentStyle(xn,'line-height',''),r,err);
-             if r=0 then
-               r:=100;
-             n2.Attribute['height'] := IntToStr( Round(StrToIntDef(n2.Attribute['height'],0) / 100 * r)) ;
-           end;
-
-           n1.Attribute['width'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + w1);
-
-           if StrToIntDef(n2.Attribute['y'],0)>0 then
-             n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),StrToIntDef(n2.Attribute['height'],0)-StrToIntDef(n2.Attribute['y'],0)) )
-           else
-             n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),StrToIntDef(n2.Attribute['height'],0)) );
-
-           w3 := w2-2*w1;
-           w5 := 0;
-
-           LineUp:=Min(LineUp, -round(StrToIntDef(n2.Attribute['height'],12)*0.8) + StrToIntDef(n2.Attribute['y'],0));
-           LineDn:=Max(LineDn, round(StrToIntDef(n2.Attribute['height'],12)*0.2 - StrToIntDef(n2.Attribute['y'],0)));
-        end;
-
-        if xn.LocalName='rect' then
-        begin
-          if n1= nil then NewRow(False, 0,0);
-            w1 := PercentWidth(xn.Attribute['width'],0);
-
-          if {(n1.Attribute['width'] = '0') and} (w1 > (PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)) then
-            addzoom := min(addzoom,PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue / w1);
-
-
-          if (n1.Attribute['width'] <> '0') and
-            (PercentWidth(n1.Attribute['width'],0) + w5 + w1 > PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)
-          then NewRow(True, 0,0);
-
-          n2 := n1.Add('rect');
-          n2.ResetXml(xn.xml);
-
-          n2.Attribute['x'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5  + PercentWidth(xn.Attribute['dx'],0));
-          n2.Attribute['y'] := IntToStr(-StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
-
-
-          n1.Attribute['width'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + w1 + PercentWidth(xn.Attribute['dx'],0));
-          n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),
-            StrToIntDef(n2.Attribute['height'],0) - abs(StrToIntDef(xn.Attribute['dy'],0))));
-
-          w_dy := Max(w_dy, StrToIntDef(xn.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
-
-          w5 := 0;
-
-
-          LineUp:=Min(LineUp, -StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
-          LineDn:=Max(LineDn, StrToIntDef(xn.Attribute['dy'],0));
-
-
-          if w3 =0 then
-          begin
-            Val(w4, w3, err);
-            w3 := w3 div 3;
-          end;
-        end;
-
-        if xn.LocalName='img' then
-        begin
-          if n1= nil then NewRow(False, 0,0);
-            w1 := PercentWidth(xn.Attribute['width'],0);
-
-          if {(n1.Attribute['width'] = '0') and} (w1 > (PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)) then
-            addzoom := min(addzoom,PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue / w1);
-
-
-          if (n1.Attribute['width'] <> '0') and
-            (PercentWidth(n1.Attribute['width'],0) + w5 + w1 > PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)
-          then NewRow(True, 0,0);
-
-          n2 := n1.Add('image');
-
-
-          n2.Attribute['filter'] := xn.Attribute['filter'];
-          n2.Attribute['width'] := xn.Attribute['width'];
-          n2.Attribute['height'] := xn.Attribute['height'];
-          n2.Attribute['x'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5  + PercentWidth(xn.Attribute['dx'],0));
-          n2.Attribute['y'] := IntToStr(-StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
-
-
-          n2.Attribute['xlink:href'] := xn.Attribute['src'];
-          n1.Attribute['width'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + w1+ PercentWidth(xn.Attribute['dx'],0));
-//         n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),-StrToIntDef(n2.Attribute['y'],0)) )
-          n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),
-          StrToIntDef(n2.Attribute['height'],0) - abs(StrToIntDef(xn.Attribute['dy'],0))));
-
-          w_dy := Max(w_dy, StrToIntDef(xn.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
-
-          w5 := 0;
-{
-         if xn.Attribute['img-width']<> '' then
-           n2.Attribute['width'] := xn.Attribute['img-width'];
-         if xn.Attribute['img-height']<> '' then
-           n2.Attribute['height'] := xn.Attribute['img-height'];
-}
-          ImgRect.Left := StrToIntDef(xn.Attribute['x1'],0);
-          ImgRect.Top := StrToIntDef(xn.Attribute['y1'],0);
-          if xn.Attribute['x2']='' then
-            ImgRect.Right := PercentWidth(n2.Attribute['width'],0) + ImgRect.Left
-          else
-            ImgRect.Right := StrToIntDef(xn.Attribute['x2'],0);
-
-          if xn.Attribute['y2']='' then
-            ImgRect.Bottom := StrToIntDef(xn.Attribute['height'],0) + ImgRect.Top
-          else
-            ImgRect.Bottom := StrToIntDef(xn.Attribute['y2'],0);
-
-
-          n2.Attribute['x'] := IntToStr(StrToIntDef(n2.Attribute['x'],0) + ImgRect.Left);
-          n2.Attribute['y'] := IntToStr(StrToIntDef(n2.Attribute['y'],0) + ImgRect.Top);
-          n2.Attribute['width'] := IntToStr( ImgRect.Right - ImgRect.Left);
-          n2.Attribute['height'] := IntToStr(ImgRect.Bottom - ImgRect.Top);
-
-          LineUp:=Min(LineUp, -StrToIntDef(xn.Attribute['height'],0));
-          LineDn:=Max(LineDn, 0);
-
-
-          if w3 =0 then
-          begin
-            Val(w4, w3, err);
-            w3 := w3 div 3;
-          end;
-
-        end;
-
-        if xn.LocalName='use' then
-        begin
-          if n1= nil then NewRow(False, 0,0);
-
-           w1 := PercentWidth(xn.Attribute['width'],0);
-           w2 := StrToIntDef(xn.Attribute['height'],0);
-
-           if (xn.Attribute['width']='')or(xn.Attribute['height']='') then
-             SvgUseWidth(xn.Attribute['src'], MainSvg, Clipart, w1, w2);
-
-           if {(n1.Attribute['width'] = '0') and} (w1 > (PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)) then
-              addzoom := min(addzoom, PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue / w1);
-
-
-           if (n1.Attribute['width'] <> '0') and
-              (PercentWidth(n1.Attribute['width'],0) + w5 + w1 > PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)
-           then NewRow(True, 0,0);
-
-           n2 := n1.Add('use');
-
-           if (xn.Attribute['width']='') then
-             n2.Attribute['width'] := IntToStr(w1)
-           else
-             n2.Attribute['width'] := xn.Attribute['width'];
-
-           if xn.Attribute['height']='' then
-             n2.Attribute['height'] := IntToStr(w2)
-           else
-             n2.Attribute['height'] := xn.Attribute['height'];
-
-           n2.Attribute['filter'] := xn.Attribute['filter'];
-
-           w1 := PercentWidth(n2.Attribute['width'],0);
-
-           if (n1.Attribute['width'] <> '0') and
-              (PercentWidth(n1.Attribute['width'],0) + w5 + w1 > PercentWidth0(ParentStyle(xn, 'html-width', RST.Attribute['width']),0)/ZoomValue)
-           then NewRow(True, 0,0);
-
-
-           n2.Attribute['x'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + PercentWidth(xn.Attribute['dx'],0));
-           n2.Attribute['y'] := IntToStr(-StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
-
-           n2.Attribute['xlink:href'] := xn.Attribute['src'];
-           n1.Attribute['width'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + w1 + PercentWidth(xn.Attribute['dx'],0));
-           n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),
-           StrToIntDef(n2.Attribute['height'],0) - abs(StrToIntDef(xn.Attribute['dy'],0))));
-
-           if xn.Attribute['scale']<>'' then
-           begin
-             n2.Attribute['transform'] := 'translate(' +n2.Attribute['x'] +','+n2.Attribute['y']+ ') '
-                                         +'scale('+xn.Attribute['scale']+')';
-             n2.Attribute['x'] := '';
-             n2.Attribute['y'] := '';
-           end;
-
-
-
-           w_dy := Max(w_dy, StrToIntDef(xn.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
-           w5 := 0;
-
-          if w3 =0 then
-          begin
-            Val(w4, w3, err);
-            w3 := w3 div 3;
-          end;
-
-          LineUp:=Min(LineUp, -StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
-          LineDn:=Max(LineDn, StrToIntDef(xn.Attribute['dy'],0));
-        end;
-
-        xn := xn.Next
-      until xn = nil;
-
-      if n1<> nil then
-        ResetRow(False);
-
-      if (Bkg <> nil) then
-      begin
-        if (hgh > StrToIntDef(NOD.Attribute['height'],0)) then
-          Bkg.Attribute['height'] := IntToStr(StrToIntDef(Bkg.Attribute['height'],0) +  hgh - StrToIntDef(NOD.Attribute['height'],0))
-        else
-        if (hgh > StrToIntDef(Bkg.Attribute['height'],0)) then
-          Bkg.Attribute['height'] := IntToStr(StrToIntDef(Bkg.Attribute['height'],0) +  hgh);
-      end;
-
-      if pos('zoom', nod.Attribute['decard-format'])> 0 then
-      begin
-
-
-        if (AddZoom > 0) and (AddZoom < 1) then
-        begin
-          ZoomValue := ZoomValue * AddZoom;
-          DoZoom := False;
-          addzoom := 1;
-        end
-        else
-        if (StrToIntDef(NOD.Attribute['height'],0)>0)
-          and (StrToIntDef(NOD.Attribute['height'],0)+1 < hgh * ZoomValue)
-        then begin
-          err := round(StrToIntDef(NOD.Attribute['height'],0) * ZoomValue);
-          ZoomValue := ZoomValue * 0.98;
-//          ZoomValue := ZoomValue * Sqrt(StrToIntDef(NOD.Attribute['height'],0) / (hgh * ZoomValue) );
-          DoZoom := err*100 = round(StrToIntDef(NOD.Attribute['height'],0) * ZoomValue*100);
-        end;
-
-      end;
-
-    until DoZoom;
-
-
-    if (bkg<>nil) and (ZoomValue<>1)and (ZoomValue<>0) then
-        Bkg.Attribute['width'] := IntToStr(Round(StrToIntDef(Bkg.Attribute['width'],0)/ZoomValue ));
-
-    if (ParentStyle(NOD, 'decard-baseline','80%')<>'100%')  then
-      nody:= nody - Round(Row1*ZoomValue);
-
-    n1 := RST;
-
-    while n1<>nil do
-    begin
-      if pos('%', n1.Attribute['width'])>0 then
-      begin
-        if (ZoomValue<>1)and (ZoomValue<>0) then
-          n1.Attribute['width'] := IntToStr(PercentWidth(n1.Attribute['width'],0))
-        else
-          n1.Attribute['width'] := IntToStr(PercentWidth(n1.Attribute['width'],0));
-      end;
-      n1 := n1.Next;
-    end;
-
-
-    if pos('valign:',nod.Attribute['decard-format'])>0 then
-    begin
-//  valign="top | middle | bottom | baseline"
-
-       if pos('valign:top', nod.Attribute['decard-format'])> 0 then
-       begin
-           Result := '<g transform="translate('+IntToStr(nodx)+','+IntToStr(nody)+') scale('+SvgFloat(ZoomValue)+')">' + RST.Nodes.xml + '</g>'
-       end
-       else
-       if pos('valign:middle', nod.Attribute['decard-format'])> 0 then
-       begin
-         Result := '<g transform="translate('+IntToStr(nodx)+','+IntToStr(nody+(StrToIntDef(NOD.Attribute['height'],0)-round(hgh*ZoomValue)) div 2)+')  scale('+SvgFloat(ZoomValue)+')">' + RST.Nodes.xml + '</g>'
-       end
-       else
-       if pos('valign:bottom', nod.Attribute['decard-format'])> 0 then
-       begin
-        Result := '<g transform="translate('+IntToStr(nodx)+','+IntToStr(nody+(StrToIntDef(NOD.Attribute['height'],0)-round(hgh*ZoomValue)) )+')  scale('+SvgFloat(ZoomValue)+')">' + RST.Nodes.xml + '</g>'
-       end
-    end
-    else
-    if  round(hgh*ZoomValue) > StrToIntDef(NOD.Attribute['height'],hgh) then
-      Result := '<g transform="translate('+IntToStr(nodx)+','+IntToStr(nody+(StrToIntDef(NOD.Attribute['height'],0)-round(hgh*ZoomValue)) div 2)+')  scale('+SvgFloat(ZoomValue)+')">' + RST.Nodes.xml + '</g>'
-    else
-      Result := '<g transform="translate('+IntToStr(nodx)+','+IntToStr(nody)+')  scale('+SvgFloat(ZoomValue)+')">' + RST.Nodes.xml + '</g>'
   finally
     sl.free;
-//    CellEditor.seBody.Text := nod.xml;
     RST.Free;
     XML.Free;
   end;

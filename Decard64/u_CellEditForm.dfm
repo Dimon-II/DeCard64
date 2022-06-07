@@ -18,6 +18,7 @@ object CellEditForm: TCellEditForm
   Position = poMainFormCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  OnDeactivate = FormDeactivate
   PixelsPerInch = 96
   TextHeight = 13
   object Splitter2: TSplitter
@@ -284,7 +285,7 @@ object CellEditForm: TCellEditForm
     Top = 0
     Width = 289
     Height = 238
-    ActivePage = tsCommon
+    ActivePage = tsMacros
     Align = alRight
     TabOrder = 2
     object tsCommon: TTabSheet
@@ -400,6 +401,55 @@ object CellEditForm: TCellEditForm
         ReadOnly = True
       end
     end
+    object tsWrap: TTabSheet
+      Caption = 'Wrap'
+      ImageIndex = 3
+      object seWrap: TSynEdit
+        Left = 0
+        Top = 0
+        Width = 281
+        Height = 210
+        Align = alClient
+        Color = clWhite
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'Courier New'
+        Font.Style = []
+        Font.Quality = fqClearTypeNatural
+        TabOrder = 0
+        CodeFolding.ShowCollapsedLine = True
+        UseCodeFolding = False
+        Gutter.Font.Charset = DEFAULT_CHARSET
+        Gutter.Font.Color = clWindowText
+        Gutter.Font.Height = -11
+        Gutter.Font.Name = 'Courier New'
+        Gutter.Font.Style = []
+        Gutter.Width = 0
+        Highlighter = CellEditFrame.SynXMLSyn1
+        Lines.Strings = (
+          '<br/>'
+          '<br '
+          '<p/>'
+          '<p ')
+        Options = [eoAutoIndent, eoEnhanceEndKey, eoGroupUndo, eoScrollPastEol, eoShowScrollHint, eoShowSpecialChars, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
+      end
+    end
+  end
+  object cbHelper: TComboBox
+    Left = 184
+    Top = 200
+    Width = 145
+    Height = 21
+    AutoComplete = False
+    TabOrder = 3
+    Text = 'cbHelper'
+    Visible = False
+    OnChange = cbHelperChange
+    OnCloseUp = cbHelperCloseUp
+    OnExit = cbHelperExit
+    OnKeyPress = cbHelperKeyPress
+    OnKeyUp = cbHelperKeyUp
   end
   object alGrid: TActionList
     Images = MainData.ilNavigate
@@ -509,6 +559,11 @@ object CellEditForm: TCellEditForm
       Caption = 'Action10'
       ShortCut = 16432
       OnExecute = CellEditFrameToolButton3Click
+    end
+    object aHelper: TAction
+      Caption = 'Helper'
+      ShortCut = 16416
+      OnExecute = aHelperExecute
     end
   end
 end
