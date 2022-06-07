@@ -193,7 +193,7 @@ object CellEditForm: TCellEditForm
     end
     object sbChkRepl: TSpeedButton
       Left = 301
-      Top = 6
+      Top = 8
       Width = 110
       Height = 27
       Action = aChkRepl

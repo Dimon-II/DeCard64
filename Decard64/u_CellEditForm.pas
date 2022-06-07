@@ -83,11 +83,13 @@ type
     FGrid: TStringGrid;
     FRow,RowDisplay: integer;
     FRepl:TStringList;
+    FNodeName: string;
     function GetText: string;
     procedure SetText(const Value: string);
     procedure SetGrid(const Value: TStringGrid);
     procedure ResetCombo;
     procedure PrepareCombo;
+    procedure SetNodeName(const Value: string);
     { Private declarations }
   public
     { Public declarations }
@@ -96,6 +98,7 @@ type
     property Text:string read GetText write SetText;
     property Grid:TStringGrid read FGrid write SetGrid;
     property Row: integer read FRow write FRow;
+    property NodeName:string read FNodeName write SetNodeName;
 
   end;
 
@@ -273,8 +276,8 @@ end;
 
 procedure TCellEditForm.cbHelperCloseUp(Sender: TObject);
 begin
-  if not (FindControl(GetForegroundWindow()) <> nil) then
-     cbHelper.Visible := False;
+//  if not (FindControl(GetForegroundWindow()) <> nil) then
+//     cbHelper.Visible := False;
  {
  if cbHelper.Visible then
    if (FindControl(GetForegroundWindow()) <> nil) then
@@ -510,7 +513,8 @@ var i,s1,s2:Integer;
 begin
   s1 := cbHelper.SelStart;
   s2 := cbHelper.SelLength;
-  if cbHelper.Hint = Copy(cbHelper.text,1,s1+s2) then exit;
+  if cbHelper.text<>'' then
+    if cbHelper.Hint = Copy(cbHelper.text,1,s1+s2) then exit;
 
   cbHelper.Items.BeginUpdate;
   cbHelper.Items.Clear;
@@ -518,7 +522,7 @@ begin
 //  cbHelper.Items.Add(cbHelper.text);
   for i:= 0 to lbMacros.Items.Count-1 do
   begin
-    if (s1+s2=0) or (pos(AnsiUpperCase(Copy(cbHelper.text,1,s1+s2)), AnsiUpperCase(lbMacros.Items[i]))=1) then
+    if (cbHelper.text='')or(s1+s2=0) or (pos(AnsiUpperCase(Copy(cbHelper.text,1,s1+s2)), AnsiUpperCase(lbMacros.Items[i]))=1) then
       cbHelper.Items.Add(lbMacros.Items[i]);
   end;
   if cbHelper.Items.Count<7 then
@@ -534,6 +538,11 @@ end;
 procedure TCellEditForm.SetGrid(const Value: TStringGrid);
 begin
   FGrid := Value;
+end;
+
+procedure TCellEditForm.SetNodeName(const Value: string);
+begin
+  FNodeName := Value;
 end;
 
 procedure TCellEditForm.SetText(const Value: string);

@@ -2194,7 +2194,10 @@ begin
   XMLEditForm.SynEditFrame.SynEditor.Lines.Delete(0);
   if XMLEditForm.ShowModal=mrOk then
   begin
+    if sgText.ColCount<XMLEditForm.SynEditFrame.SynEditor.Lines.Count+1 then
+      sgText.ColCount:=XMLEditForm.SynEditFrame.SynEditor.Lines.Count+1;
     sgText.Rows[0].Text := Trim('[0] ¹'^M+XMLEditForm.SynEditFrame.SynEditor.Text);
+
     for i := 1 to sgText.ColCount-1 do
     begin
       if (pos('[', sgText.Cells[i,0])=1) and (pos(']', sgText.Cells[i,0])<6) then
@@ -3103,12 +3106,15 @@ end;
 
 procedure TMainForm.sgTextSelectCell(Sender: TObject; ACol, ARow: Integer;
   var CanSelect: Boolean);
+var s:string;
 begin
   if CellEditForm.Visible then
   begin
+    s := sgText.Cells[ACol,0];
+    s := copy(s,pos('[',s)+1,length(s));
+    s :=StringReplace(s,']',':'+ IntToStr(ARow)+']',[]);
     CellEditForm.Text := sgText.Cells[ACol,ARow];
-    CellEditForm.Caption := 'Cell['+IntToStr(ACol)+':'+ IntToStr(ARow)+'] <'
-      + ExtractFileName(edCfgCardsFile.Text) +'>';
+    CellEditForm.Caption :=  'Cell['+s+' <'+ ExtractFileName(edCfgCardsFile.Text) +'> '+CellEditForm.NodeName;
     CellEditForm.Row := Arow;
   end;
   sgText.Invalidate;
@@ -3472,12 +3478,32 @@ begin
 end;
 
 procedure TMainForm.tbCellEditClick(Sender: TObject);
+var s:string;
+  nod:TXML_Nod;
 begin
   CellEditForm.Grid := sgText;
   CellEditForm.PrepareMacro(SVGFrame.SVGNode);
+  CellEditForm.NodeName := '';
+  nod := SVGFrame.SVGNode;
+  repeat
+    if nod<>SVGFrame.SVGNode then
+      CellEditForm.NodeName:='\'+CellEditForm.NodeName;
+
+
+    if (nod.LocalName='svg')or(nod.Attribute['id']='') then
+      CellEditForm.NodeName:='<'+nod.LocalName+'>'+CellEditForm.NodeName
+    else
+      CellEditForm.NodeName:=nod.Attribute['id']+CellEditForm.NodeName;
+    nod := nod.parent;
+    if nod.LocalName='' then Break;
+    
+  until Nod=nil;
+
   CellEditForm.Text := sgText.Cells[sgText.Col,sgText.Row];
-  CellEditForm.Caption := 'Cell['+IntToStr(sgText.Col)+':'+ IntToStr(sgText.Row)+'] <'
-    + ExtractFileName(edCfgCardsFile.Text) +'>';
+  s := sgText.Cells[sgText.Col,0];
+  s := copy(s,pos('[',s)+1,length(s));
+  s :=StringReplace(s,']',':'+ IntToStr(sgText.Row)+']',[]);
+  CellEditForm.Caption :=  'Cell['+s+' <'+ ExtractFileName(edCfgCardsFile.Text) +'> '+CellEditForm.NodeName;
   CellEditForm.aPreview.OnExecute := aShowExecute;
   CellEditForm.Show;
 end;
