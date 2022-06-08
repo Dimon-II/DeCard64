@@ -23,7 +23,6 @@ var   FBufXml:TStringList;
 function SvgFloat(d:double):string;
 begin
   str(d:0:4,result);
-
 end;
 
 function FontSizeConv(const Str: string; OldSize: double; DPI:string): double;
@@ -152,6 +151,8 @@ var Nod:TXML_Nod;
 begin
   Nod := ANod;
   repeat
+     if (aAttr='filter')and(Nod.LocalName='foreignObject') then
+       break;
      result := Nod.Attribute[aAttr];
      Nod := Nod.parent;
   until (Result<>'') or (Nod = nil) ;
@@ -798,11 +799,12 @@ begin
     sl.free;
   end;
 end;
+
 procedure AlignImages(Anod:TXML_Nod);
 var
   i, j: Integer;
 begin
-
+{
   j:=0;
   for i:=ANod.Nodes.Count-1 downto 0 do
   begin
@@ -815,13 +817,14 @@ begin
      if ANod.Nodes[i+j].HasChildren then
        AlignImages(ANod.Nodes[i+j]);
   end;
+}
 end;
 
 
 procedure level(nod:TXML_Nod);
 var
   i:Integer;
-  s,vl:string;
+  s:string;
   r,g,b:byte;
 
 begin
@@ -1623,7 +1626,11 @@ begin
            dx := PercentWidth(xn.Attribute['dx'],0);
 
            if (xn.Attribute['width']='')or(xn.Attribute['height']='') then
+           begin
              SvgUseWidth(xn.Attribute['src'], MainSvg, Clipart, w1, w2);
+             w1 := Round(w1 * StrToFloatDef(xn.Attribute['scale'],1));
+             w2 := Round(w2 * StrToFloatDef(xn.Attribute['scale'],1));
+           end;
 
            if (w1 > (PercentWidth0(ParentStyle(xn, 'right', RST.Attribute['width']),0)/ZoomValue)) then
               addzoom := min(addzoom, PercentWidth0(ParentStyle(xn, 'right', RST.Attribute['width']),0)/ZoomValue / w1);
@@ -1655,20 +1662,12 @@ begin
 
            n2.Attribute['x'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + PercentWidth(xn.Attribute['dx'],0));
            n2.Attribute['y'] := IntToStr(-StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
+           n2.Attribute['filter'] := ParentStyle(xn, 'filter');
 
            n2.Attribute['xlink:href'] := xn.Attribute['src'];
            n1.Attribute['width'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + w1 + PercentWidth(xn.Attribute['dx'],0));
            n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),
            StrToIntDef(n2.Attribute['height'],0) - abs(StrToIntDef(xn.Attribute['dy'],0))));
-
-           if xn.Attribute['scale']<>'' then
-           begin
-             n2.Attribute['transform'] := 'translate(' +n2.Attribute['x'] +','+n2.Attribute['y']+ ') '
-                                         +'scale('+xn.Attribute['scale']+')';
-             n2.Attribute['x'] := '';
-             n2.Attribute['y'] := '';
-           end;
-
 
 
            w_dy := Max(w_dy, StrToIntDef(xn.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
@@ -1682,6 +1681,21 @@ begin
 
           LineUp:=Min(LineUp, -StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
           LineDn:=Max(LineDn, StrToIntDef(xn.Attribute['dy'],0));
+
+           if xn.Attribute['scale']<>'' then
+           begin
+             n2.Attribute['transform'] := 'translate(' +n2.Attribute['x'] +','+n2.Attribute['y']+ ') '
+                                         +'scale('+xn.Attribute['scale']+')';
+             n2.Attribute['x'] := '';
+             n2.Attribute['y'] := '';
+             if n2.Attribute['filter']<>'' then
+             begin
+               n2.Attribute['filter'] := '';
+               n2.ResetXml('<g>'+n2.xml+'</g>');
+               n2.Attribute['filter'] := ParentStyle(xn, 'filter');
+             end;
+           end;
+
         end;
 
 
@@ -1850,6 +1864,7 @@ end;
 
 
 begin
+  npp:=0;
   MainSVG := NOD;
   while MainSVG.LocalName <> 'svg' do MainSVG:=MainSVG.parent;
 
@@ -1861,8 +1876,6 @@ begin
   nod.Attribute['y'] := '0';
   RootSize.X :=StrToIntDef(NOD.Attribute['width'],0);
   RootSize.Y :=StrToIntDef(NOD.Attribute['height'],0);
-
-
 
   XML:=TXML_Nod.Create(nil);
   RST:=TXML_Nod.Create(nil);
