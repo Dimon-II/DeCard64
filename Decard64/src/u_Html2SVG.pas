@@ -1436,14 +1436,16 @@ begin
             bkg.LocalName:='rect';
           bkg.index := 0;
 
-          bkg.Attribute['width'] := Nod.Attribute['width'];
-          bkg.Attribute['height'] := Nod.Attribute['height'];
-          bkg.Attribute['x'] := Nod.Attribute['x'];
-          bkg.Attribute['y'] := Nod.Attribute['y'];
+
+          bkg.Attribute['width'] := IntToStr(StrToIntDef(Nod.Attribute['width'],0)+2*StrToIntDef(xn.Attribute['outline'],0));
+          bkg.Attribute['height'] := IntToStr(StrToIntDef(Nod.Attribute['height'],0)+2*StrToIntDef(xn.Attribute['outline'],0));
+          bkg.Attribute['x'] := IntToStr(StrToIntDef(Nod.Attribute['x'],0)-StrToIntDef(xn.Attribute['outline'],0));
+          bkg.Attribute['y'] := IntToStr(StrToIntDef(Nod.Attribute['y'],0)-StrToIntDef(xn.Attribute['outline'],0));
 
           for i := 0 to xn.Attributes.Count-1 do
           if (xn.Attributes.Items[i].name<>'src') and (xn.Attributes.Items[i].name<>'img') then
              bkg.Attribute[xn.Attributes.Items[i].name] := xn.Attributes.Items[i].value;
+
 
 
         end;
@@ -1483,7 +1485,7 @@ begin
            n2.Attribute['x'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5);
 
            n2.Attribute['height'] := ParentStyle(xn,'font-size');
-           n2.Attribute['dy'] := ParentStyle(xn, 'baselile-shift');
+           n2.Attribute['dy'] := ParentStyle(xn, 'baseline-shift');
            n2.Attribute['filter'] := ParentStyle(xn, 'filter');
 
            if pos('%', ParentStyle(xn,'line-height',''))>0 then
