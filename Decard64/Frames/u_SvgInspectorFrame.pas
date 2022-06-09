@@ -350,6 +350,10 @@ procedure TSvgInspectorFrame.SetSVGNode(const Value: TXML_Nod);
       exit
     else
 
+    if (cbAtrShow.ItemIndex=2) and (Pos('fe',LocalName)=1) then
+    begin
+    end
+    else
     if (cbAtrShow.ItemIndex=0) then
     begin
     end
@@ -373,6 +377,12 @@ procedure TSvgInspectorFrame.SetSVGNode(const Value: TXML_Nod);
 
     if Aname = 'decard-baseline' then
       en := '80%,100%';
+
+    if (Aname = 'result')or(Aname = 'in')or(Aname = 'in2') then
+    begin
+      en := 'SourceGraphic,SourceAlpha';
+    end;
+
 
     if nod <> nil then
     begin
@@ -790,17 +800,54 @@ end;
 { THackInplaceEditList }
 
 procedure THackInplaceEditList.DoGetPickListItems;
+
+ function FilterList:string;
+ var nd:TXML_Nod;
+   s:string;
+ begin
+   nd := TSvgInspectorFrame(Owner.Owner).SVGNode;
+   result := ',SourceGraphic,SourceAlpha,';
+   while (nd<>nil) and (nd.LocalName<>'filter') do
+     nd:=nd.parent;
+
+   if (nd<>nil) then
+     nd:=nd.next;
+
+   while (nd<>nil)and(pos('fe',nd.LocalName)=1) do
+   begin
+        s := trim(nd.attribute['result']);
+
+        if (s<>'') and (pos(','+s+',' , result)=0) then
+          result := result +s+ ',';
+        s := trim(nd.attribute['in']);
+        if (s<>'') and (pos(','+s+',' , result)=0) then
+          result := result +s+ ',';
+        s := trim(nd.attribute['in2']);
+        if (s<>'') and (pos(','+s+',' , result)=0) then
+          result := result +s+ ',';
+        nd:=nd.next;
+    end;
+    result := StringReplace(result,',',#13,[rfReplaceAll]);
+ end;
+
 begin
   if (TStringGrid(Grid).Col>1) then
   with Grid as TStringGrid do
   begin
+    if (Cells[0, Row]='result')or(Cells[0, Row]='in')or(Cells[0, Row]='in2') then
+      PickList.Items.Text := FilterList
+    else
     if (Cells[0, Row]='font-family') then
       PickList.Items.Text := StringReplace(StringReplace(LocalFonts,',',^M,[rfReplaceAll]),'"','',[rfReplaceAll])
     else
     if (Cells[4,Row]<>'')  then
       PickList.Items.Text := StringReplace(','+Cells[4, Row],',',#13,[rfReplaceAll]);
   end
-
 end;
 
 end.
+
+
+
+
+

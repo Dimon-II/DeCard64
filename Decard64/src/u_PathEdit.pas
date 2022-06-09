@@ -35,9 +35,7 @@ type
     ToolButton5: TToolButton;
     ToolButton6: TToolButton;
     ToolButton7: TToolButton;
-    N2: TMenuItem;
     Abs1: TMenuItem;
-    Ref1: TMenuItem;
     Timer1: TTimer;
     ToolButton3: TToolButton;
     Splitter1: TSplitter;
@@ -75,6 +73,11 @@ type
     shDot2: TShape;
     shAng2: TShape;
     shDot1: TShape;
+    sePrcY: TSpinEdit;
+    sePrcX: TSpinEdit;
+    Label3: TLabel;
+    Label4: TLabel;
+    N2: TMenuItem;
     procedure DrawPaint(Sender: TObject);
     procedure shDot1DragOver(Sender, Source: TObject; X, Y: Integer;
       State: TDragState; var Accept: Boolean);
@@ -130,6 +133,7 @@ type
     function CurrentPath:string;
     procedure SvgArcTo(Curr:TPoint; rx,ry:Integer; ax:double; fa, fs:boolean; x,y:integer; Canvas:TCanvas);
     procedure DeltaPolyBezierTo(const Points: array of TPoint);
+    function StrToXY(s:string;Def:integer):integer;
   end;
 
 var
@@ -193,6 +197,18 @@ begin
       p[i].y := Points[i].y - ZeroXY.y;
     end;
     Draw.Canvas.PolyBezierTo(p);
+end;
+
+
+function TfrmPathEdit.StrToXY(s: string; Def:Integer): integer;
+begin
+  if pos('%x',s)>0 then
+    Result := Round(sePrcX.Value /100 * StrToFloatDef(copy(s,1,Length(s)-2),Def))
+  else
+  if pos('%y',s)>0 then
+    Result := Round(sePrcY.Value /100 * StrToFloatDef(copy(s,1,Length(s)-2),Def))
+  else
+    Result := StrToIntDef(s,Def)
 end;
 
 
@@ -293,7 +309,10 @@ end;
 
 procedure TfrmPathEdit.Abs1Click(Sender: TObject);
 begin
-  PathAbs(sgDots.Row)
+  if UpperCase(sgDots.cells[1,sgDots.Row])=sgDots.cells[1,sgDots.Row] then
+    PathRel(sgDots.Row)
+  else
+    PathAbs(sgDots.Row);
 end;
 
 procedure TfrmPathEdit.btnApplyClick(Sender: TObject);
@@ -359,7 +378,7 @@ begin
     sgDots.SetFocus;
     for i:= 1 to sgDots.RowCount-1 do
     begin
-      d :=  Round(Sqrt(sqr(x-8 + ZeroXY.x  - zm * StrToFloatDef(sgDots.Cells[11,i],0))  +sqr(y-8  + ZeroXY.y- zm * StrToFloatDef(sgDots.Cells[12,i],0))));
+      d :=  Round(Sqrt(sqr(x-8 + ZeroXY.x  - zm * StrToXY(sgDots.Cells[11,i],0))  +sqr(y-8  + ZeroXY.y- zm * StrToXY(sgDots.Cells[12,i],0))));
       if (i=1) or (d<l) then
       begin
         l := d;
@@ -463,8 +482,8 @@ begin
 
      if sgDots.Cells[1,i]='M' then
      begin
-        p0.X := Round(zm*StrToFloatDef(sgDots.Cells[2,i],0));
-        p0.Y := Round(zm*StrToFloatDef(sgDots.Cells[3,i],0));
+        p0.X := Round(zm*StrToXY(sgDots.Cells[2,i],0));
+        p0.Y := Round(zm*StrToXY(sgDots.Cells[3,i],0));
         pz:=p0;
         if i=sgDots.Row then
         begin
@@ -482,8 +501,8 @@ begin
      end;
      if sgDots.Cells[1,i]='m' then
      begin
-        p0.X := p0.X + Round(zm*StrToFloatDef(sgDots.Cells[2,i],0));
-        p0.Y := p0.Y + Round(zm*StrToFloatDef(sgDots.Cells[3,i],0));
+        p0.X := p0.X + Round(zm*StrToXY(sgDots.Cells[2,i],0));
+        p0.Y := p0.Y + Round(zm*StrToXY(sgDots.Cells[3,i],0));
         pz:=p0;
         if i=sgDots.Row then
         begin
@@ -501,23 +520,23 @@ begin
      end;
      if sgDots.Cells[1,i]='L' then
      begin
-        p1.X := Round(zm*StrToFloatDef(sgDots.Cells[2,i],0));
-        p1.Y := Round(zm*StrToFloatDef(sgDots.Cells[3,i],0));
+        p1.X := Round(zm*StrToXY(sgDots.Cells[2,i],0));
+        p1.Y := Round(zm*StrToXY(sgDots.Cells[3,i],0));
         LineTo(p1.X-ZeroXY.x,p1.Y-ZeroXY.y);
         p0:=p1;
         p[1]:=p0;
      end;
      if sgDots.Cells[1,i]='l' then
      begin
-        p1.X := p0.x + Round(zm*StrToFloatDef(sgDots.Cells[2,i],0));
-        p1.Y := p0.y + Round(zm*StrToFloatDef(sgDots.Cells[3,i],0));
+        p1.X := p0.x + Round(zm*StrToXY(sgDots.Cells[2,i],0));
+        p1.Y := p0.y + Round(zm*StrToXY(sgDots.Cells[3,i],0));
         LineTo(p1.X-ZeroXY.x,p1.Y-ZeroXY.y);
         p0:=p1;
         p[1]:=p0;
      end;
      if sgDots.Cells[1,i]='H' then
      begin
-        p1.X := Round(zm*StrToFloatDef(sgDots.Cells[2,i],0));
+        p1.X := Round(zm*StrToXY(sgDots.Cells[2,i],0));
         p1.Y := p0.Y;
         LineTo(p1.X-ZeroXY.x, p1.Y-ZeroXY.y);
         p0:=p1;
@@ -525,7 +544,7 @@ begin
      end;
      if sgDots.Cells[1,i]='h' then
      begin
-        p1.X := p0.x + Round(zm*StrToFloatDef(sgDots.Cells[2,i],0));
+        p1.X := p0.x + Round(zm*StrToXY(sgDots.Cells[2,i],0));
         p1.Y := p0.Y;
         LineTo(p1.X-ZeroXY.x,p1.Y-ZeroXY.y);
         p0:=p1;
@@ -534,7 +553,7 @@ begin
      if sgDots.Cells[1,i]='V' then
      begin
         p1.X := p0.X;
-        p1.Y := Round(zm*StrToFloatDef(sgDots.Cells[2,i],0));
+        p1.Y := Round(zm*StrToXY(sgDots.Cells[2,i],0));
         LineTo(p1.X-ZeroXY.x,p1.Y-ZeroXY.y);
         p0:=p1;
         p[1]:=p0;
@@ -542,7 +561,7 @@ begin
      if sgDots.Cells[1,i]='v' then
      begin
         p1.X := p0.X;
-        p1.Y := p0.y + Round(zm*StrToFloatDef(sgDots.Cells[2,i],0));
+        p1.Y := p0.y + Round(zm*StrToXY(sgDots.Cells[2,i],0));
         LineTo(p1.X-ZeroXY.x, p1.Y-ZeroXY.y);
         p0:=p1;
         p[1]:=p0;
@@ -561,13 +580,13 @@ begin
      end;
      if sgDots.Cells[1,i]='C' then
      begin
-        p[0].X := Round(zm*StrToFloatDef(sgDots.Cells[2,i],0));
-        p[0].Y := Round(zm*StrToFloatDef(sgDots.Cells[3,i],0));
-        p[1].X := Round(zm*StrToFloatDef(sgDots.Cells[4,i],0));
-        p[1].Y := Round(zm*StrToFloatDef(sgDots.Cells[5,i],0));
+        p[0].X := Round(zm*StrToXY(sgDots.Cells[2,i],0));
+        p[0].Y := Round(zm*StrToXY(sgDots.Cells[3,i],0));
+        p[1].X := Round(zm*StrToXY(sgDots.Cells[4,i],0));
+        p[1].Y := Round(zm*StrToXY(sgDots.Cells[5,i],0));
 
-        p1.X := Round(zm*StrToFloatDef(sgDots.Cells[6,i],0));
-        p1.Y := Round(zm*StrToFloatDef(sgDots.Cells[7,i],0));
+        p1.X := Round(zm*StrToXY(sgDots.Cells[6,i],0));
+        p1.Y := Round(zm*StrToXY(sgDots.Cells[7,i],0));
 //        LineTo(p1.X-ZeroXY.x,p1.Y-ZeroXY.y);
         p[2] := p1;
         DeltaPolyBezierTo(p);
@@ -575,13 +594,13 @@ begin
      end;
      if sgDots.Cells[1,i]='c' then
      begin
-        p[0].X := p0.x + Round(zm*StrToFloatDef(sgDots.Cells[2,i],0));
-        p[0].Y := p0.y + Round(zm*StrToFloatDef(sgDots.Cells[3,i],0));
-        p[1].X := p0.x + Round(zm*StrToFloatDef(sgDots.Cells[4,i],0));
-        p[1].Y := p0.y + Round(zm*StrToFloatDef(sgDots.Cells[5,i],0));
+        p[0].X := p0.x + Round(zm*StrToXY(sgDots.Cells[2,i],0));
+        p[0].Y := p0.y + Round(zm*StrToXY(sgDots.Cells[3,i],0));
+        p[1].X := p0.x + Round(zm*StrToXY(sgDots.Cells[4,i],0));
+        p[1].Y := p0.y + Round(zm*StrToXY(sgDots.Cells[5,i],0));
 
-        p1.X := p0.x + Round(zm*StrToFloatDef(sgDots.Cells[6,i],0));
-        p1.Y := p0.y + Round(zm*StrToFloatDef(sgDots.Cells[7,i],0));
+        p1.X := p0.x + Round(zm*StrToXY(sgDots.Cells[6,i],0));
+        p1.Y := p0.y + Round(zm*StrToXY(sgDots.Cells[7,i],0));
 //        LineTo(p1.X-ZeroXY.x,p1.Y-ZeroXY.y);
         p[2] := p1;
         DeltaPolyBezierTo(p);
@@ -591,11 +610,11 @@ begin
      begin
         p[0].X := 2 * p0.x - p[1].X;
         p[0].Y := 2 * p0.y - p[1].Y;
-        p[1].X := Round(zm*StrToFloatDef(sgDots.Cells[2,i],0));
-        p[1].Y := Round(zm*StrToFloatDef(sgDots.Cells[3,i],0));
+        p[1].X := Round(zm*StrToXY(sgDots.Cells[2,i],0));
+        p[1].Y := Round(zm*StrToXY(sgDots.Cells[3,i],0));
 
-        p1.X := Round(zm*StrToFloatDef(sgDots.Cells[4,i],0));
-        p1.Y := Round(zm*StrToFloatDef(sgDots.Cells[5,i],0));
+        p1.X := Round(zm*StrToXY(sgDots.Cells[4,i],0));
+        p1.Y := Round(zm*StrToXY(sgDots.Cells[5,i],0));
 //        LineTo(p1.X-ZeroXY.x,p1.Y-ZeroXY.y);
         p[2] := p1;
         DeltaPolyBezierTo(p);
@@ -605,11 +624,11 @@ begin
      begin
         p[0].X := 2 * p0.x - p[1].X;
         p[0].Y := 2 * p0.y - p[1].Y;
-        p[1].X := p0.x + Round(zm*StrToFloatDef(sgDots.Cells[2,i],0));
-        p[1].Y := p0.y + Round(zm*StrToFloatDef(sgDots.Cells[3,i],0));
+        p[1].X := p0.x + Round(zm*StrToXY(sgDots.Cells[2,i],0));
+        p[1].Y := p0.y + Round(zm*StrToXY(sgDots.Cells[3,i],0));
 
-        p1.X := p0.x + Round(zm*StrToFloatDef(sgDots.Cells[4,i],0));
-        p1.Y := p0.y + Round(zm*StrToFloatDef(sgDots.Cells[5,i],0));
+        p1.X := p0.x + Round(zm*StrToXY(sgDots.Cells[4,i],0));
+        p1.Y := p0.y + Round(zm*StrToXY(sgDots.Cells[5,i],0));
 //        LineTo(p1.X-ZeroXY.x,p1.Y-ZeroXY.y);
         p[2] := p1;
         DeltaPolyBezierTo(p);
@@ -618,10 +637,10 @@ begin
 
      if sgDots.Cells[1,i]='Q' then
      begin
-        pq.X := Round(zm*StrToFloatDef(sgDots.Cells[2,i],0));
-        pq.Y := Round(zm*StrToFloatDef(sgDots.Cells[3,i],0));
-        p1.X := Round(zm*StrToFloatDef(sgDots.Cells[4,i],0));
-        p1.Y := Round(zm*StrToFloatDef(sgDots.Cells[5,i],0));
+        pq.X := Round(zm*StrToXY(sgDots.Cells[2,i],0));
+        pq.Y := Round(zm*StrToXY(sgDots.Cells[3,i],0));
+        p1.X := Round(zm*StrToXY(sgDots.Cells[4,i],0));
+        p1.Y := Round(zm*StrToXY(sgDots.Cells[5,i],0));
 
         p[0].X := round(p0.x + 2/3 *(pq.X - p0.x));
         p[0].Y := round(p0.y + 2/3 *(pq.y - p0.y));
@@ -636,10 +655,10 @@ begin
      end;
      if sgDots.Cells[1,i]='q' then
      begin
-        pq.X := p0.x + Round(zm*StrToFloatDef(sgDots.Cells[2,i],0));
-        pq.Y := p0.y + Round(zm*StrToFloatDef(sgDots.Cells[3,i],0));
-        p1.X := p0.x + Round(zm*StrToFloatDef(sgDots.Cells[4,i],0));
-        p1.Y := p0.y + Round(zm*StrToFloatDef(sgDots.Cells[5,i],0));
+        pq.X := p0.x + Round(zm*StrToXY(sgDots.Cells[2,i],0));
+        pq.Y := p0.y + Round(zm*StrToXY(sgDots.Cells[3,i],0));
+        p1.X := p0.x + Round(zm*StrToXY(sgDots.Cells[4,i],0));
+        p1.Y := p0.y + Round(zm*StrToXY(sgDots.Cells[5,i],0));
 
         p[0].X := round(p0.x + 2/3 *(pq.X - p0.x));
         p[0].Y := round(p0.y + 2/3 *(pq.y - p0.y));
@@ -656,8 +675,8 @@ begin
      begin
         pq.X := 2 * p0.x - pq.X;
         pq.Y := 2 * p0.y - pq.Y;
-        p1.X := Round(zm*StrToFloatDef(sgDots.Cells[2,i],0));
-        p1.Y := Round(zm*StrToFloatDef(sgDots.Cells[3,i],0));
+        p1.X := Round(zm*StrToXY(sgDots.Cells[2,i],0));
+        p1.Y := Round(zm*StrToXY(sgDots.Cells[3,i],0));
 
         p[0].X := round(p0.x + 2/3 *(pq.X - p0.x));
         p[0].Y := round(p0.y + 2/3 *(pq.y - p0.y));
@@ -674,8 +693,8 @@ begin
      begin
         pq.X := 2 * p0.x - pq.X;
         pq.Y := 2 * p0.y - pq.Y;
-        p1.X := p0.x + Round(zm*StrToFloatDef(sgDots.Cells[2,i],0));
-        p1.Y := p0.y + Round(zm*StrToFloatDef(sgDots.Cells[3,i],0));
+        p1.X := p0.x + Round(zm*StrToXY(sgDots.Cells[2,i],0));
+        p1.Y := p0.y + Round(zm*StrToXY(sgDots.Cells[3,i],0));
 
         p[0].X := round(p0.x + 2/3 *(pq.X - p0.x));
         p[0].Y := round(p0.y + 2/3 *(pq.y - p0.y));
@@ -691,11 +710,11 @@ begin
 
      if sgDots.Cells[1,i]='A' then
      begin
-        p1.X := Round(zm*StrToFloatDef(sgDots.Cells[7,i],0));
-        p1.Y := Round(zm*StrToFloatDef(sgDots.Cells[8,i],0));
+        p1.X := Round(zm*StrToXY(sgDots.Cells[7,i],0));
+        p1.Y := Round(zm*StrToXY(sgDots.Cells[8,i],0));
 
-        Rx:=zm*StrToFloatDef(sgDots.Cells[2,i],0);
-        Ry:=zm*StrToFloatDef(sgDots.Cells[3,i],0);
+        Rx:=zm*StrToXY(sgDots.Cells[2,i],0);
+        Ry:=zm*StrToXY(sgDots.Cells[3,i],0);
  {
         if sqr(Rx) + sqr(Ry) < sqr(p0.x - p1.x)+sqr(p0.y - p1.y)  then
         begin
@@ -708,16 +727,16 @@ begin
         if sgDots.Cells[6,i]='0' then
           Ry := -Ry;
 
-        p[0].x := Round(p0.X + Cos(pi/180  * StrToFloatDef(sgDots.Cells[4,i],0))*Rx);
-        p[0].y := Round(p0.y + Sin(pi/180  * StrToFloatDef(sgDots.Cells[4,i],0))*Rx);
-        p[1].x := Round(p0.X - Sin(pi/180  * StrToFloatDef(sgDots.Cells[4,i],0))*Ry);
-        p[1].y := Round(p0.y - Cos(pi/180  * StrToFloatDef(sgDots.Cells[4,i],0))*Ry);
+        p[0].x := Round(p0.X + Cos(pi/180  * StrToXY(sgDots.Cells[4,i],0))*Rx);
+        p[0].y := Round(p0.y + Sin(pi/180  * StrToXY(sgDots.Cells[4,i],0))*Rx);
+        p[1].x := Round(p0.X - Sin(pi/180  * StrToXY(sgDots.Cells[4,i],0))*Ry);
+        p[1].y := Round(p0.y - Cos(pi/180  * StrToXY(sgDots.Cells[4,i],0))*Ry);
 
 //        Pen.Style := psDot;
         SvgArcTo(p0,
-           Round(zm*StrToFloatDef(sgDots.Cells[2,i],0)),
-           Round(zm*StrToFloatDef(sgDots.Cells[3,i],0)),
-           Round(StrToFloatDef(sgDots.Cells[4,i],0)),
+           Round(zm*StrToXY(sgDots.Cells[2,i],0)),
+           Round(zm*StrToXY(sgDots.Cells[3,i],0)),
+           Round(StrToXY(sgDots.Cells[4,i],0)),
            (sgDots.Cells[5,i]='1'),
            (sgDots.Cells[6,i]='1'),
            p1.X, p1.Y, frmPathEdit.Draw.Canvas);
@@ -729,9 +748,9 @@ begin
          Pen.Style := psDot;
          MoveTo(p0.x - ZeroXY.x,p0.y- ZeroXY.y);
         SvgArcTo(p0,
-           Round(zm*StrToFloatDef(sgDots.Cells[2,i],0)),
-           Round(zm*StrToFloatDef(sgDots.Cells[3,i],0)),
-           Round(StrToFloatDef(sgDots.Cells[4,i],0)),
+           Round(zm*StrToXY(sgDots.Cells[2,i],0)),
+           Round(zm*StrToXY(sgDots.Cells[3,i],0)),
+           Round(StrToXY(sgDots.Cells[4,i],0)),
            (sgDots.Cells[5,i]='0'),
            (sgDots.Cells[6,i]='0'),
            p1.X, p1.Y, frmPathEdit.Draw.Canvas);
@@ -747,11 +766,11 @@ begin
      end;
      if sgDots.Cells[1,i]='a' then
      begin
-        p1.X := p0.X + Round(zm*StrToFloatDef(sgDots.Cells[7,i],0));
-        p1.Y := p0.y + Round(zm*StrToFloatDef(sgDots.Cells[8,i],0));
+        p1.X := p0.X + Round(zm*StrToXY(sgDots.Cells[7,i],0));
+        p1.Y := p0.y + Round(zm*StrToXY(sgDots.Cells[8,i],0));
 
-        Rx:=zm*StrToFloatDef(sgDots.Cells[2,i],0);
-        Ry:=zm*StrToFloatDef(sgDots.Cells[3,i],0);
+        Rx:=zm*StrToXY(sgDots.Cells[2,i],0);
+        Ry:=zm*StrToXY(sgDots.Cells[3,i],0);
 {
         if sqr(Rx) + sqr(Ry) < sqr(p0.x - p1.x)+sqr(p0.y - p1.y)  then
         begin
@@ -764,15 +783,15 @@ begin
         if sgDots.Cells[6,i]='0' then
           Ry := -Ry;
 
-        p[0].x := Round(p0.X + Cos(pi/180  * StrToFloatDef(sgDots.Cells[4,i],0))*Rx);
-        p[0].y := Round(p0.y + Sin(pi/180  * StrToFloatDef(sgDots.Cells[4,i],0))*Rx);
-        p[1].x := Round(p0.X - Sin(pi/180  * StrToFloatDef(sgDots.Cells[4,i],0))*Ry);
-        p[1].y := Round(p0.y - Cos(pi/180  * StrToFloatDef(sgDots.Cells[4,i],0))*Ry);
+        p[0].x := Round(p0.X + Cos(pi/180  * StrToXY(sgDots.Cells[4,i],0))*Rx);
+        p[0].y := Round(p0.y + Sin(pi/180  * StrToXY(sgDots.Cells[4,i],0))*Rx);
+        p[1].x := Round(p0.X - Sin(pi/180  * StrToXY(sgDots.Cells[4,i],0))*Ry);
+        p[1].y := Round(p0.y - Cos(pi/180  * StrToXY(sgDots.Cells[4,i],0))*Ry);
 
         SvgArcTo(p0,
-           Round(zm*StrToFloatDef(sgDots.Cells[2,i],0)),
-           Round(zm*StrToFloatDef(sgDots.Cells[3,i],0)),
-           Round(StrToFloatDef(sgDots.Cells[4,i],0)),
+           Round(zm*StrToXY(sgDots.Cells[2,i],0)),
+           Round(zm*StrToXY(sgDots.Cells[3,i],0)),
+           Round(StrToXY(sgDots.Cells[4,i],0)),
            (sgDots.Cells[5,i]='1'),
            (sgDots.Cells[6,i]='1'),
            p1.X, p1.Y, frmPathEdit.Draw.Canvas);
@@ -784,9 +803,9 @@ begin
          MoveTo(p0.x- ZeroXY.x,p0.y- ZeroXY.y);
 
         SvgArcTo(p0,
-           Round(zm*StrToFloatDef(sgDots.Cells[2,i],0)),
-           Round(zm*StrToFloatDef(sgDots.Cells[3,i],0)),
-           Round(StrToFloatDef(sgDots.Cells[4,i],0)),
+           Round(zm*StrToXY(sgDots.Cells[2,i],0)),
+           Round(zm*StrToXY(sgDots.Cells[3,i],0)),
+           Round(StrToXY(sgDots.Cells[4,i],0)),
            (sgDots.Cells[5,i]='0'),
            (sgDots.Cells[6,i]='0'),
            p1.X, p1.Y, frmPathEdit.Draw.Canvas);
@@ -872,6 +891,7 @@ begin
   Draw.Invalidate;
 end;
 
+
 procedure TfrmPathEdit.sgDotsDblClick(Sender: TObject);
 begin
   sgDots.Options := sgDots.Options - [goRowSelect];
@@ -954,6 +974,8 @@ begin
   pnt := TControl(Source).ScreenToClient(TControl(Sender).ClientToScreen(Point(x,y)));
   if Source is TShape then
   begin
+    if Pos('%', sgDots.Rows[sgDots.Row].text )>0 then exit;
+
     pnt.x := TShape(Source).Left+pnt.x-8 + ZeroXY.x ;
     pnt.y := TShape(Source).Top+pnt.y-8 + ZeroXY.y ;
 
@@ -966,8 +988,8 @@ begin
       for i := 1 to sgDots.RowCount-1 do
         if (i<>sgDots.Row) then
         begin
-          p1.x := Round(StrToFloatDef(sgDots.Cells[11,i],0)*zm);
-          p1.y := Round(StrToFloatDef(sgDots.Cells[12,i],0)*zm);
+          p1.x := Round(StrToXY(sgDots.Cells[11,i],0)*zm);
+          p1.y := Round(StrToXY(sgDots.Cells[12,i],0)*zm);
           if (n=-1) then
           begin
             p0:=P1;
@@ -994,8 +1016,8 @@ begin
 
       if Pos(sgDots.Cells[1,sgDots.Row], 'mlvhcsqta')>0 then
       begin
-        pnt.x := Round(pnt.x - StrToFloatDef(sgDots.Cells[9,sgDots.Row],0)*zm);
-        pnt.y := Round(pnt.y - StrToFloatDef(sgDots.Cells[10,sgDots.Row],0)*zm);
+        pnt.x := Round(pnt.x - StrToXY(sgDots.Cells[9,sgDots.Row],0)*zm);
+        pnt.y := Round(pnt.y - StrToXY(sgDots.Cells[10,sgDots.Row],0)*zm);
       end;
 
       if Source=shDot2 then
@@ -1364,21 +1386,27 @@ procedure TfrmPathEdit.PathAbs(Idx: integer);
 var i,n1,n2:Integer;
   xy:array [0..1] of double;
 begin
+  if Pos('%', sgDots.Rows[Idx].text )>0 then
+  begin
+    sgDots.Cells[1,Idx] := UpperCase(sgDots.Cells[1,Idx]);
+    Exit;
+  end;
+
   n1:=2;
   n2:=-1;
-  xy[0]:=StrToFloatDef(sgDots.Cells[9,idx],0);
-  xy[1]:=StrToFloatDef(sgDots.Cells[10,idx],0);
+  xy[0]:=StrToXY(sgDots.Cells[9,idx],0);
+  xy[1]:=StrToXY(sgDots.Cells[10,idx],0);
   case sgDots.Cells[1,Idx][1] of
     'm','l','t': n2:=1;
     'h': n2:=0;
-    'v': sgDots.Cells[2,Idx]:=FloatToStr(RoundTo(StrToFloatDef(sgDots.Cells[2,Idx], 0)+xy[1],-3));
+    'v': sgDots.Cells[2,Idx]:=FloatToStr(RoundTo(StrToXY(sgDots.Cells[2,Idx], 0)+xy[1],-3));
     'c': n2:=5;
     's','q': n2:=3;
     'a': begin n1:=7; n2:=1; end;
   end;
   sgDots.Cells[1,Idx] := UpperCase(sgDots.Cells[1,Idx]);
   for i := 0 to n2 do
-    sgDots.Cells[n1+i,Idx]:=FloatToStr(RoundTo(StrToFloatDef(sgDots.Cells[n1+i,Idx], 0)+xy[i mod 2],-3));
+    sgDots.Cells[n1+i,Idx]:=FloatToStr(RoundTo(StrToXY(sgDots.Cells[n1+i,Idx], 0)+xy[i mod 2],-3));
 
 end;
 
@@ -1389,8 +1417,8 @@ var i,n1,n2:Integer;
 begin
   n1:=2;
   n2:=-1;
-  xy[0]:=StrToFloatDef(sgDots.Cells[9,idx],0);
-  xy[1]:=StrToFloatDef(sgDots.Cells[10,idx],0);
+  xy[0]:=StrToXY(sgDots.Cells[9,idx],0);
+  xy[1]:=StrToXY(sgDots.Cells[10,idx],0);
   if HV then
     k[0]:=-1
   else
@@ -1399,14 +1427,14 @@ begin
   case sgDots.Cells[1,Idx][1] of
     'M','L','T': n2:=1;
     'H': n2:=0;
-    'V': sgDots.Cells[2,Idx]:=FloatToStr(k[1] * RoundTo(StrToFloatDef(sgDots.Cells[2,Idx], 0)-xy[1],-3));
+    'V': sgDots.Cells[2,Idx]:=FloatToStr(k[1] * RoundTo(StrToXY(sgDots.Cells[2,Idx], 0)-xy[1],-3));
     'C': n2:=5;
     'S','Q': n2:=3;
     'A': begin n1:=7; n2:=1; end;
   end;
   sgDots.Cells[1,Idx] := LowerCase(sgDots.Cells[1,Idx]);
   for i := 0 to n2 do
-    sgDots.Cells[n1+i,Idx]:=FloatToStr(k[i mod 2] * RoundTo(StrToFloatDef(sgDots.Cells[n1+i,Idx], 0)-xy[i mod 2],-3));
+    sgDots.Cells[n1+i,Idx]:=FloatToStr(k[i mod 2] * RoundTo(StrToXY(sgDots.Cells[n1+i,Idx], 0)-xy[i mod 2],-3));
 
 end;
 
@@ -1414,21 +1442,27 @@ procedure TfrmPathEdit.PathRel(Idx: integer);
 var i,n1,n2:Integer;
   xy:array [0..1] of double;
 begin
+  if Pos('%', sgDots.Rows[Idx].text )>0 then
+  begin
+    sgDots.Cells[1,Idx] := LowerCase(sgDots.Cells[1,Idx]);
+    Exit;
+  end;
+
   n1:=2;
   n2:=-1;
-  xy[0]:=StrToFloatDef(sgDots.Cells[9,idx],0);
-  xy[1]:=StrToFloatDef(sgDots.Cells[10,idx],0);
+  xy[0]:=StrToXY(sgDots.Cells[9,idx],0);
+  xy[1]:=StrToXY(sgDots.Cells[10,idx],0);
   case sgDots.Cells[1,Idx][1] of
     'M','L','T': n2:=1;
     'H': n2:=0;
-    'V': sgDots.Cells[2,Idx]:=FloatToStr(RoundTo(StrToFloatDef(sgDots.Cells[2,Idx], 0)-xy[1],-3));
+    'V': sgDots.Cells[2,Idx]:=FloatToStr(RoundTo(StrToXY(sgDots.Cells[2,Idx], 0)-xy[1],-3));
     'C': n2:=5;
     'S','Q': n2:=3;
     'A': begin n1:=7; n2:=1; end;
   end;
   sgDots.Cells[1,Idx] := LowerCase(sgDots.Cells[1,Idx]);
   for i := 0 to n2 do
-    sgDots.Cells[n1+i,Idx]:=FloatToStr(RoundTo(StrToFloatDef(sgDots.Cells[n1+i,Idx], 0)-xy[i mod 2],-3));
+    sgDots.Cells[n1+i,Idx]:=FloatToStr(RoundTo(StrToXY(sgDots.Cells[n1+i,Idx], 0)-xy[i mod 2],-3));
 
 end;
 

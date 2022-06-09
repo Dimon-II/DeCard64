@@ -45,7 +45,7 @@ object frmPathEdit: TfrmPathEdit
     end
     object ToolBar1: TToolBar
       Left = 2
-      Top = 43
+      Top = 37
       Width = 444
       Height = 23
       AutoSize = True
@@ -146,9 +146,9 @@ object frmPathEdit: TfrmPathEdit
     end
     object sgDots: TStringGrid
       Left = 2
-      Top = 66
+      Top = 60
       Width = 444
-      Height = 176
+      Height = 182
       Align = alClient
       ColCount = 9
       DefaultColWidth = 48
@@ -164,34 +164,79 @@ object frmPathEdit: TfrmPathEdit
       OnKeyPress = sgDotsKeyPress
       OnSelectCell = sgDotsSelectCell
       OnSetEditText = sgDotsSetEditText
+      ColWidths = (
+        48
+        48
+        48
+        48
+        48
+        48
+        48
+        48
+        48)
     end
     object Panel1: TPanel
       Left = 2
       Top = 15
       Width = 444
-      Height = 28
+      Height = 22
       Align = alTop
       BevelOuter = bvNone
       TabOrder = 2
       object Label1: TLabel
-        Left = 6
-        Top = 3
+        AlignWithMargins = True
+        Left = 10
+        Top = 5
         Width = 26
-        Height = 13
+        Height = 14
+        Margins.Left = 10
+        Margins.Top = 5
+        Align = alLeft
         Caption = 'Zoom'
+        ExplicitHeight = 13
       end
       object Label2: TLabel
-        Left = 93
-        Top = 3
+        AlignWithMargins = True
+        Left = 98
+        Top = 5
         Width = 19
-        Height = 13
+        Height = 14
+        Margins.Left = 10
+        Margins.Top = 5
+        Align = alLeft
         Caption = 'Grid'
+        ExplicitHeight = 13
+      end
+      object Label3: TLabel
+        AlignWithMargins = True
+        Left = 375
+        Top = 5
+        Width = 17
+        Height = 14
+        Margins.Left = 8
+        Margins.Top = 5
+        Align = alRight
+        Caption = 'Y%'
+        ExplicitHeight = 13
+      end
+      object Label4: TLabel
+        AlignWithMargins = True
+        Left = 298
+        Top = 5
+        Width = 17
+        Height = 14
+        Margins.Left = 10
+        Margins.Top = 5
+        Align = alRight
+        Caption = 'X%'
+        ExplicitHeight = 13
       end
       object seZoom: TSpinEdit
-        Left = 38
+        Left = 39
         Top = 0
         Width = 49
         Height = 22
+        Align = alLeft
         MaxLength = 3
         MaxValue = 128
         MinValue = -16
@@ -200,10 +245,11 @@ object frmPathEdit: TfrmPathEdit
         OnChange = seZoomChange
       end
       object seGrid: TSpinEdit
-        Left = 128
+        Left = 120
         Top = 0
         Width = 49
         Height = 22
+        Align = alLeft
         MaxLength = 3
         MaxValue = 64
         MinValue = 1
@@ -212,15 +258,42 @@ object frmPathEdit: TfrmPathEdit
         OnChange = seGridChange
       end
       object chbCard: TCheckBox
-        Left = 193
-        Top = 2
+        Left = 169
+        Top = 0
         Width = 72
-        Height = 17
+        Height = 22
+        Align = alLeft
         Caption = 'Card rect'
         Checked = True
         State = cbChecked
         TabOrder = 2
         OnClick = chbCardClick
+      end
+      object sePrcY: TSpinEdit
+        Left = 395
+        Top = 0
+        Width = 49
+        Height = 22
+        Align = alRight
+        MaxLength = 4
+        MaxValue = 2000
+        MinValue = 0
+        TabOrder = 3
+        Value = 100
+        OnChange = seGridChange
+      end
+      object sePrcX: TSpinEdit
+        Left = 318
+        Top = 0
+        Width = 49
+        Height = 22
+        Align = alRight
+        MaxLength = 4
+        MaxValue = 2000
+        MinValue = 0
+        TabOrder = 4
+        Value = 100
+        OnChange = seGridChange
       end
     end
     object UndoList: TListBox
@@ -401,6 +474,14 @@ object frmPathEdit: TfrmPathEdit
   object pmPathEdit: TPopupMenu
     Left = 372
     Top = 128
+    object Abs1: TMenuItem
+      Caption = 'Switch Abs/rel'
+      ShortCut = 16416
+      OnClick = Abs1Click
+    end
+    object N2: TMenuItem
+      Caption = '-'
+    end
     object LineTo1: TMenuItem
       Caption = 'LineTo'
       ShortCut = 76
@@ -459,17 +540,6 @@ object frmPathEdit: TfrmPathEdit
       Caption = 'Close'
       ShortCut = 90
       OnClick = ZloseZ1Click
-    end
-    object N2: TMenuItem
-      Caption = '-'
-    end
-    object Abs1: TMenuItem
-      Caption = 'Absolute X:Y'
-      OnClick = Abs1Click
-    end
-    object Ref1: TMenuItem
-      Caption = 'Relative X:Y'
-      OnClick = Ref1Click
     end
     object N1: TMenuItem
       Caption = '-'

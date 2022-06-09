@@ -1298,6 +1298,9 @@ var
           if i > 0 then
             n1.Nodes[i].Attribute['x'] := IntToStr(Round(StrToIntDef(n1.Nodes[i].Attribute['x'],0) + sp * (err) ));
 
+          if (n1.Nodes[i].LocalName='g')  then
+             n1.Nodes[i].Attribute['transform'] := 'translate('+n1.Nodes[i].Attribute['x']+','+n1.Nodes[i].Attribute['y']+')';
+
           if (n1.Nodes[i].LocalName='text')  then
             err := err + HTMLLength(n1.Nodes[i].text)
           else
@@ -1313,6 +1316,7 @@ var
 
   procedure NewRow(Align:boolean; dx,dy:Integer);
   var indent, Left:Integer;
+     s:string;
   begin
     if n1 <> nil then
       ResetRow(Align);
@@ -1330,7 +1334,12 @@ var
       n1.Attribute['right'] := ParentStyle(xn,'width','');
 
     indent :=  PercentWidth(ParentStyle(xn,'text-indent','0'), 0);
-    Left :=  PercentWidth(ParentStyle(xn,'left','0'), 0);
+
+    s:= ParentStyle(xn,'left','0');
+    if Pos('%',s)>0 then
+      Left :=  PercentWidth(s,0)
+    else
+      Left := Round(StrToFloatDef(s,0) / ZoomValue / ZM);
 
     if Align and (indent>=0) then
       n1.Attribute['width'] := IntToStr(dx + Left)
@@ -1357,7 +1366,7 @@ var
   DoZoom:boolean;
   AddZoom, r :Double;
   ImgRect: TRect;
-  i:integer;
+  i,si:integer;
   fmt:string;
 
 begin
@@ -1393,12 +1402,15 @@ begin
     RST.Attribute['height'] := NOD.Attribute['height'];
     RST.Attribute['transform'] := NOD.Attribute['transform'];
 
-      npp:=0;
       w4 := ParentStyle(nod,'font-size');
       w3 := 0;
       hgh := 0;
       LineUp:=0;
       LineDn:=0;
+      if lvl>1 then
+        NewRow(false, 0, 0);
+
+
 
       repeat
 
@@ -1422,6 +1434,74 @@ begin
         if xn.LocalName='bkg' then
         begin
           bkg := TXML_Nod.Create(nil);
+
+          for i := 0 to xn.Attributes.Count-1 do
+            if (xn.Attributes.Items[i].name<>'src') and (xn.Attributes.Items[i].name<>'img') then
+               bkg.Attribute[xn.Attributes.Items[i].name] := xn.Attributes.Items[i].value;
+
+          bkg.Attribute['width'] := IntToStr(StrToIntDef(Nod.Attribute['width'],0)+2*StrToIntDef(xn.Attribute['outline'],0));
+          bkg.Attribute['height'] := IntToStr(StrToIntDef(Nod.Attribute['height'],0)+2*StrToIntDef(xn.Attribute['outline'],0));
+          bkg.Attribute['x'] := IntToStr(StrToIntDef(Nod.Attribute['x'],0)-StrToIntDef(xn.Attribute['outline'],0));
+          bkg.Attribute['y'] := IntToStr(StrToIntDef(Nod.Attribute['y'],0)-StrToIntDef(xn.Attribute['outline'],0));
+          if (xn.Attribute['patch'] <> '') then
+          begin
+            bkg.ResetXml(xn.xml);
+            bkg.LocalName :='g';
+            bkg.Attribute['width'] := IntToStr(StrToIntDef(Nod.Attribute['width'],0)+2*StrToIntDef(xn.Attribute['outline'],0));
+            bkg.Attribute['height'] := IntToStr(StrToIntDef(Nod.Attribute['height'],0)+2*StrToIntDef(xn.Attribute['outline'],0));
+            bkg.Attribute['x'] := IntToStr(StrToIntDef(Nod.Attribute['x'],0)-StrToIntDef(xn.Attribute['outline'],0));
+            bkg.Attribute['y'] := IntToStr(StrToIntDef(Nod.Attribute['y'],0)-StrToIntDef(xn.Attribute['outline'],0));
+
+            n2:=mainSvg;
+            while n2<>nil do
+            begin
+              if '#'+n2.Attribute['id']=xn.Attribute['patch'] then
+              begin
+                if xn.Attribute['outline']<>'' then
+                with bkg.Add('g') do
+                begin
+                  Attribute['transform']:='translate(-'+xn.Attribute['outline']+',-'+xn.Attribute['outline']+')';
+                  add.ResetXml(n2.xml);
+                end
+                else
+                  bkg.add.ResetXml(n2.xml);
+                break
+              end;
+              n2 := n2.Next;
+            end;
+            n2 := bkg;
+            while n2<>nil do
+            begin
+              for i := 0 to n2.Attributes.Count-1 do
+              begin
+                while pos('%x', n2.Attributes[i].value)>0 do
+                begin
+                  s := n2.Attributes[i].value;
+                  s := copy(s,1,pos('%',s)-1);
+                  for si:= Length(s)-1 downto 1 do
+                    if not (s[si] in ['0'..'9','-','.']) then
+                       break;
+                  s := Copy(s,si+1,Length(s));
+
+                  n2.Attributes[i].value := StringReplace(n2.Attributes[i].value, s+'%x',
+                    IntToStr(round(StrToFloatDef(bkg.Attribute['width'],0) / 100 * StrToFloatDef(s,0))),  [rfReplaceAll])
+                end;
+                while pos('%y', n2.Attributes[i].value)>0 do
+                begin
+                  s := n2.Attributes[i].value;
+                  s := copy(s,1,pos('%',s)-1);
+                  for si:= Length(s)-1 downto 1 do
+                    if not (s[si] in ['0'..'9','-','.']) then
+                       break;
+                  s := Copy(s,si+1,Length(s));
+                  n2.Attributes[i].value := StringReplace(n2.Attributes[i].value, s+'%y',
+                    IntToStr(round(StrToFloatDef(bkg.Attribute['height'],0) / 100 * StrToFloatDef(s,0))),  [rfReplaceAll])
+                end;
+
+              end;               n2 := n2.Next;
+            end;
+          end
+          else
           if (xn.Attribute['img'] <> '') then
           begin
             bkg.LocalName:='image';
@@ -1438,16 +1518,6 @@ begin
           else
             bkg.LocalName:='rect';
           bkg.index := 0;
-
-
-          bkg.Attribute['width'] := IntToStr(StrToIntDef(Nod.Attribute['width'],0)+2*StrToIntDef(xn.Attribute['outline'],0));
-          bkg.Attribute['height'] := IntToStr(StrToIntDef(Nod.Attribute['height'],0)+2*StrToIntDef(xn.Attribute['outline'],0));
-          bkg.Attribute['x'] := IntToStr(StrToIntDef(Nod.Attribute['x'],0)-StrToIntDef(xn.Attribute['outline'],0));
-          bkg.Attribute['y'] := IntToStr(StrToIntDef(Nod.Attribute['y'],0)-StrToIntDef(xn.Attribute['outline'],0));
-
-          for i := 0 to xn.Attributes.Count-1 do
-          if (xn.Attributes.Items[i].name<>'src') and (xn.Attributes.Items[i].name<>'img') then
-             bkg.Attribute[xn.Attributes.Items[i].name] := xn.Attributes.Items[i].value;
 
 
 
@@ -1694,7 +1764,9 @@ begin
                n2.ResetXml('<g>'+n2.xml+'</g>');
                n2.Attribute['filter'] := ParentStyle(xn, 'filter');
              end;
-           end;
+           end
+           else
+             n2.Attribute['transform'] := xn.Attribute['transform'];
 
         end;
 
@@ -1761,6 +1833,7 @@ begin
           LineUp:=Min(LineUp, -StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
           LineDn:=Max(LineDn, StrToIntDef(xn.Attribute['dy'],0));
           n2.add('g').ResetXml(ParseHtml(xn, xn.Next, 0,0,lvl+1, ZoomValue));
+          n2.Attribute['right'] := IntToStr(w1);
         end
         else
           xn := xn.Next;
