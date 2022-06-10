@@ -479,7 +479,8 @@ end;
 
 procedure TCellEditForm.PrepareMacro(ANod: TXML_Nod);
 var
-  i:integer;
+  i,j:integer;
+  s, s1,s2,s3:string;
   Nod: TXML_Nod;
   sl:TStrings;
 begin
@@ -498,11 +499,44 @@ begin
     sl.Text := Nod.Attribute['dekart:replace'];
     FRepl.AddStrings(sl);
     for i := 0 to sl.Count-1 do
-      if (sl.Names[i]<>'') and
-         (lbMacros.Items.IndexOf(sl.Names[i])=-1) and
-         (Pos('=$',sl[i])=0)
-      then
-        lbMacros.Items.Add(sl.Names[i]);
+      if (sl.Names[i]<>'') and (lbMacros.Items.IndexOf(sl.Names[i])=-1)
+      then  begin
+        if Pos('=$',sl[i])>0 then
+        begin
+          s := sl.Names[i];
+          s1:='';
+          s2:='';
+          while s<>'' do
+          begin
+            if s[1]='\' then
+            begin
+              s1 := s1 + s[2];
+              delete(s,1,2);
+              Continue
+            end;
+            if (s[1]='(') then s2:=')';
+            if (s[1]='[') then s2:=']';
+            if s2<>'' then
+            begin
+              while (s<>'') and (s2<>'') do
+              begin
+                if s[i]='\' then
+                  delete(s,1,1)
+                else
+                if s[1]=s2 then
+                  s2 := '';
+                 delete(s,1,1)
+              end;
+              Continue
+            end;
+            s1 := s1 + s[1];
+            delete(s,1,1);
+          end;
+
+          lbMacros.Items.Add(s1)
+        end
+        else lbMacros.Items.Add(sl.Names[i])
+      end;
     Nod := Nod.parent;
   until Nod = Nil;
   sl.Free;
