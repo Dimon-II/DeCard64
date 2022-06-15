@@ -285,7 +285,7 @@ object CellEditForm: TCellEditForm
     Top = 0
     Width = 289
     Height = 238
-    ActivePage = tsMacros
+    ActivePage = tsWrap
     Align = alRight
     TabOrder = 2
     object tsCommon: TTabSheet

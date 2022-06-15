@@ -296,6 +296,23 @@ object SvgTreeFrame: TSvgTreeFrame
         ImageIndex = 17
         OnClick = Clear1Click
       end
+      object N3: TMenuItem
+        Caption = '-'
+      end
+      object Export1: TMenuItem
+        Caption = 'Export'
+        ImageIndex = 6
+        object Exportbranch1: TMenuItem
+          Caption = 'Export branch'
+          ImageIndex = 34
+          OnClick = Exportbranch1Click
+        end
+        object Exportheader1: TMenuItem
+          Caption = 'Export header'
+          ImageIndex = 27
+          OnClick = Exportheader1Click
+        end
+      end
     end
   end
   object svgFindDialog: TFindDialog

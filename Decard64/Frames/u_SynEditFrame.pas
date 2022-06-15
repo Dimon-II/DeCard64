@@ -118,6 +118,7 @@ type
     procedure tbColorDialogClick(Sender: TObject);
     procedure btnPipeClick(Sender: TObject);
     procedure SynEditorKeyPress(Sender: TObject; var Key: Char);
+    procedure ToolButton4Click(Sender: TObject);
   private
     gsSearchText: string;
     gsReplaceText: string;
@@ -420,6 +421,12 @@ begin
     SynEditor.Options := SynEditor.Options - [eoShowSpecialChars]
 end;
 
+
+procedure TSynEditFrame.ToolButton4Click(Sender: TObject);
+begin
+ if MainData.dlgFont.Execute() then
+    SynEditor.Font.Name := MainData.dlgFont.Font.Name
+end;
 
 { TSynXMLSyn }
 

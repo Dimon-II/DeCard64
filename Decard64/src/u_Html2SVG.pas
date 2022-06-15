@@ -1136,7 +1136,7 @@ var
   end;
 
 
-function ParseHtml(NOD, XML:TXML_Nod; nodx,nody, lvl:integer; zm:double):string;
+function ParseHtml(NOD, XML:TXML_Nod; nodx,nody, lvl:integer; zm1:double; ARgh:string):string;
 var
   ZoomValue: double;
   npp, hgh, Row1, w_dy,
@@ -1156,33 +1156,34 @@ var
     repeat
        result := Nod.Attribute[aAttr];
        Nod := Nod.parent;
-    until (Result<>'') or (Nod = nil) ;
+    until (Result<>'') or (Nod = nil);
 
     if Result='' then Result := Def;
 
   end;
 
   function ParentRight(ANod:TXML_Nod;Def:string=''):string;
-  var Nod:TXML_Nod;
+  var Nod1:TXML_Nod;
      ws:string;
   begin
-    Nod := ANod;
+
+    Nod1 := ANod;
     repeat
-       result := Nod.Attribute['right'];
-       Nod := Nod.parent;
-    until (Result<>'') or (Nod = nil);
+       result := Nod1.Attribute['right'];
+       Nod1 := Nod1.parent;
+    until (Result<>'') or (Nod1 = nil) or (Nod1=Nod);
 
     if pos('%', Result) <> 0 then
-      Result := IntToStr(Round(RootSize.X / 100 * StrToIntDef(StringReplace(Result,'%','',[]), 0)));
+      Result := IntToStr(Round(RootSize.X /  100 * StrToIntDef(StringReplace(Result,'%','',[]), 0)));
 
     if StrToIntDef(Result,0)<0 then
     begin
 //      ws := ParentStyle(ANod, 'width', 0);
       ws := Def;
       if pos('%', ws) > 0 then
-        Result := IntToStr(Round(RootSize.X / 100 * StrToIntDef(StringReplace(ws,'%','',[]), 0)) + StrToIntDef(result,0))
+        Result := IntToStr(Round(RootSize.X /  100 * StrToIntDef(StringReplace(ws,'%','',[]), 0)) + StrToIntDef(result,0))
       else
-        Result := IntToStr(StrToIntDef(StringReplace(ws,'%','',[]), 0) + StrToIntDef(result,0));
+        Result := IntToStr(StrToIntDef(ws, 0) + StrToIntDef(result,0));
     end;
 
     if Result='' then Result := Def;
@@ -1191,40 +1192,25 @@ var
 
 
 //  Percent Width * zoom
-  function PercentWidth(AVal: string; ADef: integer):Integer;
+  function PercentWidth(AVal: string; ADef: integer; AZoom: double = 1):Integer;
   begin
     if pos('%', AVal) > 0 then
     begin
       Result := Round(RootSize.X / 100 * StrToIntDef(StringReplace(AVal,'%','',[]), ADef));
 
       if (xn = nil) and (Result>RootSize.X) then
-        Result := RootSize.X
-      else
-      if (xn<>nil) and (Result>StrToFloatDef(ParentRight(xn),RootSize.X)) then
-          Result := Round(StrToFloatDef(ParentRight(xn),RootSize.X));
+        Result := RootSize.X;
+//      else
 
-      Result := Round(Result / ZoomValue /zm);
+//      if (xn<>nil) and (Result>StrToFloatDef(ParentRight(xn),RootSize.X)) then
+//          Result := Round(StrToFloatDef(ParentRight(xn),RootSize.X));
+
+//      Result := Round(Result / ZM1);
     end
     else
       Result := Round(StrToFloatDef(AVal, ADef))
   end;
 
-// no-zoom  Percent Width
-  function PercentWidth0(AVal: string; ADef: integer):Integer;
-  begin
-    if pos('%', AVal) > 0 then
-    begin
-      Result := Round(RootSize.X / 100 * StrToIntDef(StringReplace(AVal,'%','',[]), ADef));
-      if (xn = nil) and (Result>RootSize.X) then
-        Result := RootSize.X
-      else
-      if (xn<>nil) and (Result>StrToFloatDef(ParentRight(xn),RootSize.X)) then
-          Result := Round(StrToFloatDef(ParentRight(xn),RootSize.X));
-      Result := Round(Result / zm);
-    end
-    else
-      Result := Round(StrToFloatDef(AVal, ADef))
-  end;
 
   procedure ResetRow(Align:boolean);
   var i, x, dl, err:integer;
@@ -1273,10 +1259,10 @@ var
     x := StrToIntDef(nod.Attribute['x'],0);
 
     if n1.Attribute['align']='right' then
-      x := x + round(PercentWidth0(ParentRight(n1, nod.Attribute['width']),0)/ZoomValue) - PercentWidth(n1.Attribute['width'],0)
+      x := x + round(PercentWidth(ParentRight(n1, nod.Attribute['width']),0)/ZoomValue) - PercentWidth(n1.Attribute['width'],0)
     else
     if n1.Attribute['align']='center' then
-      x := x + (round(PercentWidth0(ParentRight(n1,  nod.Attribute['width']),0)/ZoomValue) - PercentWidth(n1.Attribute['width'],0)) div 2
+      x := x + (round(PercentWidth(ParentRight(n1,  nod.Attribute['width']),0)/ZoomValue) - PercentWidth(n1.Attribute['width'],0)) div 2
     else
     if Align and (n1.Attribute['align']='width')  then
     begin
@@ -1284,7 +1270,7 @@ var
       begin
         if n1.Nodes.Count > 1 then
         begin
-           w := (round(PercentWidth0(ParentRight(n1,  nod.Attribute['width']),0)/ZoomValue) - PercentWidth(n1.Attribute['width'],0)) / (n1.Nodes.Count-1);
+           w := (round(PercentWidth(ParentRight(n1,  nod.Attribute['width']),0)/ZoomValue) - PercentWidth(n1.Attribute['width'],0)) / (n1.Nodes.Count-1);
            for i := 1 to n1.Nodes.Count-1 do
 
              n1.Nodes[i].Attribute['x'] := IntToStr(Round(StrToIntDef(n1.Nodes[i].Attribute['x'],0) + i*w));
@@ -1304,7 +1290,7 @@ var
         if err> 1 then
           err:= err - 1;
 
-        sp := sp + (round(PercentWidth0(ParentRight(n1, nod.Attribute['width']),0)/ZoomValue) - PercentWidth(n1.Attribute['width'],0))/(err);
+        sp := sp + (round(PercentWidth(ParentRight(n1, nod.Attribute['width']),0)/ZoomValue) - PercentWidth(n1.Attribute['width'],0))/(err);
         Str(sp:0:3,s);
         n1.Attribute['letter-spacing'] := s;
         err := 0;
@@ -1332,6 +1318,7 @@ var
   procedure NewRow(Align:boolean; dx,dy:Integer);
   var indent, Left:Integer;
      s:string;
+     Nd:TXML_Nod;
   begin
     if n1 <> nil then
       ResetRow(Align);
@@ -1339,22 +1326,20 @@ var
 
     n1 := rst.Add('g');
     n1.Attribute['id'] := 'ROW'+IntToStr(npp);
-    n1.Attribute['align'] := ParentStyle(xn,'align','left');
-    n1.Attribute['letter-spacing'] := ParentStyle(xn,'letter-spacing','0');
-    n1.Attribute['line-height'] := ParentStyle(xn,'line-height','');
 
-    n1.Attribute['right'] := ParentStyle(xn,'right','');
-{
-    if n1.Attribute['right']='' then
-      n1.Attribute['right'] := ParentStyle(xn,'width','');
-}
-    indent :=  PercentWidth(ParentStyle(xn,'text-indent','0'), 0);
+    nd:=xn;
+    if (nd.LocalName='html') then
+      nd := nd.parent;
 
-    s:= ParentStyle(xn,'left','0');
-    if Pos('%',s)>0 then
-      Left :=  PercentWidth(s,0)
-    else
-      Left := Round(StrToFloatDef(s,0) / ZoomValue / ZM);
+    n1.Attribute['letter-spacing'] := ParentStyle(nd,'letter-spacing','0');
+    n1.Attribute['line-height'] := ParentStyle(nd,'line-height','');
+    indent :=  PercentWidth(ParentStyle(nd,'text-indent','0'), 0);
+    n1.Attribute['align'] := ParentStyle(nd,'align','left');
+
+    n1.Attribute['right'] := ParentRight(nd,'');
+    s:= ParentStyle(nd,'left','0');
+    Left :=  round(PercentWidth(s,0) / ZoomValue) ;
+
 
     if Align and (indent>=0) then
       n1.Attribute['width'] := IntToStr(dx + Left)
@@ -1383,6 +1368,7 @@ var
   ImgRect: TRect;
   i,si:integer;
   fmt:string;
+  OldNpp:Integer;
 
 begin
   bkg := nil;
@@ -1394,7 +1380,9 @@ begin
       fmt := 'valign:middle;zoom';
 
     addzoom := 1;
+    oldnpp:=npp;
     repeat
+      npp := oldnpp;
       DoZoom:=True;
 
       n1 := nil;
@@ -1416,6 +1404,7 @@ begin
     RST.Attribute['width'] :=  NOD.Attribute['width'];
     RST.Attribute['height'] := NOD.Attribute['height'];
     RST.Attribute['transform'] := NOD.Attribute['transform'];
+    RST.Attribute['right'] := ARgh;
 
       w4 := ParentStyle(nod,'font-size');
       w3 := 0;
@@ -1448,12 +1437,18 @@ begin
         if xn.LocalName='bkg' then
         begin
           bkg := TXML_Nod.Create(nil);
+             bkg.LocalName :='g';
 
           for i := 0 to xn.Attributes.Count-1 do
             if (xn.Attributes.Items[i].name<>'src') and (xn.Attributes.Items[i].name<>'img') then
                bkg.Attribute[xn.Attributes.Items[i].name] := xn.Attributes.Items[i].value;
 
-          bkg.Attribute['width'] := IntToStr(StrToIntDef(Nod.Attribute['width'],0)+2*StrToIntDef(xn.Attribute['outline'],0));
+          w1 := PercentWidth(Nod.Attribute['width'],0);
+          if pos('%',Nod.Attribute['width'])>0 then
+            w1 := round(w1/zm1);
+
+//          bkg.Attribute['width'] := IntToStr(StrToIntDef(Nod.Attribute['width'],0)+2*StrToIntDef(xn.Attribute['outline'],0));
+          bkg.Attribute['width'] := IntToStr(w1 + 2*StrToIntDef(xn.Attribute['outline'],0));
           bkg.Attribute['height'] := IntToStr(StrToIntDef(Nod.Attribute['height'],0)+2*StrToIntDef(xn.Attribute['outline'],0));
           bkg.Attribute['x'] := IntToStr(StrToIntDef(Nod.Attribute['x'],0)-StrToIntDef(xn.Attribute['outline'],0));
           bkg.Attribute['y'] := IntToStr(StrToIntDef(Nod.Attribute['y'],0)-StrToIntDef(xn.Attribute['outline'],0));
@@ -1461,7 +1456,8 @@ begin
           begin
             bkg.ResetXml(xn.xml);
             bkg.LocalName :='g';
-            bkg.Attribute['width'] := IntToStr(StrToIntDef(Nod.Attribute['width'],0)+2*StrToIntDef(xn.Attribute['outline'],0));
+//            bkg.Attribute['width'] :=  IntToStr( PercentWidth(Nod.Attribute['width'],0) +2*StrToIntDef(xn.Attribute['outline'],0));
+            bkg.Attribute['width'] := IntToStr(w1 + 2*StrToIntDef(xn.Attribute['outline'],0));
             bkg.Attribute['height'] := IntToStr(StrToIntDef(Nod.Attribute['height'],0)+2*StrToIntDef(xn.Attribute['outline'],0));
             bkg.Attribute['x'] := IntToStr(StrToIntDef(Nod.Attribute['x'],0)-StrToIntDef(xn.Attribute['outline'],0));
             bkg.Attribute['y'] := IntToStr(StrToIntDef(Nod.Attribute['y'],0)-StrToIntDef(xn.Attribute['outline'],0));
@@ -1546,11 +1542,11 @@ begin
            w2 := SizeParse(xn.Attribute['id']+'Z').Right+SizeParse(xn.Attribute['id']+'Z').Left;
            w2 := round(w2 + (w2-2*w1)* WordSpacing);
 
-           if (w1 > (PercentWidth0(ParentRight(xn,  RST.Attribute['width']),0)/ZoomValue)) then
-              addzoom := min(addzoom,PercentWidth0(ParentRight(xn,  RST.Attribute['width']),0)/ZoomValue / w1);
+           if (w1*ZoomValue > (PercentWidth(ParentRight(n1,  RST.Attribute['width']),0))) then
+              addzoom := min(addzoom,PercentWidth(ParentRight(n1,  RST.Attribute['width']),0)/ZoomValue / w1);
 
            if (n1.Attribute['width'] <> '0') and
-              (PercentWidth(n1.Attribute['width'],0) + w5 + w1 > PercentWidth0(ParentRight(xn,  RST.Attribute['width']),0)/ZoomValue)
+              ((PercentWidth(n1.Attribute['width'],0) + w5 + w1) * ZoomValue > PercentWidth(ParentRight(n1,  RST.Attribute['width']),0))
            then NewRow(True, 0,0);
            w5 := w5 - SizeParse(xn.Attribute['id']).Left;
 
@@ -1604,12 +1600,12 @@ begin
             dx := PercentWidth(xn.Attribute['dx'],0);
 
 
-          if (w1+dx > (PercentWidth0(ParentRight(xn,  RST.Attribute['width']),0)/ZoomValue)) then
-            addzoom := min(addzoom,PercentWidth0(ParentRight(xn,  RST.Attribute['width']),0)/ZoomValue / w1);
+          if ((w1+dx)*ZoomValue > (PercentWidth(ParentRight(xn,  RST.Attribute['width']),0))) then
+            addzoom := min(addzoom,PercentWidth(ParentRight(xn,  RST.Attribute['width']),0)/ZoomValue / w1);
 
 
           if (n1.Attribute['width'] <> '0') and
-            (PercentWidth(n1.Attribute['width'],0) + w5 + w1 +dx > PercentWidth0(ParentRight(xn,  RST.Attribute['width']),0)/ZoomValue)
+            ((PercentWidth(n1.Attribute['width'],0) + w5 + w1 +dx) * ZoomValue > PercentWidth(ParentRight(xn,  RST.Attribute['width']),0))
           then NewRow(True, 0,0);
 
           n2 := n1.Add('rect');
@@ -1645,12 +1641,12 @@ begin
             w1 := PercentWidth(xn.Attribute['width'],0);
             dx := PercentWidth(xn.Attribute['dx'],0);
 
-          if (w1 + dx > (PercentWidth0(ParentRight(xn,  RST.Attribute['width']),0)/ZoomValue)) then
-            addzoom := min(addzoom,PercentWidth0(ParentRight(xn,  RST.Attribute['width']),0)/ZoomValue / w1);
+          if (w1 + dx) * ZoomValue > PercentWidth(ParentRight(xn,  RST.Attribute['width']),0) then
+            addzoom := min(addzoom, PercentWidth(ParentRight(xn,  RST.Attribute['width']),0)/ZoomValue / w1);
 
 
           if (n1.Attribute['width'] <> '0') and
-            (PercentWidth(n1.Attribute['width'],0) + w5 + w1 + dx> PercentWidth0(ParentRight(xn,  RST.Attribute['width']),0)/ZoomValue)
+            (((PercentWidth(n1.Attribute['width'],0) + w5 + w1 + dx)*ZoomValue) > PercentWidth(ParentRight(xn,  RST.Attribute['width']),0))
           then NewRow(True, 0,0);
 
           n2 := n1.Add('image');
@@ -1716,11 +1712,11 @@ begin
              w2 := Round(w2 * StrToFloatDef(xn.Attribute['scale'],1));
            end;
 
-           if (w1 > (PercentWidth0(ParentRight(xn,  RST.Attribute['width']),0)/ZoomValue)) then
-              addzoom := min(addzoom, PercentWidth0(ParentRight(xn,  RST.Attribute['width']),0)/ZoomValue / w1);
+           if (w1*ZoomValue > PercentWidth(ParentRight(xn,  RST.Attribute['width']),0)) then
+              addzoom := min(addzoom, PercentWidth(ParentRight(xn,  RST.Attribute['width']),0)/ZoomValue / w1);
 
            if (n1.Attribute['width'] <> '0') and
-              (PercentWidth(n1.Attribute['width'],0) + w5 + w1 +dx> PercentWidth0(ParentRight(xn,  RST.Attribute['width']),0)/ZoomValue)
+              ((PercentWidth(n1.Attribute['width'],0) + w5 + w1 +dx)*ZoomValue > PercentWidth(ParentRight(xn,  RST.Attribute['width']),0))
            then NewRow(True, 0,0);
 
            n2 := n1.Add('use');
@@ -1740,7 +1736,7 @@ begin
            w1 := PercentWidth(n2.Attribute['width'],0);
 
            if (n1.Attribute['width'] <> '0') and
-              (PercentWidth(n1.Attribute['width'],0) + w5 + w1 +dx> PercentWidth0(ParentRight(xn,  RST.Attribute['width']),0)/ZoomValue)
+              ((PercentWidth(n1.Attribute['width'],0) + w5 + w1 +dx) *ZoomValue > PercentWidth(ParentRight(xn,  RST.Attribute['width']),0))
            then NewRow(True, 0,0);
 
 
@@ -1756,6 +1752,24 @@ begin
 
            w_dy := Max(w_dy, StrToIntDef(xn.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
            w5 := 0;
+
+          ImgRect.Left := StrToIntDef(xn.Attribute['x1'],0);
+          ImgRect.Top := StrToIntDef(xn.Attribute['y1'],0);
+          if xn.Attribute['x2']='' then
+            ImgRect.Right := PercentWidth(n2.Attribute['width'],0) + ImgRect.Left
+          else
+            ImgRect.Right := StrToIntDef(xn.Attribute['x2'],0);
+
+          if xn.Attribute['y2']='' then
+            ImgRect.Bottom := StrToIntDef(xn.Attribute['height'],0) + ImgRect.Top
+          else
+            ImgRect.Bottom := StrToIntDef(xn.Attribute['y2'],0);
+
+          n2.Attribute['x'] := IntToStr(StrToIntDef(n2.Attribute['x'],0) + ImgRect.Left);
+          n2.Attribute['y'] := IntToStr(StrToIntDef(n2.Attribute['y'],0) + ImgRect.Top);
+          n2.Attribute['width'] := IntToStr( ImgRect.Right - ImgRect.Left);
+          n2.Attribute['height'] := IntToStr(ImgRect.Bottom - ImgRect.Top);
+
 
           if w3 =0 then
           begin
@@ -1790,26 +1804,34 @@ begin
 
           if n1= nil then NewRow(False, 0,0);
 
-           w1 := PercentWidth(xn.Attribute['width'],0);
+           w1 := PercentWidth(xn.Attribute['width'], 0);
+
+           if Pos('%',ParentStyle(xn, 'width',''))>0  then
+             w1 := round(w1 / ZoomValue / zm1);
+
+
            w2 := StrToIntDef(xn.Attribute['height'],0);
            dx := PercentWidth(xn.Attribute['dx'],0);
 
-           if (w1+dx > (PercentWidth0(ParentRight(xn.parent,  RST.Attribute['width']),0)/ZoomValue)) then
-              addzoom := min(addzoom, PercentWidth0(ParentRight(xn.parent,  RST.Attribute['width']),0)/ZoomValue / w1);
+           if (w1+dx)*ZoomValue > PercentWidth(ParentRight(xn.parent,  RST.Attribute['width']),0) then
+              addzoom := min(addzoom, PercentWidth(ParentRight(xn.parent,  RST.Attribute['width']),0)/ZoomValue / w1);
 
            if (n1.Attribute['width'] <> '0') and
-              (PercentWidth(n1.Attribute['width'],0) + w5 + w1+dx> PercentWidth0(ParentRight(xn.parent,  RST.Attribute['width']),0)/ZoomValue)
+              ((PercentWidth(n1.Attribute['width'],0) + w5 + w1+dx) * ZoomValue > PercentWidth(ParentRight(xn.parent,  RST.Attribute['width']),0))
            then NewRow(True, 0,0);
 
            n2 := n1.Add('g');
 
            for i:= 0 to xn.Attributes.Count-1 do
              n2.Attribute[xn.Attributes[i].Name] := xn.Attributes[i].value;
-
+{
            if (xn.Attribute['width']='') then
              n2.Attribute['width'] := IntToStr(w1)
            else
              n2.Attribute['width'] := xn.Attribute['width'];
+}
+             n2.Attribute['width'] := IntToStr(w1);
+
 
            if xn.Attribute['height']='' then
              n2.Attribute['height'] := IntToStr(w2)
@@ -1821,7 +1843,7 @@ begin
            w1 := PercentWidth(n2.Attribute['width'],0);
 
            if (n1.Attribute['width'] <> '0') and
-              (PercentWidth(n1.Attribute['width'],0) + w5 + w1 + dx> PercentWidth0(ParentRight(xn.parent,  RST.Attribute['width']),0)/ZoomValue)
+              ((PercentWidth(n1.Attribute['width'],0) + w5 + w1 + dx)*ZoomValue > PercentWidth(ParentRight(xn.parent,  RST.Attribute['width']),0))
            then NewRow(True, 0,0);
 
            n2.Attribute['x'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + PercentWidth(xn.Attribute['dx'],0));
@@ -1846,8 +1868,26 @@ begin
 
           LineUp:=Min(LineUp, -StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
           LineDn:=Max(LineDn, StrToIntDef(xn.Attribute['dy'],0));
-//          n2.Attribute['right'] := IntToStr(w1);
-          n2.add('g').ResetXml(ParseHtml(xn, xn.Next, 0,0,lvl+1, ZoomValue));
+
+          if pos('%', n2.Attribute['width'])>0 then
+            n2.Attribute['width'] := IntToStr(round( PercentWidth(n2.Attribute['width'],0)/ZoomValue/zm1));
+
+
+          if n2.Attribute['right']='' then
+            n2.Attribute['right'] := n2.Attribute['width']
+          else
+          if Pos('%',n2.Attribute['right'])>0 then
+            n2.Attribute['right'] := IntToStr(round(PercentWidth(n2.Attribute['right'], w1)/ZoomValue/zm1))
+          else
+            n2.Attribute['right'] := ParentRight(n2,n2.Attribute['width']);
+
+          if n2.Attribute['left']='' then
+            n2.Attribute['left']:='0';
+
+          n2.add('g').ResetXml(ParseHtml(xn, xn.Next, 0,0,lvl+1, ZoomValue*zm1, n2.Attribute['right']));
+          n2.Attribute['right'] := '';
+          n2.Attribute['left'] := '';
+//          n2.Attribute['w1'] := inttostr(w1);
         end
         else
           xn := xn.Next;
@@ -2138,7 +2178,7 @@ begin
 
     sl.text := GetSVGSize(ARootName + '###.svg',zz);
 
-    Result := ParseHtml(nod, xml, nodx, nody,1,1);
+    Result := ParseHtml(nod, xml, nodx, nody,1,1, NOD.Attribute['width']);
 
   finally
     sl.free;

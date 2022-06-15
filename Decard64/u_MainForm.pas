@@ -3551,6 +3551,8 @@ begin
       if cbDPI.Text='' then cbDPI.Text := '300';
 //      cbEngine.ItemIndex := StrToIntDef(Attribute['Engine'],0);
       lblEncoding.Caption := Attribute['encoding'];
+      if Attribute['wrap']<>'' then
+        CellEditForm.seWrap.Lines.CommaText :=Attribute['wrap'];
 
     end;
     if lblEncoding.Caption = 'UTF8' then
@@ -3805,6 +3807,7 @@ begin
       Attribute['LocalFonts'] := edCfgTTF.Text;
       Attribute['Engine'] :=  IntToStr(cbEngine.ItemIndex);
       Attribute['OutFormat'] :=  IntToStr(cbOutFormat.ItemIndex);
+     Attribute['wrap'] := CellEditForm.seWrap.Lines.CommaText;
 
 
     end;
