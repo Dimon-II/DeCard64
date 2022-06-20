@@ -264,6 +264,7 @@ object CellEditForm: TCellEditForm
     inherited SynEditor: TSynEdit
       Width = 492
       Height = 210
+      OnKeyDown = CellEditFrameSynEditorKeyDown
       OnChange = CellEditFrameSynEditorChange
       ExplicitWidth = 492
       ExplicitHeight = 210
@@ -273,9 +274,10 @@ object CellEditForm: TCellEditForm
       ExplicitWidth = 492
       inherited tbrEditor: TToolBar
         inherited ToolButton3: TToolButton
-          Hint = 'Add selected to [Common]'
+          Hint = 'Add to Common (Ctrl+0)'
+          Caption = '+'
           Visible = True
-          OnClick = CellEditFrameToolButton3Click
+          OnClick = aAddCommonExecute
         end
       end
     end
@@ -285,7 +287,7 @@ object CellEditForm: TCellEditForm
     Top = 0
     Width = 289
     Height = 238
-    ActivePage = tsWrap
+    ActivePage = tsMacros
     Align = alRight
     TabOrder = 2
     object tsCommon: TTabSheet
@@ -296,9 +298,14 @@ object CellEditForm: TCellEditForm
         Width = 240
         Height = 210
         Align = alClient
+        DragMode = dmAutomatic
         ItemHeight = 13
         TabOrder = 0
         OnDblClick = lbCommonDblClick
+        OnDragDrop = lbCommonDragDrop
+        OnDragOver = lbCommonDragOver
+        OnKeyDown = lbCommonKeyDown
+        OnMouseDown = lbCommonMouseDown
       end
       object lbCommonIdx: TListBox
         Left = 0
@@ -558,12 +565,18 @@ object CellEditForm: TCellEditForm
       Category = 'Common Ctrl-#'
       Caption = 'Action10'
       ShortCut = 16432
-      OnExecute = CellEditFrameToolButton3Click
     end
     object aHelper: TAction
       Caption = 'Helper'
       ShortCut = 16416
       OnExecute = aHelperExecute
+    end
+    object aAddCommon: TAction
+      Caption = '+'
+      Hint = 'Add to Common'
+      ImageIndex = 22
+      ShortCut = 16432
+      OnExecute = aAddCommonExecute
     end
   end
 end

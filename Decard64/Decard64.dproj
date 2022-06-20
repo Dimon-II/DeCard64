@@ -202,6 +202,10 @@
         <DCCReference Include="regexp\core\unaRE.pas"/>
         <DCCReference Include="regexp\core\unaTypes.pas"/>
         <DCCReference Include="regexp\core\unaUtils.pas"/>
+        <DCCReference Include="u_TraceReplace.pas">
+            <Form>TraceReplForm</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -228,12 +232,6 @@
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment Version="3">
-                <DeployFile LocalName="Win64\Debug\Decard64.rsm" Configuration="Debug" Class="DebugSymbols">
-                    <Platform Name="Win64">
-                        <RemoteName>Decard64.rsm</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="Win64\Debug\Decard64.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win64">
                         <RemoteName>Decard64.exe</RemoteName>

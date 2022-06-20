@@ -1750,7 +1750,7 @@ begin
            StrToIntDef(n2.Attribute['height'],0) - abs(StrToIntDef(xn.Attribute['dy'],0))));
 
 
-           w_dy := Max(w_dy, StrToIntDef(xn.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
+           w_dy := Max(w_dy, StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
            w5 := 0;
 
           ImgRect.Left := StrToIntDef(xn.Attribute['x1'],0);
@@ -1761,7 +1761,7 @@ begin
             ImgRect.Right := StrToIntDef(xn.Attribute['x2'],0);
 
           if xn.Attribute['y2']='' then
-            ImgRect.Bottom := StrToIntDef(xn.Attribute['height'],0) + ImgRect.Top
+            ImgRect.Bottom := StrToIntDef(n2.Attribute['height'],0) + ImgRect.Top
           else
             ImgRect.Bottom := StrToIntDef(xn.Attribute['y2'],0);
 

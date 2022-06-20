@@ -26,7 +26,7 @@ object MainForm: TMainForm
     Top = 0
     Width = 1097
     Height = 624
-    ActivePage = tsProject
+    ActivePage = tsDesigner
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -1895,6 +1895,21 @@ object MainForm: TMainForm
                 inherited tbResize: TToolButton
                   OnClick = InspectorFrametbResizeClick
                 end
+              end
+            end
+          end
+          inherited tsReplace: TTabSheet
+            ExplicitWidth = 321
+            ExplicitHeight = 391
+            inherited ReplaceFrame: TSynEditFrame
+              Width = 321
+              Height = 391
+              inherited SynEditor: TSynEdit
+                Width = 321
+                Height = 363
+              end
+              inherited pscrSysEdit: TPageScroller
+                Width = 321
               end
             end
           end

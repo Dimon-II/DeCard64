@@ -23,7 +23,8 @@ uses
   unaClasses in 'regexp\core\unaClasses.pas',
   unaRE in 'regexp\core\unaRE.pas',
   unaTypes in 'regexp\core\unaTypes.pas',
-  unaUtils in 'regexp\core\unaUtils.pas';
+  unaUtils in 'regexp\core\unaUtils.pas',
+  u_TraceReplace in 'u_TraceReplace.pas' {TraceReplForm};
 
 {$R *.res}
 
@@ -37,5 +38,6 @@ begin
   Application.CreateForm(TformGlyph, formGlyph);
   Application.CreateForm(TPipeForm, PipeForm);
   Application.CreateForm(TfrmPathEdit, frmPathEdit);
+  Application.CreateForm(TTraceReplForm, TraceReplForm);
   Application.Run;
 end.
