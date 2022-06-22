@@ -198,10 +198,6 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="src\u_ForeignObject.pas"/>
-        <DCCReference Include="regexp\core\unaClasses.pas"/>
-        <DCCReference Include="regexp\core\unaRE.pas"/>
-        <DCCReference Include="regexp\core\unaTypes.pas"/>
-        <DCCReference Include="regexp\core\unaUtils.pas"/>
         <DCCReference Include="u_TraceReplace.pas">
             <Form>TraceReplForm</Form>
             <FormType>dfm</FormType>

@@ -243,6 +243,7 @@
 		<visibility/>
 		<body/>
 		<d/>
+		<fill-rule/>
 		<decard-format/>
 		<style/>
 	</sorting>
@@ -273,6 +274,7 @@
 			<visibility/>
 			<body/>
 			<d/>
+			<fill-rule/>
 			<decard-format/>
 			<style/>
 			<fill/>
@@ -310,6 +312,12 @@
 			<points/>	
 			<flood-color/>
 			<flood-opacity/>
+			<in/>
+			<in2/>
+			<result/>
+			<mode/>
+			<stdDeviation/>
+			<type/>
 		</Common>
 		<Font>
 			<font-size/>

@@ -121,7 +121,7 @@ implementation
 
 {$R *.dfm}
 
-uses u_MainData, u_MainForm, u_XMLEditForm, Clipbrd, unaRe, u_TraceReplace;
+uses u_MainData, u_MainForm, u_XMLEditForm, Clipbrd, u_TraceReplace;
 
 { TCellEditForm }
 

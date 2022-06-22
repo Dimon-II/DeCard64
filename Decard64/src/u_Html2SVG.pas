@@ -15,7 +15,7 @@ implementation
 {$WARN IMPLICIT_STRING_CAST OFF}
 
 uses system.sysutils, system.strutils, System.Types, system.Math, Vcl.Graphics,
-u_ThreadRender, VCL.Forms, u_MainForm, Winapi.Windows, unaRE;
+u_ThreadRender, VCL.Forms, u_MainForm, Winapi.Windows, RegularExpressions;
 
 var   FBufXml:TStringList;
 
@@ -175,8 +175,8 @@ var
 
 
 function DoReplace(txt:string;Nod:TXML_Nod):string;
-var i:integer;
-  s,n,r:string;
+var i,deep:integer;
+  s,n,r,z:string;
   sn, idx:TStringList;
   Prnt:TXML_Nod;
 begin
@@ -226,6 +226,7 @@ begin
         if idx.IndexOf(n)=-1 then
         begin
           idx.Add(n);
+          deep:=0;
 
 
           r := copy(sn[i],length(n)+2, Length(sn[i]));
@@ -238,7 +239,11 @@ begin
           end
           else
           if copy(r,1,1)='$' then
-            s := unaRe.replace(s,n,copy(r,2,length(r)),1,True);
+          repeat
+            z:=s;
+            InC(deep);
+            s := TRegEx.replace(s,n,copy(r,2,length(r)));
+          until (z=s)or(deep=32);
 
 
         end;
