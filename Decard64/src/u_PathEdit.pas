@@ -133,7 +133,7 @@ type
     function CurrentPath:string;
     procedure SvgArcTo(Curr:TPoint; rx,ry:Integer; ax:double; fa, fs:boolean; x,y:integer; Canvas:TCanvas);
     procedure DeltaPolyBezierTo(const Points: array of TPoint);
-    function StrToXY(s:string;Def:integer):integer;
+    function StrToXY(s:string;Def:integer):double;
   end;
 
 var
@@ -200,15 +200,15 @@ begin
 end;
 
 
-function TfrmPathEdit.StrToXY(s: string; Def:Integer): integer;
+function TfrmPathEdit.StrToXY(s: string; Def:Integer): double;
 begin
   if pos('%x',s)>0 then
-    Result := Round(sePrcX.Value /100 * StrToFloatDef(copy(s,1,Length(s)-2),Def))
+    Result := Roundto(sePrcX.Value /100 * StrToFloatDef(copy(s,1,Length(s)-2),Def),-3)
   else
   if pos('%y',s)>0 then
-    Result := Round(sePrcY.Value /100 * StrToFloatDef(copy(s,1,Length(s)-2),Def))
+    Result := Roundto(sePrcY.Value /100 * StrToFloatDef(copy(s,1,Length(s)-2),Def),-3)
   else
-    Result := StrToIntDef(s,Def)
+    Result := roundto(StrToFloatDef(s,Def),-4)
 end;
 
 
@@ -1294,6 +1294,7 @@ end;
 procedure TfrmPathEdit.ParsePath(APath: string);
 var i,j,n:Integer;
   s:string;
+  r:double;
 begin
   s:=APath;
   for i := 1 to Length(s) do
@@ -1368,14 +1369,25 @@ begin
       sgDots.Cells[1,n]:='l';
     end;
 
-
-
     sgDots.Cells[j,n]:=sgDots.Cells[j,n]+s[i];
   end;
   if n=0 then
     sgDots.RowCount:=2
   else
     sgDots.RowCount:=n+1;
+
+  for i := 1 to sgDots.RowCount-1 do
+    for j := 1 to sgDots.ColCount-1 do
+      if pos('.',sgDots.Cells[j,i])>0 then
+      begin
+        s := sgDots.Cells[j,i];
+        r := StrToFloatDef(s,0);
+        r := RoundTo(r,-3);
+        s := FloatToStr(r);
+        sgDots.Cells[j,i] := s;
+      end;
+
+
 
   sgDots.FixedRows := 1;
   ResetCaption(sgDots.Row);
