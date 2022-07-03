@@ -300,11 +300,11 @@ object CellEditForm: TCellEditForm
         Align = alClient
         DragMode = dmAutomatic
         ItemHeight = 13
+        PopupMenu = pmCommon
         TabOrder = 0
         OnDblClick = lbCommonDblClick
         OnDragDrop = lbCommonDragDrop
         OnDragOver = lbCommonDragOver
-        OnKeyDown = lbCommonKeyDown
         OnMouseDown = lbCommonMouseDown
       end
       object lbCommonIdx: TListBox
@@ -333,35 +333,37 @@ object CellEditForm: TCellEditForm
       Caption = 'Macros'
       ImageIndex = 1
       object lbMacros: TListBox
-        Left = 41
+        Left = 0
         Top = 0
-        Width = 240
+        Width = 87
+        Height = 210
+        Align = alLeft
+        ItemHeight = 13
+        TabOrder = 0
+        Visible = False
+        OnDblClick = lbMacrosDblClick
+      end
+      object lbSelector: TListBox
+        Left = 216
+        Top = 0
+        Width = 65
+        Height = 210
+        Align = alRight
+        ItemHeight = 13
+        Items.Strings = (
+          'All')
+        TabOrder = 1
+        OnClick = lbSelectorClick
+      end
+      object lbFiltered: TListBox
+        Left = 87
+        Top = 0
+        Width = 129
         Height = 210
         Align = alClient
         ItemHeight = 13
-        TabOrder = 0
+        TabOrder = 2
         OnDblClick = lbMacrosDblClick
-      end
-      object lbMacrosIdx: TListBox
-        Left = 0
-        Top = 0
-        Width = 41
-        Height = 210
-        Align = alLeft
-        Color = clBtnFace
-        Enabled = False
-        ItemHeight = 13
-        Items.Strings = (
-          'Ctrl-1'
-          'Ctrl-2'
-          'Ctrl-3'
-          'Ctrl-4'
-          'Ctrl-5'
-          'Ctrl-6'
-          'Ctrl-7'
-          'Ctrl-8'
-          'Ctrl-9')
-        TabOrder = 1
       end
     end
     object tsHTMS: TTabSheet
@@ -561,11 +563,6 @@ object CellEditForm: TCellEditForm
       ShortCut = 16441
       OnExecute = Action1Execute
     end
-    object Action10: TAction
-      Category = 'Common Ctrl-#'
-      Caption = 'Action10'
-      ShortCut = 16432
-    end
     object aHelper: TAction
       Caption = 'Helper'
       ShortCut = 16416
@@ -577,6 +574,38 @@ object CellEditForm: TCellEditForm
       ImageIndex = 22
       ShortCut = 16432
       OnExecute = aAddCommonExecute
+    end
+  end
+  object pmCommon: TPopupMenu
+    Images = MainData.ilEditor
+    Left = 579
+    Top = 104
+    object Add1: TMenuItem
+      Action = aAddCommon
+      Caption = 'Add'
+      Hint = 'Add selection to common list'
+    end
+    object Del1: TMenuItem
+      Caption = 'Del'
+      Hint = 'Delete from common list'
+      ImageIndex = 0
+      ShortCut = 16430
+      OnClick = Del1Click
+    end
+    object Clear1: TMenuItem
+      Caption = 'Clear'
+      Hint = 'Clear common list'
+      ImageIndex = 5
+      OnClick = Clear1Click
+    end
+    object N1: TMenuItem
+      Caption = '-'
+    end
+    object FillbyCol1: TMenuItem
+      Caption = 'Smart fill'
+      Hint = 'Add all macro from focused grid column'
+      ImageIndex = 2
+      OnClick = FillbyCol1Click
     end
   end
 end

@@ -3261,11 +3261,13 @@ end;
 procedure TMainForm.SvgTreeFrame1treeTemplateChange(Sender: TObject;
   Node: TTreeNode);
 begin
+
 //  PrepareAtr(TXML_Nod(Node.Data));
   InspectorFrame.FocusedNode := Node;
   InspectorFrame.SVGNode := Node.Data;
   if CellEditForm.Visible then
-    CellEditForm.PrepareMacro(SVGFrame.SVGNode);
+    tbCellEdit.Click;
+//    CellEditForm.PrepareMacro(InspectorFrame.SVGNode);
   PaintBox.Visible := True;
   PaintBox.Invalidate;
 end;

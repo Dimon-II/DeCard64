@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, u_SynEditFrame,
   Vcl.ExtCtrls, Vcl.Grids, Profixxml, Vcl.Buttons, System.Actions,
-  Vcl.ActnList, System.UITypes, Vcl.ComCtrls, SynEdit;
+  Vcl.ActnList, System.UITypes, Vcl.ComCtrls, SynEdit, Vcl.Menus;
 
 type
 
@@ -49,13 +49,19 @@ type
     Action7: TAction;
     Action8: TAction;
     Action9: TAction;
-    Action10: TAction;
-    lbMacrosIdx: TListBox;
     tsWrap: TTabSheet;
     seWrap: TSynEdit;
     cbHelper: TComboBox;
     aHelper: TAction;
     aAddCommon: TAction;
+    pmCommon: TPopupMenu;
+    Add1: TMenuItem;
+    Del1: TMenuItem;
+    Clear1: TMenuItem;
+    FillbyCol1: TMenuItem;
+    N1: TMenuItem;
+    lbSelector: TListBox;
+    lbFiltered: TListBox;
     procedure FormCreate(Sender: TObject);
     procedure CellEditFrameSynEditorChange(Sender: TObject);
     procedure lbMacrosDblClick(Sender: TObject);
@@ -83,11 +89,13 @@ type
       State: TDragState; var Accept: Boolean);
     procedure lbCommonMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: Integer);
-    procedure lbCommonKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
     procedure aAddCommonExecute(Sender: TObject);
     procedure CellEditFrameSynEditorKeyDown(Sender: TObject; var Key: Word;
       Shift: TShiftState);
+    procedure Del1Click(Sender: TObject);
+    procedure Clear1Click(Sender: TObject);
+    procedure FillbyCol1Click(Sender: TObject);
+    procedure lbSelectorClick(Sender: TObject);
   private
     FOldText:string;
     FGrid: TStringGrid;
@@ -160,52 +168,20 @@ var
   i:integer;
 begin
   s := CellEditFrame.SynEditor.Text;
-{
-  for i:=0 to FRepl.Count-1 do
-    if Pos('=', FRepl[i])>0 then
-    begin
-      n:=Copy(FRepl[i], 1, Pos('=', FRepl[i])-1);
-      r := copy(FRepl[i],length(n)+2, Length(FRepl[i]));
-      if Pos(WideUpperCase(WideString(n)), WideUpperCase(s)) >0 then
-      begin
-        if copy(r,1,1)='=' then
-          s := StringReplace(s, n, copy(r,2,length(r)) ,[rfReplaceAll])
-        else
-          s := StringReplace(s, n, r ,[rfReplaceAll, rfIgnoreCase]);
-        end
-      else
-      if copy(r,1,1)='$' then
-        s := unaRe.replace(s,n,copy(r,2,length(r)),1,True);
-    end;
-  s := StringReplace(s, '>', '>'#13#10 ,[rfReplaceAll, rfIgnoreCase]);
 
-  XMLEditForm.XML := s;
-  XMLEditForm.seTags.Visible := False;
-  XMLEditForm.splTags.Visible := False;
-  XMLEditForm.ShowModal;
-  }
   TraceReplForm.seRepl.Lines.Assign(FRepl);
   TraceReplForm.seCell.Lines.Text := CellEditFrame.SynEditor.Text;
   TraceReplForm.aTraceAll.Execute;
   TraceReplForm.ShowModal;
-
 end;
 
 procedure TCellEditForm.Action1Execute(Sender: TObject);
 begin
-  case pcHelpher.ActivePageIndex of
-    0: if lbCommon.Count > TAction(Sender).tag + lbCommon.TopIndex-1 then
-       begin
-         lbCommon.ItemIndex := TAction(Sender).tag + lbCommon.TopIndex-1;
-         lbCommonDblClick(nil);
-       end;
-    1: if lbMacros.Count > TAction(Sender).tag + lbMacros.TopIndex-1 then
-       begin
-         lbMacros.ItemIndex := TAction(Sender).tag + lbMacros.TopIndex-1;
-         lbMacrosDblClick(nil);
-       end;
+  if lbCommon.Count > TAction(Sender).tag + lbCommon.TopIndex-1 then
+  begin
+    lbCommon.ItemIndex := TAction(Sender).tag + lbCommon.TopIndex-1;
+    lbCommonDblClick(nil);
   end;
-
 end;
 
 procedure TCellEditForm.aGidLeftExecute(Sender: TObject);
@@ -376,6 +352,28 @@ begin
     aAddCommon.Execute
 end;
 
+procedure TCellEditForm.Clear1Click(Sender: TObject);
+begin
+ lbCommon.Clear;
+end;
+
+procedure TCellEditForm.Del1Click(Sender: TObject);
+begin
+ if lbCommon.ItemIndex<>-1 then
+   lbCommon.Items.Delete(lbCommon.ItemIndex);
+end;
+
+procedure TCellEditForm.FillbyCol1Click(Sender: TObject);
+var i,j:Integer;
+begin
+  for i := 1 to  Grid.RowCount-1 do
+    for j:= 0 to lbMacros.Count-1 do
+      if (Pos(lbMacros.Items[j], Grid.Cells[Grid.Col, i])>0) and
+         (lbCommon.Items.IndexOf(lbMacros.Items[j])=-1)
+       then
+         lbCommon.Items.Add(lbMacros.Items[j]);
+end;
+
 procedure TCellEditForm.FormCreate(Sender: TObject);
 begin
   btnCancel.OnClick := btnCancelClick;
@@ -405,18 +403,8 @@ var
   s:string;
 begin
   s := lbCommon.Items[lbCommon.ItemIndex];
-  if Sender <> nil then
-    if lbCommon.ItemIndex >0 then
-    begin
-      lbCommon.Items.Delete(lbCommon.ItemIndex);
-      lbCommon.Items.Insert(0,s);
-      lbCommon.ItemIndex := 0;
-    end;
-
-  if (s = '<br/>')or(s = '<p/>')
-    or (copy(s,1,4) = '<br ')or(copy(s,1,3) = '<p ')
-  then
-    s :=  ^M+s;
+  if seWrap.Lines.IndexOf(s)>-1 then
+    s :=  ^M + s;
   CellEditFrame.SynEditor.SelText := s;
   CellEditFrame.SynEditor.SetFocus;
   SetCursorPos(Mouse.CursorPos.x, lbCommon.ClientToScreen(point(0,10)).y);
@@ -446,13 +434,6 @@ begin
    Accept := Source = lbCommon;
 end;
 
-procedure TCellEditForm.lbCommonKeyDown(Sender: TObject; var Key: Word;
-  Shift: TShiftState);
-begin
-  If (ssCtrl in Shift) and (Key = vk_Delete ) and (lbCommon.ItemIndex<>-1) Then
-     lbCommon.Items.Delete(lbCommon.ItemIndex);
-end;
-
 procedure TCellEditForm.lbCommonMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
@@ -464,19 +445,34 @@ procedure TCellEditForm.lbMacrosDblClick(Sender: TObject);
 var
   s:string;
 begin
-  s := lbMacros.Items[lbMacros.ItemIndex];
+  s := lbFiltered.Items[lbFiltered.ItemIndex];
 
   if Sender<>nil then
-  begin
-    if lbCommon.Items.IndexOf(s)>-1 then
-       lbCommon.Items.Delete(lbCommon.Items.IndexOf(s));
-    lbCommon.Items.Insert(0,s);
-  end;
+    lbCommon.Items.Add(s);
 
-  if (s = '<br/>')or(s = '<p/>') then
-  s := s + ^M;
+  if seWrap.Lines.IndexOf(s)>-1 then
+    s :=  ^M + s;
+
   CellEditFrame.SynEditor.SelText := s;
   CellEditFrame.SynEditor.SetFocus;
+end;
+
+procedure TCellEditForm.lbSelectorClick(Sender: TObject);
+var i,j:Integer;
+begin
+  if lbSelector.ItemIndex<1 then
+    lbFiltered.Items.Assign(lbMacros.Items)
+  else begin
+    lbFiltered.Items.Clear;
+    if lbSelector.Items.count = lbSelector.ItemIndex+1 then
+      j := lbMacros.Items.count
+    else
+      j := Integer(lbSelector.Items.Objects[lbSelector.ItemIndex+1]);
+
+    for i := Integer(lbSelector.Items.Objects[lbSelector.ItemIndex]) to J-1 do
+       lbFiltered.Items.Add(lbMacros.Items[i])
+
+  end;
 end;
 
 procedure TCellEditForm.PrepareCombo;
@@ -551,32 +547,32 @@ end;
 procedure TCellEditForm.PrepareMacro(ANod: TXML_Nod);
 var
   i,j:integer;
-  s, s1,s2,s3:string;
+  s, s1,s2,s3, ls:string;
   Nod: TXML_Nod;
   sl:TStringList;
-  s22:TStringList;
 begin
 
   Nod := ANod;
   sl:=TStringList.Create;
-  s22:=TStringList.Create;
   sl.CaseSensitive :=True;
-  s22.CaseSensitive :=True;
-  s22.AddStrings(lbMacros.Items);
+
   lbMacros.Clear;
   FRepl.Clear;
 
   lbMacros.Items.Add('<br/>');
   lbMacros.Items.Add('<p/>');
-//  lbMacros.Items.Add('<b>');
-//  lbMacros.Items.Add('<i>');
+  if lbSelector.ItemIndex>-1 then
+  ls := lbSelector.Items[lbSelector.ItemIndex];
+  lbSelector.Items.Text := 'All';
+
 
   repeat
     sl.Text := Nod.Attribute['dekart:replace'];
     FRepl.AddStrings(sl);
     for i := 0 to sl.Count-1 do
-      if (sl.Names[i]<>'') and (s22.IndexOf(sl.Names[i])=-1)
-      then begin
+      if (sl.Names[i]<>'') then
+      begin
+
         if Pos('=$',sl[i])>0 then
         begin
           s := sl.Names[i];
@@ -608,19 +604,26 @@ begin
             s1 := s1 + s[1];
             delete(s,1,1);
           end;
-
           lbMacros.Items.Add(s1);
-          s22.add(s1);
         end
-        else begin
+        else
           lbMacros.Items.Add(sl.Names[i]);
-          s22.Add(sl.Names[i]);
-        end;
+      end
+      else
+      if (trim(sl[i])<>'') then
+      begin
+        s := trim(sl[i]);
+        if (s[1]='[')and(s[Length(s)]=']') then
+          lbSelector.Items.AddObject(Copy(s,2,Length(s)-2),Pointer(lbMacros.Items.Count));
       end;
     Nod := Nod.parent;
   until Nod = Nil;
   sl.Free;
-  s22.Free;
+  if lbSelector.Items.IndexOf(ls)=-1 then
+    lbSelector.ItemIndex := 0
+  else
+  lbSelector.ItemIndex := lbSelector.Items.IndexOf(ls);
+  lbSelectorClick(lbSelector);
 end;
 
 procedure TCellEditForm.ResetCombo;
@@ -670,13 +673,6 @@ begin
     if trim(seWrap.Lines[i])<>'' then
       s := StringReplace(s, seWrap.Lines[i], #13#10+seWrap.Lines[i],[rfreplaceall]);
 
-
- {
-  s := StringReplace(Value, '<br/>', #13#10'<br/>',[rfreplaceall]);
-  s := StringReplace(s, '<br ', #13#10'<br ',[rfreplaceall]);
-  s := StringReplace(s, '<p/>', #13#10'<p/>',[rfreplaceall]);
-  s := StringReplace(s, '<p ', #13#10'<p ',[rfreplaceall]);
-}
   CellEditFrame.SynEditor.OnChange := Nil;
   CellEditFrame.SynEditor.Text := s;
   CellEditFrame.SynEditor.OnChange := CellEditFrameSynEditorChange;

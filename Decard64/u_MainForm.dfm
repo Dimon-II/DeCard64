@@ -1898,21 +1898,6 @@ object MainForm: TMainForm
               end
             end
           end
-          inherited tsReplace: TTabSheet
-            ExplicitWidth = 321
-            ExplicitHeight = 391
-            inherited ReplaceFrame: TSynEditFrame
-              Width = 321
-              Height = 391
-              inherited SynEditor: TSynEdit
-                Width = 321
-                Height = 363
-              end
-              inherited pscrSysEdit: TPageScroller
-                Width = 321
-              end
-            end
-          end
         end
       end
       object gbPreview: TGroupBox

@@ -1726,6 +1726,9 @@ begin
 
            n2 := n1.Add('use');
 
+           for i:=xn.Attributes.Count-1 downto 0 do
+              n2.Attribute[xn.Attributes[i].name] := xn.Attributes[i].value;
+
            if (xn.Attribute['width']='') then
              n2.Attribute['width'] := IntToStr(w1)
            else
@@ -1750,6 +1753,7 @@ begin
            n2.Attribute['filter'] := ParentStyle(xn, 'filter');
 
            n2.Attribute['xlink:href'] := xn.Attribute['src'];
+           n2.Attribute['src'] := '';
            n1.Attribute['width'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + w1 + PercentWidth(xn.Attribute['dx'],0));
            n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),
            StrToIntDef(n2.Attribute['height'],0) - abs(StrToIntDef(xn.Attribute['dy'],0))));
