@@ -447,7 +447,7 @@ var
 begin
   s := lbFiltered.Items[lbFiltered.ItemIndex];
 
-  if Sender<>nil then
+  if (Sender<>nil)and(lbCommon.Items.IndexOf(s)=-1) then
     lbCommon.Items.Add(s);
 
   if seWrap.Lines.IndexOf(s)>-1 then
