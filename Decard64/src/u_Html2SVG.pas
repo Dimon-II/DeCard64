@@ -1958,6 +1958,8 @@ begin
       n1 := n1.Next;
     end;
 
+    if Bkg<>nil then
+       Bkg.Attribute['transform'] := 'translate('+IntToStr(nodx)+','+IntToStr(nody)+')';
 
     if pos('valign:',fmt)>0 then
     begin
@@ -1965,17 +1967,22 @@ begin
 
        if pos('valign:top', fmt)> 0 then
        begin
-           Result := '<g transform="translate('+IntToStr(nodx)+','+IntToStr(nody)+') scale('+SvgFloat(ZoomValue)+')">' + RST.Nodes.xml + '</g>'
+         Result := '<g transform="translate('+IntToStr(nodx)+','+IntToStr(nody)+') scale('+SvgFloat(ZoomValue)+')">' + RST.Nodes.xml + '</g>';
        end
        else
        if pos('valign:middle', fmt)> 0 then
        begin
-         Result := '<g transform="translate('+IntToStr(nodx)+','+IntToStr(nody+(StrToIntDef(NOD.Attribute['height'],0)-round(hgh*ZoomValue)) div 2)+')  scale('+SvgFloat(ZoomValue)+')">' + RST.Nodes.xml + '</g>'
+
+         Result := '<g transform="translate('+IntToStr(nodx)+','+IntToStr(nody+(StrToIntDef(NOD.Attribute['height'],0)-round(hgh*ZoomValue)) div 2)+')  scale('+SvgFloat(ZoomValue)+')">' + RST.Nodes.xml + '</g>';
+         if (Bkg<>nil) and (lvl=1) then
+           Bkg.Attribute['transform'] := 'translate('+IntToStr(nodx)+','+IntToStr(nody+(StrToIntDef(NOD.Attribute['height'],0)-round(hgh*ZoomValue)) div 2)+')';
        end
        else
        if pos('valign:bottom', fmt)> 0 then
        begin
-        Result := '<g transform="translate('+IntToStr(nodx)+','+IntToStr(nody+(StrToIntDef(NOD.Attribute['height'],0)-round(hgh*ZoomValue)) )+')  scale('+SvgFloat(ZoomValue)+')">' + RST.Nodes.xml + '</g>'
+         Result := '<g transform="translate('+IntToStr(nodx)+','+IntToStr(nody+(StrToIntDef(NOD.Attribute['height'],0)-round(hgh*ZoomValue)) )+')  scale('+SvgFloat(ZoomValue)+')">' + RST.Nodes.xml + '</g>';
+         if (Bkg<>nil) and (lvl=1) then
+           Bkg.Attribute['transform'] := 'translate('+IntToStr(nodx)+','+IntToStr(nody+(StrToIntDef(NOD.Attribute['height'],0)-round(hgh*ZoomValue)) )+')';
        end
     end
     else
@@ -1987,7 +1994,8 @@ begin
     if Bkg<>nil then
      begin
 //       Bkg.Attribute['transform'] := 'translate('+IntToStr(nodx)+','+IntToStr(nody)+') scale('+SvgFloat(ZoomValue)+')';
-       Bkg.Attribute['transform'] := 'translate('+IntToStr(nodx)+','+IntToStr(nody)+')';
+
+
        Result := '<g>' +  bkg.xml + Result + '</g>';
        Bkg.Free;
      end;
