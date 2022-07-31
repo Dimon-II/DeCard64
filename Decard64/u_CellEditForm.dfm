@@ -287,6 +287,7 @@ object CellEditForm: TCellEditForm
     Top = 0
     Width = 289
     Height = 238
+    Hint = 'Restore unnecessarily translated macros, parentheses analysis.'
     ActivePage = tsMacros
     Align = alRight
     TabOrder = 2
@@ -442,6 +443,94 @@ object CellEditForm: TCellEditForm
           '<p/>'
           '<p ')
         Options = [eoAutoIndent, eoEnhanceEndKey, eoGroupUndo, eoScrollPastEol, eoShowScrollHint, eoShowSpecialChars, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
+      end
+    end
+    object tsTranslate: TTabSheet
+      Caption = 'Translate'
+      ImageIndex = 4
+      object splRevers: TSplitter
+        Left = 0
+        Top = 206
+        Width = 281
+        Height = 4
+        Cursor = crVSplit
+        Align = alBottom
+        Beveled = True
+        ExplicitTop = 102
+      end
+      object tbrTranslate: TToolBar
+        Left = 0
+        Top = 0
+        Width = 281
+        Height = 21
+        AutoSize = True
+        ButtonHeight = 21
+        ButtonWidth = 37
+        Caption = 'tbrTranslate'
+        ParentShowHint = False
+        ShowCaptions = True
+        ShowHint = True
+        TabOrder = 0
+        object tbMerge: TToolButton
+          Left = 0
+          Top = 0
+          Hint = 'Restore unnecessarily translated macros, parentheses analysis.'
+          Caption = 'Merge'
+          ImageIndex = 0
+          OnClick = tbMergeClick
+        end
+        object tbApply: TToolButton
+          Left = 37
+          Top = 0
+          Caption = 'Apply'
+          ImageIndex = 1
+          OnClick = tbApplyClick
+        end
+      end
+      object seTranslate: TSynEdit
+        Left = 0
+        Top = 21
+        Width = 281
+        Height = 185
+        Align = alClient
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'Courier New'
+        Font.Style = []
+        Font.Quality = fqClearTypeNatural
+        TabOrder = 1
+        CodeFolding.ShowCollapsedLine = True
+        UseCodeFolding = False
+        Gutter.Font.Charset = DEFAULT_CHARSET
+        Gutter.Font.Color = clWindowText
+        Gutter.Font.Height = -11
+        Gutter.Font.Name = 'Courier New'
+        Gutter.Font.Style = []
+        Gutter.ShowLineNumbers = True
+        Highlighter = CellEditFrame.SynXMLSyn1
+        Options = [eoAutoIndent, eoDragDropEditing, eoGroupUndo, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
+        SearchEngine = CellEditFrame.SynEditSearch1
+        WordWrap = True
+        OnChange = seTranslateChange
+        OnGutterGetText = seTranslateGutterGetText
+        ExplicitTop = 28
+        ExplicitWidth = 492
+        ExplicitHeight = 210
+        RemovedKeystrokes = <
+          item
+            Command = ecDeleteLastChar
+            ShortCut = 8200
+          end
+          item
+            Command = ecLineBreak
+            ShortCut = 8205
+          end
+          item
+            Command = ecContextHelp
+            ShortCut = 112
+          end>
+        AddedKeystrokes = <>
       end
     end
   end

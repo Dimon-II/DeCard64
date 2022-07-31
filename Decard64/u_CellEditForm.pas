@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, u_SynEditFrame,
   Vcl.ExtCtrls, Vcl.Grids, Profixxml, Vcl.Buttons, System.Actions,
-  Vcl.ActnList, System.UITypes, Vcl.ComCtrls, SynEdit, Vcl.Menus;
+  Vcl.ActnList, System.UITypes, Vcl.ComCtrls, SynEdit, Vcl.Menus, Vcl.ToolWin;
 
 type
 
@@ -62,6 +62,12 @@ type
     N1: TMenuItem;
     lbSelector: TListBox;
     lbFiltered: TListBox;
+    tsTranslate: TTabSheet;
+    splRevers: TSplitter;
+    tbrTranslate: TToolBar;
+    tbMerge: TToolButton;
+    tbApply: TToolButton;
+    seTranslate: TSynEdit;
     procedure FormCreate(Sender: TObject);
     procedure CellEditFrameSynEditorChange(Sender: TObject);
     procedure lbMacrosDblClick(Sender: TObject);
@@ -96,6 +102,11 @@ type
     procedure Clear1Click(Sender: TObject);
     procedure FillbyCol1Click(Sender: TObject);
     procedure lbSelectorClick(Sender: TObject);
+    procedure tbMergeClick(Sender: TObject);
+    procedure seTranslateGutterGetText(Sender: TObject; aLine: Integer;
+      var aText: string);
+    procedure seTranslateChange(Sender: TObject);
+    procedure tbApplyClick(Sender: TObject);
   private
     FOldText:string;
     FGrid: TStringGrid;
@@ -112,6 +123,7 @@ type
   public
     { Public declarations }
     StartingPoint : TPoint;
+    Doing:string;
     procedure PrepareMacro(ANod:TXML_Nod);
     procedure btnCancelClick(Sender: TObject);
     property Text:string read GetText write SetText;
@@ -663,6 +675,18 @@ begin
   FNodeName := Value;
 end;
 
+procedure TCellEditForm.seTranslateChange(Sender: TObject);
+begin
+   Doing := '';
+end;
+
+procedure TCellEditForm.seTranslateGutterGetText(Sender: TObject;
+  aLine: Integer; var aText: string);
+begin
+  if pos('('+IntToStr(Aline)+')',Doing)>0 then
+    aText :='>>'+aText;
+end;
+
 procedure TCellEditForm.SetText(const Value: string);
 var s: string;
     i: integer;
@@ -679,5 +703,167 @@ begin
 end;
 
 
+
+procedure TCellEditForm.tbApplyClick(Sender: TObject);
+begin
+  text := StringReplace(seTranslate.Lines.text, #13#10,'',[rfReplaceAll]);
+  Grid.Cells[Grid.Col, Grid.Row] := GetText;
+end;
+
+procedure TCellEditForm.tbMergeClick(Sender: TObject);
+var
+  list1, list2:TStringList;
+  i,j, k: Integer;
+  cnt1, cnt2 :Integer;
+  s:string;
+  m: TSynEditMark;
+
+  procedure ParseLang(AText:string; AList:TStringList; AStart,AStop:string);
+  var
+    s, z : string;
+    i, j, k: integer;
+  begin
+    AList.Clear;
+    AList.Add('');
+    s := StringReplace(AText,#13#10,'',[rfReplaceAll]);
+    i := 0;
+    while i<Length(s) do
+    begin
+      Inc(i);
+
+      // 1 word after (
+      if (i<Length(s)) and (s[i]='(')and(Pos(s[i+1],'0123456789_-')=0)  then
+      begin
+        for j := i+1 to Length(s) do
+          if (WideUpperCase(WideString(s[j]))=WideLowerCase(WideString(s[j]))) and (Pos(s[j],'0123456789_-')=0)
+          then Break;
+        if s[j]=')' then
+        begin
+          AList.Add(Copy(s,i, j-i+1));
+          AList.Objects[AList.Count-1] := AList;
+          AList.Add('');
+          i := j;
+          Continue;
+        end;
+      end;
+
+      // regex function name like qwerty(
+      if s[i]='(' then
+      begin
+        z:='(';
+        k:=1;
+        if (pos('(', AStart)>0) and (i>1) and (s[i-1]=' ') then
+          k:=2;
+
+        for j := i-k downto 1 do
+          if (WideUpperCase(WideString(s[j]))=WideLowerCase(WideString(s[j]))) and (Pos(s[j],'0123456789_-')=0)
+          then Break
+          else z := s[j] + z;
+
+        if j<i-1 then
+          if WideUpperCase(WideString(z[1]))<>WideLowerCase(WideString(z[1])) then
+          begin
+            AList[AList.Count-1] := Copy(AList[AList.Count-1],1,Length(AList[AList.Count-1])-Length(z));
+            AList.Add(z);
+            AList.Objects[AList.Count-1] := AList;
+            AList.Add('');
+            Continue;
+          end;
+      end;
+
+      // text between  AStart/AStop, contains no extra starting letter
+      j:=pos(s[i],AStart);
+      if j>0 then
+      begin
+        j := pos(Copy(AStop,j,1), s, i+1);
+        z := Copy(s,i, j-i+1);
+
+        if Pos(s[i],z,2)>0 then j:=0;
+
+        if (j>0) then
+        begin
+          AList.Add(z);
+          AList.Objects[AList.Count-1] := AList;
+          AList.Add('');
+          i := j;
+          Continue;
+        end;
+      end;
+
+      if s[i]='(' then
+      begin
+        j := pos(')', s, i+1);
+        z := Copy(s,i, j-i+1);
+
+        if Pos(s[i],z,2)>0 then j:=0;
+
+        if (j>0) then
+        begin
+          AList.Add(z);
+          AList.Add('');
+          i := j;
+          Continue;
+        end;
+      end;
+
+
+      AList[AList.Count-1] := AList[AList.Count-1] + s[i]
+    end;
+
+    for i := Alist.Count-1 downto 0 do
+     if Alist[i]='' then Alist.Delete(i);
+  end;
+begin
+  list1:=TStringList.Create;
+  list2:=TStringList.Create;
+  try
+    ParseLang(seTranslate.Lines.Text, list2,'<{[(','>}])');
+    ParseLang(CellEditFrame.SynEditor.Lines.Text, list1,'<{[','>}]');
+
+    cnt1:=0;
+    Doing := '';
+    seTranslate.Lines.Assign(list2);
+    seTranslate.Marks.Clear;
+
+    for i:= 0 to list1.Count-1 do
+    begin
+      for k:=1 to length(list1[i]) do
+        if Pos(list1[i][k],'<[{(')>0 then Inc(cnt1);
+      if list1.Objects[i]<> nil then
+      begin
+       cnt2 := 0;
+       for j:= 0 to list2.Count-1 do
+       begin
+         for k:=1 to length(list2[j]) do
+           if Pos(list2[j][k],'<[{(')>0 then Inc(cnt2);
+         if cnt1=cnt2 then
+         begin
+           list2[j] := list1[i];
+           seTranslate.Lines[j] := list1[i];
+
+           m := TSynEditMark.Create(seTranslate);
+           m.Line := j+1;
+//           m.ImageList := ImageList1;
+           m.ImageIndex := 0;
+           if seTranslate.Marks.Count<10 then
+             m.ImageIndex := seTranslate.Marks.Count+1;
+
+
+           m.Visible := true;
+           seTranslate.Marks.Add(m);
+           Doing := Doing + '('+IntToStr(j+1)+')';
+           break;
+         end;
+       end;
+
+      end;
+    end;
+
+
+  finally
+    list1.Free;
+    list2.Free;
+  end;
+end;
 
 end.
