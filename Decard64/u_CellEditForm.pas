@@ -831,11 +831,11 @@ begin
     s := seTranslate.Lines.Text;
     z := Text;
     repeat
-      i:=Pos('(',z,i);
-      j:=Pos('(',s,j);
+      i:=Pos('(',z,i+1);
+      j:=Pos('(',s,j+1);
 
       if (i>1)and(j>1)and(z[i-1]<>' ')and(s[j-1]=' ')  then
-      delete(s,j-1,1);
+        delete(s,j-1,1);
     until i=0;
 
     ParseLang(s, list2,'<{[(','>}])');
@@ -849,6 +849,7 @@ begin
     begin
       for k:=1 to length(list1[i]) do
         if Pos(list1[i][k],'<[{(')>0 then Inc(cnt1);
+
       if list1.Objects[i]<> nil then
       begin
        cnt2 := 0;
@@ -856,22 +857,24 @@ begin
        begin
          for k:=1 to length(list2[j]) do
            if Pos(list2[j][k],'<[{(')>0 then Inc(cnt2);
-         if (cnt1=cnt2)and(seTranslate.Lines[j] <> list1[i]) then
+         if (cnt1=cnt2) then
          begin
-           list2[j] := list1[i];
-           seTranslate.Lines[j] := list1[i];
+           if (list2[j] <> list1[i]) then
+           begin
+             list2[j] := list1[i];
+             seTranslate.Lines[j] := list1[i];
 
-           m := TSynEditMark.Create(seTranslate);
-           m.Line := j+1;
-//           m.ImageList := ImageList1;
-           m.ImageIndex := 0;
-           if seTranslate.Marks.Count<10 then
-             m.ImageIndex := seTranslate.Marks.Count+1;
+             m := TSynEditMark.Create(seTranslate);
+             m.Line := j+1;
+             m.ImageIndex := 0;
+             if seTranslate.Marks.Count<10 then
+              m.ImageIndex := seTranslate.Marks.Count+1;
 
 
-           m.Visible := true;
-           seTranslate.Marks.Add(m);
-           Doing := Doing + '('+IntToStr(j+1)+')';
+             m.Visible := true;
+             seTranslate.Marks.Add(m);
+             Doing := Doing + '('+IntToStr(j+1)+')';
+           end;
            break;
          end;
        end;
