@@ -1,7 +1,7 @@
 object CellEditForm: TCellEditForm
   Left = 0
   Top = 0
-  BorderStyle = bsSizeToolWin
+  BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'CellEditForm'
   ClientHeight = 280
   ClientWidth = 784
@@ -19,6 +19,7 @@ object CellEditForm: TCellEditForm
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnDeactivate = FormDeactivate
+  OnResize = FormResize
   PixelsPerInch = 96
   TextHeight = 13
   object Splitter2: TSplitter
@@ -264,6 +265,7 @@ object CellEditForm: TCellEditForm
     inherited SynEditor: TSynEdit
       Width = 492
       Height = 210
+      Constraints.MinWidth = 340
       OnKeyDown = CellEditFrameSynEditorKeyDown
       OnChange = CellEditFrameSynEditorChange
       ExplicitWidth = 492
@@ -288,7 +290,7 @@ object CellEditForm: TCellEditForm
     Width = 289
     Height = 238
     Hint = 'Restore unnecessarily translated macros, parentheses analysis.'
-    ActivePage = tsMacros
+    ActivePage = tsTranslate
     Align = alRight
     TabOrder = 2
     object tsCommon: TTabSheet
@@ -448,6 +450,7 @@ object CellEditForm: TCellEditForm
     object tsTranslate: TTabSheet
       Caption = 'Translate'
       ImageIndex = 4
+      Constraints.MinWidth = 120
       object splRevers: TSplitter
         Left = 0
         Top = 206
@@ -514,9 +517,6 @@ object CellEditForm: TCellEditForm
         WordWrap = True
         OnChange = seTranslateChange
         OnGutterGetText = seTranslateGutterGetText
-        ExplicitTop = 28
-        ExplicitWidth = 492
-        ExplicitHeight = 210
         RemovedKeystrokes = <
           item
             Command = ecDeleteLastChar

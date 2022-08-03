@@ -107,6 +107,7 @@ type
       var aText: string);
     procedure seTranslateChange(Sender: TObject);
     procedure tbApplyClick(Sender: TObject);
+    procedure FormResize(Sender: TObject);
   private
     FOldText:string;
     FGrid: TStringGrid;
@@ -401,6 +402,13 @@ end;
 procedure TCellEditForm.FormDestroy(Sender: TObject);
 begin
   FRepl.Free;
+end;
+
+procedure TCellEditForm.FormResize(Sender: TObject);
+begin
+ if pcHelpher.Width > Width /2 then
+   pcHelpher.Width := Width div 2;
+
 end;
 
 function TCellEditForm.GetText: string;
@@ -713,9 +721,9 @@ end;
 procedure TCellEditForm.tbMergeClick(Sender: TObject);
 var
   list1, list2:TStringList;
-  i,j, k: Integer;
+  i, j, k: Integer;
   cnt1, cnt2 :Integer;
-  s:string;
+  s,z:string;
   m: TSynEditMark;
 
   procedure ParseLang(AText:string; AList:TStringList; AStart,AStop:string);
@@ -752,9 +760,10 @@ var
       begin
         z:='(';
         k:=1;
+{
         if (pos('(', AStart)>0) and (i>1) and (s[i-1]=' ') then
           k:=2;
-
+}
         for j := i-k downto 1 do
           if (WideUpperCase(WideString(s[j]))=WideLowerCase(WideString(s[j]))) and (Pos(s[j],'0123456789_-')=0)
           then Break
@@ -817,8 +826,19 @@ begin
   list1:=TStringList.Create;
   list2:=TStringList.Create;
   try
-    ParseLang(seTranslate.Lines.Text, list2,'<{[(','>}])');
-    ParseLang(CellEditFrame.SynEditor.Lines.Text, list1,'<{[','>}]');
+    ParseLang(Text, list1,'<{[','>}]');
+    i:=0;
+    s := seTranslate.Lines.Text;
+    z := Text;
+    repeat
+      i:=Pos('(',z,i);
+      j:=Pos('(',s,j);
+
+      if (i>1)and(j>1)and(z[i-1]<>' ')and(s[j-1]=' ')  then
+      delete(s,j-1,1);
+    until i=0;
+
+    ParseLang(s, list2,'<{[(','>}])');
 
     cnt1:=0;
     Doing := '';
@@ -836,7 +856,7 @@ begin
        begin
          for k:=1 to length(list2[j]) do
            if Pos(list2[j][k],'<[{(')>0 then Inc(cnt2);
-         if cnt1=cnt2 then
+         if (cnt1=cnt2)and(seTranslate.Lines[j] <> list1[i]) then
          begin
            list2[j] := list1[i];
            seTranslate.Lines[j] := list1[i];
