@@ -132,10 +132,10 @@ var
 
   fmt: string;
 
-  fit_to: resvg_fit_to;
   trans: resvg_transform;
   tree: ^presvg_render_tree;
   pth: utf8String;
+  sss:resvg_size;
 
 begin
   fmt := LowerCase(StringReplace(ExtractFileExt(FResultFile), '.', '', []));
@@ -143,11 +143,10 @@ begin
   resvg_options_set_resources_dir(opt, PChar(pth));
   resvg_options_set_dpi(opt, DPI);
 
-  resvg_options_set_keep_named_groups(opt, FIdObject <> nil);
+//  resvg_options_set_keep_named_groups(opt, FIdObject <> nil);
 
   // fit_to._type := RESVG_FIT_TO_ZOOM;
   // fit_to.value := fzoom;
-  fit_to._type := RESVG_FIT_TO_ORIGINAL;
 
   ApplyRenderingOptions(opt);
 
@@ -164,15 +163,18 @@ begin
 
   begin
 
-    sz.width := Round(resvg_get_image_viewbox(tree).width);
+    sss := resvg_get_image_size(tree);
+    sz.width := sss.width;
+    sz.height := sss.height;
 
-    sz.height := Round(resvg_get_image_viewbox(tree).height);
+//    sz.width := Round(resvg_get_image_viewbox(tree).width);
+//    sz.height := Round(resvg_get_image_viewbox(tree).height);
 
     SetLength(Img, Round(sz.width * sz.height * 4));
 
     try
 
-      resvg_render(tree, fit_to, resvg_transform_identity(), Round(sz.width), Round(sz.height), @(Img[0]));
+      resvg_render(tree, resvg_transform_identity(), Round(sz.width), Round(sz.height), @(Img[0]));
 
     except
 

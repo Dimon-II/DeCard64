@@ -290,7 +290,7 @@ begin
   FBufXml.Clear;
   FBufXml.Add('<?xml version="1.0" encoding="UTF-8"?>');
   FBufXml.Add('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">');
-  FBufXml.Add('<svg xmlns:xlink="http://www.w3.org/1999/xlink" fill="black" font-weight="normal" stroke-width="1"  xmlns="http://www.w3.org/2000/svg" font-size="12" image-rendering="auto" width="1" height="1">');
+  FBufXml.Add('<svg xmlns:xlink="http://www.w3.org/1999/xlink" fill="black" font-weight="normal" stroke-width="1"  xmlns="http://www.w3.org/2000/svg" font-size="12"  width="1" height="1">');
   FBufXml.Add('<text y="50" id="txt" '+AStyle+'>'+ (S) +'</text><rect id="dummy" width="100" height="100"/></svg>');
   s := GetSVGSize(ATempFolder + '###.svg', 'txt');
   Delete(s,1,Pos(',',s));
@@ -416,7 +416,7 @@ begin
     FBufXml.Clear;
     FBufXml.Add('<?xml version="1.0" encoding="UTF-8"?>');
     FBufXml.Add('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">');
-    FBufXml.Add('<svg xmlns:xlink="http://www.w3.org/1999/xlink" fill="black" font-weight="normal" stroke-width="1"  xmlns="http://www.w3.org/2000/svg" font-size="12" image-rendering="auto" width="1" height="1">');
+    FBufXml.Add('<svg xmlns:xlink="http://www.w3.org/1999/xlink" fill="black" font-weight="normal" stroke-width="1"  xmlns="http://www.w3.org/2000/svg" font-size="12"  width="1" height="1">');
     FBufXml.Add('<g font-size="'+nod.Attribute['font-size']
               +'" font-family="'+nod.Attribute['font-family']
               +'" letter-spacing="'+nod.Attribute['letter-spacing']
@@ -1068,6 +1068,9 @@ var
   s, s1,zz:string;
   Z:Char;
   RootSize:TPoint;
+
+  FontBase, Baseline:double;
+
 {
   XML,xn,n1,n2, RST, Bkg, MainSVG:TXML_Nod;
   s,s1:String;
@@ -1126,7 +1129,7 @@ var
     FBufXml.Clear;
     FBufXml.Add('<?xml version="1.0" encoding="UTF-8"?>');
     FBufXml.Add('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">');
-    FBufXml.Add('<svg xmlns:template="127.0.0.1" xmlns:dekart="http://127.0.0.1"  xmlns:xlink="http://www.w3.org/1999/xlink" fill="black" font-weight="normal" stroke-width="1"  xmlns="http://www.w3.org/2000/svg" font-size="12" image-rendering="auto" width="1" height="1">');
+    FBufXml.Add('<svg xmlns:template="127.0.0.1" xmlns:dekart="http://127.0.0.1"  xmlns:xlink="http://www.w3.org/1999/xlink" fill="black" font-weight="normal" stroke-width="1"  xmlns="http://www.w3.org/2000/svg" font-size="12" width="1" height="1">');
     FBufXml.Add('<use y="0" id="txt" xlink:href="' + StringReplace(Atext, AClipartName +'#', '#clipart', [rfReplaceAll, rfIgnoreCase])+'"/>');
     FBufXml.Add(S);
     FBufXml.Add('<rect id="dummy" width="100" height="100"/></svg>');
@@ -1141,7 +1144,7 @@ var
   end;
 
 
-function ParseHtml(NOD, XML:TXML_Nod; nodx,nody, lvl:integer; zm1:double; ARgh:string):string;
+function ParseHtml(NOD, XML:TXML_Nod; nodx, nody, lvl:integer; zm1:double; ARgh:string):string;
 var
   ZoomValue: double;
   npp, hgh, Row1, w_dy,
@@ -1175,8 +1178,11 @@ var
     Nod1 := ANod;
     repeat
        result := Nod1.Attribute['right'];
+       if (Nod1.LocalName='html') and (Nod1<>ANod) then break;
        Nod1 := Nod1.parent;
-    until (Result<>'') or (Nod1 = nil) or (Nod1=Nod);
+    until (Result<>'') or (Nod1 = nil)
+//     or (Nod1=Nod)
+;
 
     if pos('%', Result) <> 0 then
       Result := IntToStr(Round(RootSize.X /  100 * StrToIntDef(StringReplace(Result,'%','',[]), 0)));
@@ -1192,6 +1198,37 @@ var
     end;
 
     if Result='' then Result := Def;
+  end;
+
+  function ParentLeft(ANod:TXML_Nod):integer;
+  var Nod1:TXML_Nod;
+     rst,ws:string;
+  begin
+    Result:=0;
+
+    Nod1 := ANod;
+    rst := '';
+    repeat
+       rst := Nod1.Attribute['left'];
+       if (Nod1.LocalName='html') and (Nod1<>ANod) then break;
+       Nod1 := Nod1.parent;
+    until (rst<>'') or (Nod1 = nil);
+
+    if pos('%', rst) <> 0 then
+      Result := Round(RootSize.X / 100 * StrToIntDef(StringReplace(rst,'%','',[]), 0))
+    else
+      Result := StrToIntDef(rst, 0);
+
+    if Result<0 then
+    begin
+//      ws := ParentStyle(ANod, 'width', 0);
+      ws := '0';
+      if pos('%', ws) > 0 then
+        Result := Round(RootSize.X /  100 * StrToIntDef(StringReplace(ws,'%','',[]), 0)) + result
+      else
+        Result := StrToIntDef(ws, 0) + result;
+    end;
+
   end;
 
 
@@ -1252,6 +1289,8 @@ var
     else
     begin
       n1.Attribute['height'] := ParentStyle(n1,'line-height','');
+      if (npp=1) then
+        Row1 := Round(StrToIntDef(n1.Attribute['height'],0)*0.2);
       LineUp := round(-StrToIntDef(n1.Attribute['height'],0)) ;
       LineDn := 0;
     end;
@@ -1356,7 +1395,8 @@ var
 
 
     n1.Attribute['height'] := '0';
-    w3 := 0;
+    w3 := Round(StrToIntDef(ParentStyle(nd,'font-size','12'),12) / 5);
+
     w5 := 0;
     w_dy := 0;
     RowFont := 0;
@@ -1376,6 +1416,13 @@ var
   OldNpp:Integer;
 
 begin
+  hgh:=0;
+  Row1:=0;
+  w_dy:=0;
+  LineUp:=0;
+  LineDn:=0;
+
+
   bkg := nil;
   RST:=TXML_Nod.Create(nil);
   try
@@ -1457,6 +1504,9 @@ begin
           bkg.Attribute['height'] := IntToStr(StrToIntDef(Nod.Attribute['height'],0)+2*StrToIntDef(xn.Attribute['outline'],0));
           bkg.Attribute['x'] := IntToStr(StrToIntDef(Nod.Attribute['x'],0)-StrToIntDef(xn.Attribute['outline'],0));
           bkg.Attribute['y'] := IntToStr(StrToIntDef(Nod.Attribute['y'],0)-StrToIntDef(xn.Attribute['outline'],0));
+          if StrToIntDef(bkg.Attribute['height'],0) < StrToIntDef(bkg.Attribute['ry'],0)*2 then
+            bkg.Attribute['ry'] := IntToStr( StrToIntDef(bkg.Attribute['height'],0) div 2);
+
           if (xn.Attribute['patch'] <> '') then
           begin
             bkg.ResetXml(xn.xml);
@@ -1547,8 +1597,11 @@ begin
            w2 := SizeParse(xn.Attribute['id']+'Z').Right+SizeParse(xn.Attribute['id']+'Z').Left;
            w2 := round(w2 + (w2-2*w1)* WordSpacing);
 
-           if (w1*ZoomValue > (PercentWidth(ParentRight(n1,  RST.Attribute['width']),0))) then
-              addzoom := min(addzoom,PercentWidth(ParentRight(n1,  RST.Attribute['width']),0)/ZoomValue / w1);
+
+
+           if (w1*ZoomValue > PercentWidth(ParentRight(n1,  RST.Attribute['width']),0)- ParentLeft(xn)) then
+              addzoom := min(addzoom,
+                (PercentWidth(ParentRight(n1,  RST.Attribute['width']),0) - ParentLeft(xn))/ZoomValue / w1);
 
            if (n1.Attribute['width'] <> '0') and
               ((PercentWidth(n1.Attribute['width'],0) + w5 + w1) * ZoomValue > PercentWidth(ParentRight(n1,  RST.Attribute['width']),0))
@@ -1633,7 +1686,7 @@ begin
           LineDn:=Max(LineDn, StrToIntDef(xn.Attribute['dy'],0));
 
 
-          if w3 =0 then
+          if w3 = 0 then
           begin
             Val(w4, w3, err);
             w3 := w3 div 3;
@@ -1643,8 +1696,22 @@ begin
         if xn.LocalName='img' then
         begin
           if n1= nil then NewRow(False, 0,0);
-            w1 := PercentWidth(xn.Attribute['width'],0);
-            dx := PercentWidth(xn.Attribute['dx'],0);
+
+          Baseline := StrToIntDef(xn.Attribute['baseline-shift'],0);
+
+          if xn.Attribute['font-base']<>'' then
+          begin
+            FontBase := StrToIntDef(ParentStyle(xn, 'font-size', xn.Attribute['font-base']),12)
+              / StrToIntDef(xn.Attribute['font-base'],12);
+            if xn.Attribute['baseline-shift']='' then
+              Baseline := StrToIntDef(ParentStyle(xn, 'baseline-shift', '0'),0) / FontBase;
+          end
+          else
+            FontBase := 1;
+
+
+          w1 := round(PercentWidth(xn.Attribute['width'],0)*FontBase);
+          dx := round(PercentWidth(xn.Attribute['dx'],0)*FontBase);
 
           if (w1 + dx) * ZoomValue > PercentWidth(ParentRight(xn,  RST.Attribute['width']),0) then
             addzoom := min(addzoom, PercentWidth(ParentRight(xn,  RST.Attribute['width']),0)/ZoomValue / w1);
@@ -1660,37 +1727,37 @@ begin
           n2.Attribute['filter'] := xn.Attribute['filter'];
           n2.Attribute['width'] := xn.Attribute['width'];
           n2.Attribute['height'] := xn.Attribute['height'];
-          n2.Attribute['x'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5  + PercentWidth(xn.Attribute['dx'],0));
-          n2.Attribute['y'] := IntToStr(-StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
+          n2.Attribute['x'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5  + Round(PercentWidth(xn.Attribute['dx'],0) * FontBase));
+          n2.Attribute['y'] :=  IntToStr(Round((-StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0) + Baseline) * FontBase));
 
 
           n2.Attribute['xlink:href'] := xn.Attribute['src'];
           n1.Attribute['width'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + w1+ PercentWidth(xn.Attribute['dx'],0));
           n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),
-          StrToIntDef(n2.Attribute['height'],0) - abs(StrToIntDef(xn.Attribute['dy'],0))));
+                          round(FontBase *(StrToIntDef(n2.Attribute['height'],0) - abs(StrToIntDef(xn.Attribute['dy'],0)) + BaseLine))));
 
-          w_dy := Max(w_dy, StrToIntDef(xn.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
+          w_dy := Max(w_dy, Round((StrToIntDef(xn.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0) + Baseline) * FontBase));
 
           w5 := 0;
 
-          ImgRect.Left := StrToIntDef(xn.Attribute['x1'],0);
-          ImgRect.Top := StrToIntDef(xn.Attribute['y1'],0);
+          ImgRect.Left := Round(StrToIntDef(xn.Attribute['x1'],0) * FontBase);
+          ImgRect.Top := Round((StrToIntDef(xn.Attribute['y1'],0) + BaseLine) * FontBase);
           if xn.Attribute['x2']='' then
-            ImgRect.Right := PercentWidth(n2.Attribute['width'],0) + ImgRect.Left
+            ImgRect.Right := Round(PercentWidth(n2.Attribute['width'],0) * FontBase) + ImgRect.Left
           else
-            ImgRect.Right := StrToIntDef(xn.Attribute['x2'],0);
+            ImgRect.Right := Round(StrToIntDef(xn.Attribute['x2'],0) * FontBase);
 
           if xn.Attribute['y2']='' then
-            ImgRect.Bottom := StrToIntDef(xn.Attribute['height'],0) + ImgRect.Top
+            ImgRect.Bottom := Round(StrToIntDef(xn.Attribute['height'],0) * FontBase) + ImgRect.Top
           else
-            ImgRect.Bottom := StrToIntDef(xn.Attribute['y2'],0);
+            ImgRect.Bottom := round(StrToIntDef(xn.Attribute['y2'],0)*FontBase);
 
           n2.Attribute['x'] := IntToStr(StrToIntDef(n2.Attribute['x'],0) + ImgRect.Left);
           n2.Attribute['y'] := IntToStr(StrToIntDef(n2.Attribute['y'],0) + ImgRect.Top);
           n2.Attribute['width'] := IntToStr( ImgRect.Right - ImgRect.Left);
           n2.Attribute['height'] := IntToStr(ImgRect.Bottom - ImgRect.Top);
 
-          LineUp:=Min(LineUp, -StrToIntDef(xn.Attribute['height'],0));
+          LineUp:=Min(LineUp, Round(-StrToIntDef(xn.Attribute['height'],0)* FontBase));
           LineDn:=Max(LineDn, 0);
 
 
@@ -1706,19 +1773,38 @@ begin
         begin
           if n1= nil then NewRow(False, 0,0);
 
-           w1 := PercentWidth(xn.Attribute['width'],0);
-           w2 := StrToIntDef(xn.Attribute['height'],0);
-           dx := PercentWidth(xn.Attribute['dx'],0);
+          Baseline := StrToIntDef(xn.Attribute['baseline-shift'],0);
+          if xn.Attribute['font-base']<>'' then
+          begin
+            FontBase :=   StrToIntDef(ParentStyle(xn, 'font-size', xn.Attribute['font-base']),12)
+              / StrToIntDef(xn.Attribute['font-base'],12);
+            if xn.Attribute['baseline-shift']='' then
+              Baseline := StrToIntDef(ParentStyle(xn, 'baseline-shift', '0'),0) / FontBase;
+          end
+          else
+            FontBase := 1;
 
-           if (xn.Attribute['width']='')or(xn.Attribute['height']='') then
-           begin
-             SvgUseWidth(xn.Attribute['src'], MainSvg, Clipart, w1, w2);
-             w1 := Round(w1 * StrToFloatDef(xn.Attribute['scale'],1));
-             w2 := Round(w2 * StrToFloatDef(xn.Attribute['scale'],1));
-           end;
 
-           if (w1*ZoomValue > PercentWidth(ParentRight(xn,  RST.Attribute['width']),0)) then
-              addzoom := min(addzoom, PercentWidth(ParentRight(xn,  RST.Attribute['width']),0)/ZoomValue / w1);
+          w1 := PercentWidth(xn.Attribute['width'],0);
+          w2 := StrToIntDef(xn.Attribute['height'],0);
+          dx := PercentWidth(xn.Attribute['dx'],0);
+
+          if (xn.Attribute['width']='')or(xn.Attribute['height']='') then
+          begin
+            SvgUseWidth(xn.Attribute['src'], MainSvg, Clipart, w1, w2);
+            w1 := Round(w1 * StrToFloatDef(xn.Attribute['scale'],1));
+            w2 := Round(w2 * StrToFloatDef(xn.Attribute['scale'],1));
+          end;
+
+          w1 := round(w1 * FontBase);
+          w2 := round(w2 * FontBase);
+          dx := round(dx * FontBase);
+
+
+          if ((w1+dx)*ZoomValue > PercentWidth(ParentRight(n1,  RST.Attribute['width']),0)- ParentLeft(xn)) then
+             addzoom := min(addzoom,
+                (PercentWidth(ParentRight(n1,  RST.Attribute['width']),0) - ParentLeft(xn))/ZoomValue / (w1+dx));
+
 
            if (n1.Attribute['width'] <> '0') and
               ((PercentWidth(n1.Attribute['width'],0) + w5 + w1 +dx)*ZoomValue > PercentWidth(ParentRight(xn,  RST.Attribute['width']),0))
@@ -1741,38 +1827,39 @@ begin
 
            n2.Attribute['filter'] := xn.Attribute['filter'];
 
-           w1 := PercentWidth(n2.Attribute['width'],0);
+           w1 := Round(PercentWidth(n2.Attribute['width'],0) * FontBase);
 
            if (n1.Attribute['width'] <> '0') and
               ((PercentWidth(n1.Attribute['width'],0) + w5 + w1 +dx) *ZoomValue > PercentWidth(ParentRight(xn,  RST.Attribute['width']),0))
            then NewRow(True, 0,0);
 
 
-           n2.Attribute['x'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + PercentWidth(xn.Attribute['dx'],0));
-           n2.Attribute['y'] := IntToStr(-StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
+           n2.Attribute['x'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + Round(PercentWidth(xn.Attribute['dx'],0) * FontBase  ));
+           n2.Attribute['y'] := IntToStr(Round((-StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0) + Baseline) *FontBase));
            n2.Attribute['filter'] := ParentStyle(xn, 'filter');
 
            n2.Attribute['xlink:href'] := xn.Attribute['src'];
            n2.Attribute['src'] := '';
-           n1.Attribute['width'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + w1 + PercentWidth(xn.Attribute['dx'],0));
+           n1.Attribute['width'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5 + w1 + Round(PercentWidth(xn.Attribute['dx'],0)* FontBase));
            n1.Attribute['height'] := IntToStr(Max(StrToIntDef(n1.Attribute['height'],0),
-           StrToIntDef(n2.Attribute['height'],0) - abs(StrToIntDef(xn.Attribute['dy'],0))));
+             round(FontBase *(StrToIntDef(n2.Attribute['height'],0) - abs(StrToIntDef(xn.Attribute['dy'],0))))));
 
 
-           w_dy := Max(w_dy, StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
+           w_dy := Max(w_dy, round(FontBase *(StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0))));
            w5 := 0;
 
-          ImgRect.Left := StrToIntDef(xn.Attribute['x1'],0);
-          ImgRect.Top := StrToIntDef(xn.Attribute['y1'],0);
+          ImgRect.Left := round(FontBase * StrToIntDef(xn.Attribute['x1'],0));
+          ImgRect.Top := round(FontBase * StrToIntDef(xn.Attribute['y1'],0));
+
           if xn.Attribute['x2']='' then
-            ImgRect.Right := PercentWidth(n2.Attribute['width'],0) + ImgRect.Left
+            ImgRect.Right := round(FontBase * PercentWidth(n2.Attribute['width'],0)) + ImgRect.Left
           else
-            ImgRect.Right := StrToIntDef(xn.Attribute['x2'],0);
+            ImgRect.Right := round(FontBase * StrToIntDef(xn.Attribute['x2'],0));
 
           if xn.Attribute['y2']='' then
-            ImgRect.Bottom := StrToIntDef(n2.Attribute['height'],0) + ImgRect.Top
+            ImgRect.Bottom := round(FontBase *StrToIntDef(n2.Attribute['height'],0)) + ImgRect.Top
           else
-            ImgRect.Bottom := StrToIntDef(xn.Attribute['y2'],0);
+            ImgRect.Bottom := round(FontBase *StrToIntDef(xn.Attribute['y2'],0));
 
           n2.Attribute['x'] := IntToStr(StrToIntDef(n2.Attribute['x'],0) + ImgRect.Left);
           n2.Attribute['y'] := IntToStr(StrToIntDef(n2.Attribute['y'],0) + ImgRect.Top);
@@ -1789,10 +1876,17 @@ begin
           LineUp:=Min(LineUp, -StrToIntDef(n2.Attribute['height'],0) + StrToIntDef(xn.Attribute['dy'],0));
           LineDn:=Max(LineDn, StrToIntDef(xn.Attribute['dy'],0));
 
-           if xn.Attribute['scale']<>'' then
+          n2.Attribute['scale'] := xn.Attribute['scale'];
+
+          if (FontBase <> 1) then
+          begin
+            n2.Attribute['scale'] := SvgFloat(StrToFloatDef(n2.Attribute['scale'],1) * FontBase);
+          end;
+
+           if n2.Attribute['scale']<>'' then
            begin
              n2.Attribute['transform'] := 'translate(' +n2.Attribute['x'] +','+n2.Attribute['y']+ ') '
-                                         +'scale('+xn.Attribute['scale']+')';
+                                         +'scale('+n2.Attribute['scale']+')';
              n2.Attribute['x'] := '';
              n2.Attribute['y'] := '';
              if n2.Attribute['filter']<>'' then
@@ -1822,8 +1916,9 @@ begin
            w2 := StrToIntDef(xn.Attribute['height'],0);
            dx := PercentWidth(xn.Attribute['dx'],0);
 
-           if (w1+dx)*ZoomValue > PercentWidth(ParentRight(xn.parent,  RST.Attribute['width']),0) then
-              addzoom := min(addzoom, PercentWidth(ParentRight(xn.parent,  RST.Attribute['width']),0)/ZoomValue / w1);
+          if ((w1+dx)*ZoomValue > PercentWidth(ParentRight(n1,  RST.Attribute['width']),0)- ParentLeft(xn)) then
+             addzoom := min(addzoom,
+                (PercentWidth(ParentRight(n1,  RST.Attribute['width']),0) - ParentLeft(xn))/ZoomValue / (w1+dx));
 
            if (n1.Attribute['width'] <> '0') and
               ((PercentWidth(n1.Attribute['width'],0) + w5 + w1+dx) * ZoomValue > PercentWidth(ParentRight(xn.parent,  RST.Attribute['width']),0))
@@ -2162,7 +2257,7 @@ begin
 
     FBufXml.Add('<?xml version="1.0" encoding="UTF-8"?>');
     FBufXml.Add('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">');
-    FBufXml.Add('<svg xmlns:xlink="http://www.w3.org/1999/xlink" fill="black" font-weight="normal" stroke-width="1"  xmlns="http://www.w3.org/2000/svg" font-size="12" image-rendering="auto" width="1" height="1">');
+    FBufXml.Add('<svg xmlns:xlink="http://www.w3.org/1999/xlink" fill="black" font-weight="normal" stroke-width="1"  xmlns="http://www.w3.org/2000/svg" font-size="12"  width="1" height="1">');
 //    n1:=nil;
     xn := XML;
     zz:='';

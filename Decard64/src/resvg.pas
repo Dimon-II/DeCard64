@@ -6,20 +6,15 @@ uses Vcl.Imaging.pngimage;
 
 const
 
-{$IFDEF WIN32}
-  resvgdll='resvg32.dll'; {Setup as you need}
-{$ENDIF WIN32}
 
-{$IFDEF WIN64}
-  resvgdll='resvg64.dll'; {Setup as you need}
-{$ENDIF WIN64}
+  resvgdll='resvg.dll';
 
 
 const
   RESVG_MAJOR_VERSION = 0;
-  RESVG_MINOR_VERSION = 15;
-  RESVG_PATCH_VERSION = 0;
-  RESVG_VERSION = '0.15.0';
+  RESVG_MINOR_VERSION = 34;
+  RESVG_PATCH_VERSION = 1;
+  RESVG_VERSION = '0.34.1';
 
 type
 
@@ -46,12 +41,6 @@ type
     RESVG_FIT_TO_HEIGHT,
     RESVG_FIT_TO_ZOOM);
 
-  resvg_fit_to = record
-    _type: resvg_fit_to_type;
-    value: single;
-   end;
-
-
   resvg_shape_rendering = (RESVG_SHAPE_RENDERING_OPTIMIZE_SPEED,
    RESVG_SHAPE_RENDERING_CRISP_EDGES,RESVG_SHAPE_RENDERING_GEOMETRIC_PRECISION
    );
@@ -67,24 +56,24 @@ type
    );
 
   resvg_rect = record
-    x: double;
-    y: double;
-    width: double;
-    height: double;
+    x: single;
+    y: single;
+    width: single;
+    height: single;
    end;
 
   resvg_size = record
-    width: double;
-    height: double;
+    width: single;
+    height: single;
    end;
 
   resvg_transform = record
-    a: double;
-    b: double;
-    c: double;
-    d: double;
-    e: double;
-    f: double;
+    a: single;
+    b: single;
+    c: single;
+    d: single;
+    e: single;
+    f: single;
    end;
 
 Type
@@ -99,17 +88,22 @@ Type
  procedure resvg_init_log; cdecl; external resvgdll;
  function resvg_parse_tree_from_data(data:Pchar; len:longword; opt:Presvg_options; tree:Presvg_render_tree):longint; cdecl; external resvgdll;
  function resvg_get_image_viewbox(tree:Presvg_render_tree):resvg_rect; cdecl; external resvgdll;
+ function resvg_get_image_size(tree:Presvg_render_tree):resvg_size; cdecl; external resvgdll;
+
+
  function resvg_node_exists(tree:Presvg_render_tree; id:PChar):boolean; cdecl; external resvgdll;
  function resvg_get_node_bbox(tree:Presvg_render_tree; id:PChar; bbox:Presvg_rect):boolean; cdecl; external resvgdll;
  procedure resvg_tree_destroy(tree:Presvg_render_tree); cdecl; external resvgdll;
- procedure resvg_render(tree:Presvg_render_tree; fit_to:resvg_fit_to; trans: resvg_transform; width, height:integer; Img:Pchar); cdecl; external resvgdll;
+ procedure resvg_render(tree:Presvg_render_tree; trans: resvg_transform; width, height:integer; Img:Pchar); cdecl; external resvgdll;
 
  procedure resvg_options_load_system_fonts(opt:Presvg_options); cdecl; external resvgdll;
  function resvg_options_create():Presvg_options; cdecl; external resvgdll;
  procedure resvg_options_destroy(opt:Presvg_options); cdecl; external resvgdll;
  procedure resvg_options_set_resources_dir(opt:Presvg_options; file_path:PChar); cdecl; external resvgdll;
  procedure resvg_options_set_dpi(opt:Presvg_options; dpi: double); cdecl; external resvgdll;
- procedure resvg_options_set_keep_named_groups(opt:Presvg_options; keep:boolean);cdecl; external resvgdll;
+
+// procedure resvg_options_set_keep_named_groups(opt:Presvg_options; keep:boolean);cdecl; external resvgdll;
+
  procedure resvg_options_set_shape_rendering_mode(opt:Presvg_options;  mode:resvg_shape_rendering );cdecl; external resvgdll;
  procedure resvg_options_set_text_rendering_mode(opt:Presvg_options;  mode:resvg_text_rendering );cdecl; external resvgdll;
  procedure resvg_options_set_image_rendering_mode(opt:Presvg_options;  mode:resvg_image_rendering );cdecl; external resvgdll;
@@ -117,7 +111,6 @@ Type
  function resvg_transform_identity():resvg_transform; cdecl; external resvgdll;
 
  procedure BmpGRBA(BMP: TPNGImage; Img: Pointer);
-
 
 implementation
 

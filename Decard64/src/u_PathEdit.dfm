@@ -10,11 +10,9 @@ object frmPathEdit: TfrmPathEdit
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poMainFormCenter
   OnCreate = FormCreate
   OnMouseWheel = FormMouseWheel
-  PixelsPerInch = 96
   TextHeight = 13
   object splLeft: TSplitter
     Left = 661
@@ -33,6 +31,8 @@ object frmPathEdit: TfrmPathEdit
     Align = alRight
     Caption = 'SVG'
     TabOrder = 0
+    ExplicitLeft = 660
+    ExplicitHeight = 531
     object Splitter1: TSplitter
       Left = 2
       Top = 242
@@ -164,6 +164,7 @@ object frmPathEdit: TfrmPathEdit
       OnKeyPress = sgDotsKeyPress
       OnSelectCell = sgDotsSelectCell
       OnSetEditText = sgDotsSetEditText
+      ExplicitHeight = 181
       ColWidths = (
         48
         48
@@ -305,6 +306,7 @@ object frmPathEdit: TfrmPathEdit
       ItemHeight = 13
       TabOrder = 3
       Visible = False
+      ExplicitTop = 394
     end
     object mePATH: TSynEdit
       Left = 2
@@ -325,11 +327,31 @@ object frmPathEdit: TfrmPathEdit
       Gutter.Font.Height = -11
       Gutter.Font.Name = 'Consolas'
       Gutter.Font.Style = []
+      Gutter.Bands = <
+        item
+          Kind = gbkMarks
+          Width = 13
+        end
+        item
+          Kind = gbkLineNumbers
+        end
+        item
+          Kind = gbkFold
+        end
+        item
+          Kind = gbkTrackChanges
+        end
+        item
+          Kind = gbkMargin
+          Width = 3
+        end>
       Highlighter = SynGeneralSyn1
       Lines.Strings = (
         'M 0,0')
+      SelectedColor.Alpha = 0.400000005960464500
       WordWrap = True
       OnChange = mePATHChange
+      ExplicitTop = 244
     end
     object Panel2: TPanel
       Left = 2
@@ -339,6 +361,7 @@ object frmPathEdit: TfrmPathEdit
       Align = alBottom
       BevelOuter = bvNone
       TabOrder = 5
+      ExplicitTop = 498
       object btnApply: TButton
         AlignWithMargins = True
         Left = 285
@@ -389,6 +412,8 @@ object frmPathEdit: TfrmPathEdit
     ParentBackground = False
     ParentCtl3D = False
     TabOrder = 1
+    ExplicitWidth = 657
+    ExplicitHeight = 531
     object Draw: TPaintBox
       AlignWithMargins = True
       Left = 9
@@ -620,9 +645,6 @@ object frmPathEdit: TfrmPathEdit
     end
   end
   object SynGeneralSyn1: TSynGeneralSyn
-    Options.AutoDetectEnabled = False
-    Options.AutoDetectLineLimit = 0
-    Options.Visible = False
     DetectPreprocessor = False
     Left = 256
     Top = 352
