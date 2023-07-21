@@ -2,36 +2,42 @@ object formGlyph: TformGlyph
   Left = 192
   Top = 171
   Caption = 'Glyph font'
-  ClientHeight = 441
-  ClientWidth = 811
+  ClientHeight = 352
+  ClientWidth = 648
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -14
+  Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
   FormStyle = fsStayOnTop
-  OldCreateOrder = False
   Position = poMainFormCenter
   OnCreate = FormCreate
-  PixelsPerInch = 120
-  TextHeight = 17
+  TextHeight = 13
   object Image1: TImage
-    Left = 131
-    Top = 131
-    Width = 131
-    Height = 131
+    Left = 105
+    Top = 105
+    Width = 105
+    Height = 105
+    Margins.Left = 2
+    Margins.Top = 2
+    Margins.Right = 2
+    Margins.Bottom = 2
   end
   object Grid: TDrawGrid
     Left = 0
-    Top = 47
-    Width = 811
-    Height = 394
+    Top = 38
+    Width = 648
+    Height = 314
+    Margins.Left = 2
+    Margins.Top = 2
+    Margins.Right = 2
+    Margins.Bottom = 2
     Align = alClient
     ColCount = 16
     Ctl3D = False
-    DefaultColWidth = 24
-    DefaultRowHeight = 36
+    DefaultColWidth = 19
+    DefaultRowHeight = 29
     FixedCols = 0
     RowCount = 1
     FixedRows = 0
@@ -41,27 +47,42 @@ object formGlyph: TformGlyph
     TabOrder = 0
     OnDblClick = miCopyCharClick
     OnDrawCell = GridDrawCell
+    ExplicitWidth = 652
+    ExplicitHeight = 315
   end
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 811
-    Height = 47
+    Width = 648
+    Height = 38
+    Margins.Left = 2
+    Margins.Top = 2
+    Margins.Right = 2
+    Margins.Bottom = 2
     Align = alTop
     TabOrder = 1
+    ExplicitWidth = 652
     object cbFont: TComboBox
-      Left = 115
-      Top = 10
-      Width = 357
+      Left = 92
+      Top = 8
+      Width = 286
       Height = 25
+      Margins.Left = 2
+      Margins.Top = 2
+      Margins.Right = 2
+      Margins.Bottom = 2
       TabOrder = 0
       OnChange = cbFontChange
     end
     object BitBtn1: TBitBtn
-      Left = 8
-      Top = 7
-      Width = 98
-      Height = 32
+      Left = 6
+      Top = 6
+      Width = 79
+      Height = 25
+      Margins.Left = 2
+      Margins.Top = 2
+      Margins.Right = 2
+      Margins.Bottom = 2
       Caption = 'Font'
       Glyph.Data = {
         F6000000424DF600000000000000760000002800000010000000100000000100
@@ -76,10 +97,14 @@ object formGlyph: TformGlyph
       OnClick = BitBtn1Click
     end
     object BitBtn2: TBitBtn
-      Left = 481
-      Top = 7
-      Width = 126
-      Height = 32
+      Left = 385
+      Top = 6
+      Width = 101
+      Height = 25
+      Margins.Left = 2
+      Margins.Top = 2
+      Margins.Right = 2
+      Margins.Bottom = 2
       Caption = 'Copy &&-code '
       Glyph.Data = {
         F6000000424DF600000000000000760000002800000010000000100000000100
@@ -94,10 +119,14 @@ object formGlyph: TformGlyph
       OnClick = miCopyCharClick
     end
     object BitBtn3: TBitBtn
-      Left = 616
-      Top = 7
-      Width = 125
-      Height = 32
+      Left = 493
+      Top = 6
+      Width = 100
+      Height = 25
+      Margins.Left = 2
+      Margins.Top = 2
+      Margins.Right = 2
+      Margins.Bottom = 2
       Caption = 'Copy <tag/>'
       Glyph.Data = {
         F6000000424DF600000000000000760000002800000010000000100000000100

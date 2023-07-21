@@ -26,16 +26,32 @@ object SynEditFrame: TSynEditFrame
     Gutter.Font.Height = -11
     Gutter.Font.Name = 'Courier New'
     Gutter.Font.Style = []
+    Gutter.Font.Quality = fqClearTypeNatural
     Gutter.ShowLineNumbers = True
+    Gutter.Bands = <
+      item
+        Kind = gbkMarks
+        Width = 13
+      end
+      item
+        Kind = gbkLineNumbers
+      end
+      item
+        Kind = gbkFold
+      end
+      item
+        Kind = gbkTrackChanges
+      end
+      item
+        Kind = gbkMargin
+        Width = 3
+      end>
     Highlighter = SynXMLSyn1
     Options = [eoAutoIndent, eoDragDropEditing, eoGroupUndo, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
     SearchEngine = SynEditSearch1
+    SelectedColor.Alpha = 0.400000005960464500
     WordWrap = True
     RemovedKeystrokes = <
-      item
-        Command = ecDeleteLastChar
-        ShortCut = 8200
-      end
       item
         Command = ecLineBreak
         ShortCut = 8205
@@ -283,9 +299,6 @@ object SynEditFrame: TSynEditFrame
     end
   end
   object SynXMLSyn1: TSynXMLSyn
-    Options.AutoDetectEnabled = False
-    Options.AutoDetectLineLimit = 0
-    Options.Visible = False
     WantBracesParsed = False
     Left = 272
     Top = 56

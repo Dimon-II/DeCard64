@@ -62,7 +62,12 @@ begin
     wc:=copy(ws,ACol+1,1)
   else
     wc:=' ';
-  sz:=GetTextSize(Grid.Canvas.Handle, PWideChar(wc),1);
+
+//  sz:=GetTextSize(Grid.Canvas.Handle, PWideChar(wc),1);
+
+  sz.cx:=24;
+  sz.cy:=24;
+
 
   if Grid.ColWidths[acol]<sz.cx+3 then
     Grid.ColWidths[acol]:=sz.cx+3;
