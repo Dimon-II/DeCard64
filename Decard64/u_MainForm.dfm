@@ -10,7 +10,6 @@ object MainForm: TMainForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   ShowHint = True
   OnCloseQuery = FormCloseQuery
@@ -19,14 +18,13 @@ object MainForm: TMainForm
   OnMouseWheel = FormMouseWheel
   OnResize = FormResize
   OnShow = FormShow
-  PixelsPerInch = 96
   TextHeight = 13
   object pcMain: TPageControl
     Left = 0
     Top = 0
     Width = 1097
     Height = 624
-    ActivePage = tsProject
+    ActivePage = tsDesigner
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -52,6 +50,7 @@ object MainForm: TMainForm
         ShowCaptions = True
         TabOrder = 0
         Transparent = True
+        ExplicitWidth = 1085
         object tbOpenProject: TToolButton
           Left = 0
           Top = 0
@@ -121,6 +120,7 @@ object MainForm: TMainForm
         Align = alTop
         Caption = 'Folders / files'
         TabOrder = 1
+        ExplicitWidth = 1085
         object lblCfgRoot: TLabel
           Left = 13
           Top = 24
@@ -852,6 +852,7 @@ object MainForm: TMainForm
         BevelOuter = bvNone
         ParentColor = True
         TabOrder = 2
+        ExplicitWidth = 1085
         object pnProjectSize: TPanel
           Left = 0
           Top = 0
@@ -1273,7 +1274,7 @@ object MainForm: TMainForm
             Caption = 'Processing: Set of cards'
             TabOrder = 3
             object Label6: TLabel
-              Left = 389
+              Left = 304
               Top = 21
               Width = 12
               Height = 13
@@ -1338,22 +1339,28 @@ object MainForm: TMainForm
               Height = 13
               Caption = 'Card size:'
             end
+            object lblRange: TLabel
+              Left = 196
+              Top = 19
+              Width = 31
+              Height = 13
+              Caption = 'Range'
+            end
             object chbMirror: TCheckBox
-              Left = 144
-              Top = 18
-              Width = 143
+              Left = 145
+              Top = 17
+              Width = 54
               Height = 17
               Hint = 'Change order for back side'
-              Caption = 'Mirror order'
+              Caption = 'Mirror'
               TabOrder = 1
               OnClick = chbMirrorClick
             end
             object seFrom: TSpinEdit
-              Left = 321
+              Left = 230
               Top = 15
               Width = 64
               Height = 22
-              Enabled = False
               MaxValue = 32
               MinValue = 1
               TabOrder = 2
@@ -1361,32 +1368,22 @@ object MainForm: TMainForm
               OnChange = seFromChange
             end
             object seTo: TSpinEdit
-              Left = 405
+              Left = 323
               Top = 15
               Width = 64
               Height = 22
-              Enabled = False
               MaxValue = 32
               MinValue = 1
               TabOrder = 3
               Value = 1
             end
-            object chbRange: TCheckBox
-              Left = 251
-              Top = 18
-              Width = 65
-              Height = 17
-              Caption = 'Range'
-              TabOrder = 4
-              OnClick = chbRangeClick
-            end
             object btnAll: TButton
-              Left = 474
+              Left = 392
               Top = 14
               Width = 75
               Height = 24
               Caption = 'All'
-              TabOrder = 5
+              TabOrder = 4
               OnClick = btnAllClick
             end
             object cbCount: TComboBox
@@ -1406,7 +1403,7 @@ object MainForm: TMainForm
               Width = 216
               Height = 21
               Hint = 'Column with count of copies (default 1)'
-              TabOrder = 6
+              TabOrder = 5
               Items.Strings = (
                 '[1]'
                 '[2]')
@@ -1418,7 +1415,7 @@ object MainForm: TMainForm
               Height = 21
               Hint = 'Column with count of copies (default 1)'
               ItemIndex = 0
-              TabOrder = 7
+              TabOrder = 6
               Text = '-1'
               Items.Strings = (
                 '-1'
@@ -1432,7 +1429,7 @@ object MainForm: TMainForm
               Width = 76
               Height = 21
               MaxLength = 3
-              TabOrder = 8
+              TabOrder = 7
             end
             object seScale1: TSpinEdit
               Left = 697
@@ -1442,7 +1439,7 @@ object MainForm: TMainForm
               Hint = 'Height'
               MaxValue = 1000
               MinValue = 1
-              TabOrder = 9
+              TabOrder = 8
               Value = 1
               OnChange = seCountXChange
             end
@@ -1460,7 +1457,7 @@ object MainForm: TMainForm
               MaxValue = 1000
               MinValue = 1
               ParentFont = False
-              TabOrder = 10
+              TabOrder = 9
               Value = 1
               OnChange = seCountXChange
             end
@@ -1470,6 +1467,14 @@ object MainForm: TMainForm
               Width = 76
               Height = 17
               Caption = 'Flip duplex'
+              TabOrder = 10
+            end
+            object chbSplit: TCheckBox
+              Left = 473
+              Top = 17
+              Width = 89
+              Height = 17
+              Caption = 'Filename split'
               TabOrder = 11
             end
           end
@@ -1482,6 +1487,7 @@ object MainForm: TMainForm
           Align = alClient
           Caption = 'Sheet'
           TabOrder = 1
+          ExplicitWidth = 228
           object imgSheet: TImage
             Left = 9
             Top = 15
@@ -1519,6 +1525,8 @@ object MainForm: TMainForm
         Align = alBottom
         Caption = 'Rendering'
         TabOrder = 3
+        ExplicitTop = 544
+        ExplicitWidth = 1085
         DesignSize = (
           1089
           51)
@@ -1662,6 +1670,7 @@ object MainForm: TMainForm
         Color = clBtnFace
         ReadOnly = True
         TabOrder = 4
+        ExplicitHeight = 152
       end
       object meLog: TMemo
         Left = 417
@@ -1676,6 +1685,8 @@ object MainForm: TMainForm
         ReadOnly = True
         ScrollBars = ssVertical
         TabOrder = 5
+        ExplicitWidth = 668
+        ExplicitHeight = 152
       end
     end
     object tsDesigner: TTabSheet
@@ -1743,6 +1754,66 @@ object MainForm: TMainForm
           inherited pscrTemplate: TPageScroller
             Width = 281
             ExplicitWidth = 281
+            inherited tbrTemplate: TToolBar
+              Width = 264
+              Height = 46
+              ButtonHeight = 44
+              ButtonWidth = 32
+              ExplicitWidth = 264
+              ExplicitHeight = 46
+              inherited ToolButton37: TToolButton
+                ExplicitWidth = 32
+                ExplicitHeight = 44
+              end
+              inherited ToolButton3: TToolButton
+                Left = 32
+                ExplicitLeft = 32
+                ExplicitHeight = 44
+              end
+              inherited btnNewObject: TToolButton
+                Left = 40
+                ExplicitLeft = 40
+                ExplicitWidth = 32
+                ExplicitHeight = 44
+              end
+              inherited tbCopyTag: TToolButton
+                Left = 72
+                ExplicitLeft = 72
+                ExplicitWidth = 32
+                ExplicitHeight = 44
+              end
+              inherited btn10: TToolButton
+                Left = 104
+                ExplicitLeft = 104
+                ExplicitWidth = 32
+                ExplicitHeight = 44
+              end
+              inherited btnUp: TToolButton
+                Left = 136
+                ExplicitLeft = 136
+                ExplicitWidth = 32
+                ExplicitHeight = 44
+              end
+              inherited btnDown: TToolButton
+                Left = 168
+                ExplicitLeft = 168
+                ExplicitWidth = 32
+                ExplicitHeight = 44
+              end
+              inherited btnSearch1: TToolButton
+                Left = 200
+                ExplicitLeft = 200
+                ExplicitWidth = 32
+                ExplicitHeight = 44
+              end
+              inherited tbXML: TToolButton
+                Left = 232
+                OnClick = SVGFrametbXMLClick
+                ExplicitLeft = 232
+                ExplicitWidth = 32
+                ExplicitHeight = 44
+              end
+            end
           end
           inherited pnFindRemind: TPanel
             Width = 281
@@ -1889,12 +1960,27 @@ object MainForm: TMainForm
             inherited Panel1: TPanel
               Width = 315
               ExplicitWidth = 315
+              inherited Panel2: TPanel
+                inherited cbAtrShow: TComboBox
+                  Height = 21
+                end
+              end
               inherited tbrInspector: TToolBar
                 Width = 227
                 ExplicitWidth = 227
                 inherited tbResize: TToolButton
                   OnClick = InspectorFrametbResizeClick
                 end
+              end
+            end
+          end
+          inherited tsReplace: TTabSheet
+            ExplicitTop = 24
+            ExplicitHeight = 533
+            inherited ReplaceFrame: TSynEditFrame
+              Height = 533
+              inherited SynEditor: TSynEdit
+                Height = 505
               end
             end
           end
@@ -2188,9 +2274,62 @@ object MainForm: TMainForm
         end
         inherited pscrTemplate: TPageScroller
           inherited tbrTemplate: TToolBar
-            Height = 23
-            ButtonHeight = 21
+            Width = 264
+            Height = 46
+            ButtonHeight = 44
+            ButtonWidth = 32
             ExplicitHeight = 23
+            inherited ToolButton37: TToolButton
+              ExplicitWidth = 32
+              ExplicitHeight = 44
+            end
+            inherited ToolButton3: TToolButton
+              Left = 32
+              ExplicitLeft = 32
+              ExplicitHeight = 44
+            end
+            inherited btnNewObject: TToolButton
+              Left = 40
+              ExplicitLeft = 40
+              ExplicitWidth = 32
+              ExplicitHeight = 44
+            end
+            inherited tbCopyTag: TToolButton
+              Left = 72
+              ExplicitLeft = 72
+              ExplicitWidth = 32
+              ExplicitHeight = 44
+            end
+            inherited btn10: TToolButton
+              Left = 104
+              ExplicitLeft = 104
+              ExplicitWidth = 32
+              ExplicitHeight = 44
+            end
+            inherited btnUp: TToolButton
+              Left = 136
+              ExplicitLeft = 136
+              ExplicitWidth = 32
+              ExplicitHeight = 44
+            end
+            inherited btnDown: TToolButton
+              Left = 168
+              ExplicitLeft = 168
+              ExplicitWidth = 32
+              ExplicitHeight = 44
+            end
+            inherited btnSearch1: TToolButton
+              Left = 200
+              ExplicitLeft = 200
+              ExplicitWidth = 32
+              ExplicitHeight = 44
+            end
+            inherited tbXML: TToolButton
+              Left = 232
+              ExplicitLeft = 232
+              ExplicitWidth = 32
+              ExplicitHeight = 44
+            end
           end
         end
         inherited pnFindRemind: TPanel
@@ -2241,6 +2380,7 @@ object MainForm: TMainForm
           ExplicitWidth = 642
           ExplicitHeight = 596
           inherited tsAtr: TTabSheet
+            ExplicitTop = 24
             ExplicitWidth = 634
             ExplicitHeight = 568
             inherited splInspector: TSplitter
@@ -2264,9 +2404,24 @@ object MainForm: TMainForm
             inherited Panel1: TPanel
               Width = 634
               ExplicitWidth = 634
+              inherited Panel2: TPanel
+                inherited cbAtrShow: TComboBox
+                  Height = 21
+                end
+              end
               inherited tbrInspector: TToolBar
                 Width = 546
                 ExplicitWidth = 546
+              end
+            end
+          end
+          inherited tsReplace: TTabSheet
+            ExplicitTop = 24
+            ExplicitHeight = 533
+            inherited ReplaceFrame: TSynEditFrame
+              Height = 533
+              inherited SynEditor: TSynEdit
+                Height = 505
               end
             end
           end
@@ -2557,6 +2712,8 @@ object MainForm: TMainForm
     Align = alBottom
     TabOrder = 1
     Visible = False
+    ExplicitTop = 623
+    ExplicitWidth = 1093
   end
   object dlgTextFind: TFindDialog
     OnClose = dlgTextFindClose

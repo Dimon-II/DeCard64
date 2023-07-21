@@ -14,13 +14,11 @@ object CellEditForm: TCellEditForm
   Font.Name = 'Tahoma'
   Font.Style = []
   FormStyle = fsStayOnTop
-  OldCreateOrder = False
   Position = poMainFormCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnDeactivate = FormDeactivate
   OnResize = FormResize
-  PixelsPerInch = 96
   TextHeight = 13
   object Splitter2: TSplitter
     Left = 492
@@ -38,6 +36,8 @@ object CellEditForm: TCellEditForm
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitTop = 237
+    ExplicitWidth = 780
     DesignSize = (
       784
       42)
@@ -206,7 +206,7 @@ object CellEditForm: TCellEditForm
       ParentFont = False
     end
     object btnApply: TButton
-      Left = 620
+      Left = 612
       Top = 9
       Width = 75
       Height = 25
@@ -221,9 +221,10 @@ object CellEditForm: TCellEditForm
       ParentFont = False
       TabOrder = 0
       OnClick = btnApplyClick
+      ExplicitLeft = 608
     end
     object btnCancel: TButton
-      Left = 701
+      Left = 693
       Top = 9
       Width = 75
       Height = 25
@@ -237,6 +238,7 @@ object CellEditForm: TCellEditForm
       Font.Style = []
       ParentFont = False
       TabOrder = 1
+      ExplicitLeft = 689
     end
     object chbScrollPreview: TCheckBox
       Left = 82
@@ -268,12 +270,13 @@ object CellEditForm: TCellEditForm
       Constraints.MinWidth = 340
       OnKeyDown = CellEditFrameSynEditorKeyDown
       OnChange = CellEditFrameSynEditorChange
-      ExplicitWidth = 492
-      ExplicitHeight = 210
+      OnGutterGetText = CellEditFrameSynEditorGutterGetText
+      ExplicitWidth = 488
+      ExplicitHeight = 209
     end
     inherited pscrSysEdit: TPageScroller
       Width = 492
-      ExplicitWidth = 492
+      ExplicitWidth = 488
       inherited tbrEditor: TToolBar
         inherited ToolButton3: TToolButton
           Hint = 'Add to Common (Ctrl+0)'
@@ -290,9 +293,11 @@ object CellEditForm: TCellEditForm
     Width = 289
     Height = 238
     Hint = 'Restore unnecessarily translated macros, parentheses analysis.'
-    ActivePage = tsTranslate
+    ActivePage = tsCommon
     Align = alRight
     TabOrder = 2
+    ExplicitLeft = 491
+    ExplicitHeight = 237
     object tsCommon: TTabSheet
       Caption = 'Common'
       object lbCommon: TListBox
@@ -309,6 +314,7 @@ object CellEditForm: TCellEditForm
         OnDragDrop = lbCommonDragDrop
         OnDragOver = lbCommonDragOver
         OnMouseDown = lbCommonMouseDown
+        ExplicitHeight = 209
       end
       object lbCommonIdx: TListBox
         Left = 0
@@ -330,6 +336,7 @@ object CellEditForm: TCellEditForm
           'Ctrl-8'
           'Ctrl-9')
         TabOrder = 1
+        ExplicitHeight = 209
       end
     end
     object tsMacros: TTabSheet
@@ -393,7 +400,25 @@ object CellEditForm: TCellEditForm
         Gutter.Font.Height = -11
         Gutter.Font.Name = 'Courier New'
         Gutter.Font.Style = []
-        Gutter.Width = 0
+        Gutter.Font.Quality = fqClearTypeNatural
+        Gutter.Bands = <
+          item
+            Kind = gbkMarks
+            Width = 13
+          end
+          item
+            Kind = gbkLineNumbers
+          end
+          item
+            Kind = gbkFold
+          end
+          item
+            Kind = gbkTrackChanges
+          end
+          item
+            Kind = gbkMargin
+            Width = 3
+          end>
         Highlighter = CellEditFrame.SynXMLSyn1
         Lines.Strings = (
           'Known tags:'
@@ -411,6 +436,7 @@ object CellEditForm: TCellEditForm
           '<bkg src="bitmap file" or any rect attributes />')
         Options = [eoAutoIndent, eoEnhanceEndKey, eoGroupUndo, eoScrollPastEol, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
         ReadOnly = True
+        SelectedColor.Alpha = 0.400000005960464500
       end
     end
     object tsWrap: TTabSheet
@@ -437,7 +463,25 @@ object CellEditForm: TCellEditForm
         Gutter.Font.Height = -11
         Gutter.Font.Name = 'Courier New'
         Gutter.Font.Style = []
-        Gutter.Width = 0
+        Gutter.Font.Quality = fqClearTypeNatural
+        Gutter.Bands = <
+          item
+            Kind = gbkMarks
+            Width = 13
+          end
+          item
+            Kind = gbkLineNumbers
+          end
+          item
+            Kind = gbkFold
+          end
+          item
+            Kind = gbkTrackChanges
+          end
+          item
+            Kind = gbkMargin
+            Width = 3
+          end>
         Highlighter = CellEditFrame.SynXMLSyn1
         Lines.Strings = (
           '<br/>'
@@ -445,6 +489,7 @@ object CellEditForm: TCellEditForm
           '<p/>'
           '<p ')
         Options = [eoAutoIndent, eoEnhanceEndKey, eoGroupUndo, eoScrollPastEol, eoShowScrollHint, eoShowSpecialChars, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
+        SelectedColor.Alpha = 0.400000005960464500
       end
     end
     object tsTranslate: TTabSheet
@@ -510,18 +555,34 @@ object CellEditForm: TCellEditForm
         Gutter.Font.Height = -11
         Gutter.Font.Name = 'Courier New'
         Gutter.Font.Style = []
+        Gutter.Font.Quality = fqClearTypeNatural
         Gutter.ShowLineNumbers = True
+        Gutter.Bands = <
+          item
+            Kind = gbkMarks
+            Width = 13
+          end
+          item
+            Kind = gbkLineNumbers
+          end
+          item
+            Kind = gbkFold
+          end
+          item
+            Kind = gbkTrackChanges
+          end
+          item
+            Kind = gbkMargin
+            Width = 3
+          end>
         Highlighter = CellEditFrame.SynXMLSyn1
         Options = [eoAutoIndent, eoDragDropEditing, eoGroupUndo, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
         SearchEngine = CellEditFrame.SynEditSearch1
+        SelectedColor.Alpha = 0.400000005960464500
         WordWrap = True
         OnChange = seTranslateChange
         OnGutterGetText = seTranslateGutterGetText
         RemovedKeystrokes = <
-          item
-            Command = ecDeleteLastChar
-            ShortCut = 8200
-          end
           item
             Command = ecLineBreak
             ShortCut = 8205

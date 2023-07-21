@@ -10,10 +10,8 @@ object XMLEditForm: TXMLEditForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poMainFormCenter
   OnCreate = FormCreate
-  PixelsPerInch = 96
   TextHeight = 13
   object pnBottom: TPanel
     Left = 0
@@ -23,6 +21,8 @@ object XMLEditForm: TXMLEditForm
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
+    ExplicitTop = 399
+    ExplicitWidth = 620
     DesignSize = (
       624
       41)
@@ -36,6 +36,7 @@ object XMLEditForm: TXMLEditForm
       Default = True
       ModalResult = 1
       TabOrder = 0
+      ExplicitLeft = 456
     end
     object btnCancel: TButton
       Left = 541
@@ -47,6 +48,7 @@ object XMLEditForm: TXMLEditForm
       Caption = 'Cancel'
       ModalResult = 2
       TabOrder = 1
+      ExplicitLeft = 537
     end
   end
   object pnEdit: TPanel
@@ -80,8 +82,8 @@ object XMLEditForm: TXMLEditForm
       inherited SynEditor: TSynEdit
         Width = 622
         Height = 215
-        ExplicitWidth = 622
-        ExplicitHeight = 215
+        ExplicitWidth = 618
+        ExplicitHeight = 214
       end
       inherited pscrSysEdit: TPageScroller
         Width = 622
@@ -109,6 +111,25 @@ object XMLEditForm: TXMLEditForm
       Gutter.Font.Height = -11
       Gutter.Font.Name = 'Courier New'
       Gutter.Font.Style = []
+      Gutter.Font.Quality = fqClearTypeNatural
+      Gutter.Bands = <
+        item
+          Kind = gbkMarks
+          Width = 13
+        end
+        item
+          Kind = gbkLineNumbers
+        end
+        item
+          Kind = gbkFold
+        end
+        item
+          Kind = gbkTrackChanges
+        end
+        item
+          Kind = gbkMargin
+          Width = 3
+        end>
       Highlighter = SynEditFrame.SynXMLSyn1
       Lines.Strings = (
         'Known tags:'
@@ -125,6 +146,9 @@ object XMLEditForm: TXMLEditForm
         '<use src="clipart.svg#ref" width="xxx" height="yyy"  dy='#39'...'#39'/>'
         '<bkg src="bitmap file" or any rect attributes />')
       ReadOnly = True
+      SelectedColor.Alpha = 0.400000005960464500
+      ExplicitTop = 248
+      ExplicitWidth = 618
     end
   end
 end

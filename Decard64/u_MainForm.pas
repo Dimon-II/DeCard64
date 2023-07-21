@@ -102,7 +102,6 @@ type
     chbMirror: TCheckBox;
     seFrom: TSpinEdit;
     seTo: TSpinEdit;
-    chbRange: TCheckBox;
     btnAll: TButton;
     cbCount: TComboBox;
     cbFileName: TComboBox;
@@ -224,6 +223,8 @@ type
     Label7: TLabel;
     edPageBlank: TEdit;
     sbPageBlank: TSpeedButton;
+    lblRange: TLabel;
+    chbSplit: TCheckBox;
     procedure sbOpenRootClick(Sender: TObject);
     procedure sbOpenTextClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -280,7 +281,6 @@ type
     procedure pcMainChanging(Sender: TObject; var AllowChange: Boolean);
     procedure ClipartFrametreeTemplateChange(Sender: TObject; Node: TTreeNode);
     procedure btnAllClick(Sender: TObject);
-    procedure chbRangeClick(Sender: TObject);
     procedure pcMainChange(Sender: TObject);
     procedure aShowExecute(Sender: TObject);
     procedure aPrevExecute(Sender: TObject);
@@ -329,6 +329,7 @@ type
     procedure FillSelection1Click(Sender: TObject);
     procedure btnBleed2mmClick(Sender: TObject);
     procedure sbPageBlankClick(Sender: TObject);
+    procedure SVGFrametbXMLClick(Sender: TObject);
   private
     { Private declarations }
     FSel:TRect;
@@ -365,6 +366,8 @@ type
     procedure PDFText(AXML:string; aPDF:TPdfDocument);
     procedure RenderRow(ARow:integer);
     procedure GridSort(ACol:integer;Srt:boolean);
+    procedure SaveXML(AFilename, AXML:string);
+    function LoadXML(AFilename:string):string;
   end;
 
 
@@ -667,7 +670,6 @@ procedure TMainForm.btnAllClick(Sender: TObject);
 begin
   seFrom.Value := 1;
   seTo.Value := sgText.RowCount-1;
-  chbRange.Checked := False;
 end;
 
 procedure TMainForm.btnBleed2mmClick(Sender: TObject);
@@ -691,7 +693,7 @@ end;
 procedure TMainForm.btnProcessClick(Sender: TObject);
 var i, j, k, cnt, n, w, h:Integer;
   x1,x2:TXML_Doc;
-  s,sx1,sxb1, fmt, fn, DPI,ZM :string;
+  s,sx1,sxb1, fmt, fn, DPI,ZM, OldFileName :string;
   f:TFileStream;
   dlt, dltBK:TPoint;
 
@@ -751,7 +753,7 @@ var
     PrevFile := PrevFile + '[' + result + ']';
   end;
 
-  procedure SaveRender;
+  procedure SaveRender(FileBreak: boolean);
   var
     ii: Integer;
     s: string;
@@ -829,8 +831,11 @@ var
         lPdf.CreateOrGetImage(imgRender.Picture.Bitmap, @Box);
       end;
 
-      if (StrToIntDef(edPageLimit.Text, 0) > 0) and
-        (StrToIntDef(edPageLimit.Text, 0) = PdfPages) then
+      if ((StrToIntDef(edPageLimit.Text, 0) > 0) and (StrToIntDef(edPageLimit.Text, 0) = PdfPages))
+      or (chbSplit.Checked and (i < sgText.RowCount - 1) and FileBreak and
+          (ResultName(cbFileName.Text, sgText.RowCount - 1, i, j)
+            <> ResultName(cbFileName.Text, sgText.RowCount - 1, i+1, j)))
+      then
       begin
         lPdf.SaveToFile(edCfgRoot.Text + edCfgResult.Text +
           CheckNewFile(ChangeFileExt(fn, '.' + cbOutFormat.Text)));
@@ -1095,12 +1100,15 @@ begin
     sx1 := x1.xml;
     N := 0;
     fmt := Stringofchar('0', length(IntToStr(sgText.RowCount)));
+
+
     for i := 1 to sgText.RowCount - 1 do
     begin
       Application.ProcessMessages;
 
-      if chbRange.Checked and ((i < seFrom.Value) or (i > seTo.Value)) then
+      if (i < seFrom.Value) or (i > seTo.Value) then
         Continue;
+
       if StopFlag then
         Abort;
       // StartAnalitics('Process');
@@ -1186,19 +1194,33 @@ begin
 
         x1.Nodes.Last.Add('g').xml := x2.Nodes.Last.xml;
         inc(N);
+
+
         if (N = seCountX.Value * seCountY.Value) or
           ((i = sgText.RowCount - 1) and (j = Cnt)) or
-          (chbRange.Checked and (i = seTo.Value) and (j = Cnt)) then
+          ((i = seTo.Value) and (j = Cnt))
+        then
         begin
-          SaveRender;
+          SaveRender(j = Cnt);
           N := 0;
         end;
       end;
+
+      if (N > 0) and chbSplit.Checked and (i < sgText.RowCount - 1) and
+      (ResultName(cbFileName.Text, sgText.RowCount - 1, i, 0) <> ResultName(cbFileName.Text, sgText.RowCount -1 , i+1, 0))
+      then
+      begin
+        SaveRender(True);
+        N := 0;
+      end;
+
+
       // StopAnalitics('Process');
       // ShowAnalitics;
     end;
+
     if N > 0 then
-      SaveRender;
+      SaveRender(True);
 
     x1.Free;
     x2.Free;
@@ -1441,12 +1463,6 @@ begin
    DrawSheet;
 end;
 
-procedure TMainForm.chbRangeClick(Sender: TObject);
-begin
-  seFrom.Enabled := chbRange.Checked;
-  seTo.Enabled := chbRange.Checked;
-end;
-
 procedure TMainForm.chbSaveTempClick(Sender: TObject);
 begin
   if chbSaveTemp.Checked then
@@ -1519,7 +1535,7 @@ begin
   begin
     Clipart.Node['svg'].Attribute['xmlns:dekart']:='http://127.0.0.1';
     edCfgClipart.Text := ExtractRelativePath(edCfgRoot.Text, MainData.dlgSaveSVG.FileName);
-    Clipart.SaveToFile(MainData.dlgSaveSVG.FileName);
+    SaveXML(MainData.dlgSaveSVG.FileName, Clipart.xml);
   end;
 
 end;
@@ -2174,6 +2190,35 @@ begin
     FSel.Top := n;
   end;
   InspectorFrame.SetSize(FSel);
+end;
+
+function TMainForm.LoadXML(AFilename:string): string;
+var
+  sl:TStringList;
+  s:string;
+  ps:integer;
+begin
+  sl:=TStringList.Create;
+  try
+    sl.LoadFromFile(AFilename,TEncoding.UTF8);
+    s := sl.text;
+
+    while True do
+    begin
+      ps:=Pos('^M'#13#10,s);
+      if ps=0 then break;
+      delete(s,ps+2,2);
+    end;
+    while True do
+    begin
+      ps:=Pos('dekart:replace="'#13#10,s);
+      if ps=0 then break;
+      delete(s,ps+16,2);
+    end;
+  finally
+    Result := s;
+    sl.free;
+  end;
 end;
 
 procedure TMainForm.miApplysortingClick(Sender: TObject);
@@ -2928,6 +2973,45 @@ begin
 
 end;
 
+procedure TMainForm.SaveXML(AFilename, AXML: string);
+var
+  sl:TStringList;
+  i,j,k:integer;
+  s,sp,s1:string;
+begin
+  try
+    sl:=TStringList.Create;
+    sl.Text := AXML;
+
+    for i := sl.Count-1 downto 0 do
+    begin
+      s:=sl[i];
+      if (Copy(Trim(s), 1, 1)='<') and (Copy(Trim(s), 2, 1)<>'/') then
+      begin
+        sp := Copy(s,1,Pos('<',s)-1) + StringOfChar(' ',Pos(' ', Trim(s) ));
+        s1 := Copy(s,Pos('>', s+'>')+1,Length(s));
+        s := Copy(s,1, Pos('>', s+'>'));
+        k:=0;
+        for j := length(s) downto 1 do
+          if s[j]='"' then
+          begin
+            k:=k+1;
+            if (k>1) and (k mod 2 = 1) and (s[j+1]= ' ') then
+              s := copy(s,1,j) + #13#10 + sp + copy(s,j+2,length(s));
+          end;
+          sl[i] := s + s1;
+      end;
+    end;
+    sl.text := StringReplace(sl.text,'^M','^M'^M,[rfReplaceAll]);
+    sl.text := StringReplace(sl.text,'dekart:replace="','dekart:replace="'^M,[rfReplaceAll]);
+
+    sl.SaveToFile(AFilename, TEncoding.UTF8);
+  finally
+    sl.free
+
+  end;
+end;
+
 procedure TMainForm.sbOpenClipartClick(Sender: TObject);
 begin
   MainData.dlgOpenSVG.Title := 'Open SVG-clipart';
@@ -2937,7 +3021,7 @@ begin
   if MainData.dlgOpenSVG.Execute then
   begin
     edCfgClipart.Text := ExtractRelativePath(edCfgRoot.Text, MainData.dlgOpenSVG.FileName);
-    Clipart.LoadFromFile(MainData.dlgOpenSVG.FileName);
+    Clipart.xml := LoadXML(MainData.dlgOpenSVG.FileName);
     PrepareClipart;
   end;
 
@@ -3209,7 +3293,8 @@ begin
   if MainData.dlgOpenSVG.Execute then
   begin
     edCfgPropotype.Text := ExtractRelativePath(edCfgRoot.Text, MainData.dlgOpenSVG.FileName);
-    SVG.LoadFromFile(MainData.dlgOpenSVG.FileName);
+    SVG.xml :=  LoadXML(MainData.dlgOpenSVG.FileName);
+//    SVG.LoadFromFile(MainData.dlgOpenSVG.FileName);
     PrepareXML;
   end;
 end;
@@ -3248,10 +3333,16 @@ begin
   begin
     SVG.Node['svg'].Attribute['xmlns:dekart']:='http://127.0.0.1';
     edCfgPropotype.Text := ExtractRelativePath(edCfgRoot.Text, MainData.dlgSaveSVG.FileName);
-    SVG.SaveToFile(MainData.dlgSaveSVG.FileName);
+    SaveXML(MainData.dlgSaveSVG.FileName, SVG.xml);
   end;
 end;
 
+
+procedure TMainForm.SVGFrametbXMLClick(Sender: TObject);
+begin
+  SVGFrame.tbXMLClick(Sender);
+
+end;
 
 procedure TMainForm.SVGFrametreeTemplateExit(Sender: TObject);
 begin
@@ -3577,7 +3668,8 @@ begin
     fProtoFile:=MainData.dlgOpenSVG.FileName;
 //    sePrototype.Lines.LoadFromFile(dlgOpenSVG.FileName);
 //    sePrototype.Lines.text := Utf8ToAnsiEx(sePrototype.Lines.text,CP_ACP);
-    SVG.LoadFromFile(fProtoFile);
+//    SVG.LoadFromFile(fProtoFile);
+    SVG.XML := LoadXML(fProtoFile);
     PrepareXML;
 
     chbLOCK.Checked := True;
@@ -3590,7 +3682,9 @@ begin
 
     if FileExists(edCfgRoot.Text + edCfgClipart.Text) then
     begin
-      Clipart.LoadFromFile(edCfgRoot.Text + edCfgClipart.Text);
+//      Clipart.LoadFromFile(edCfgRoot.Text + edCfgClipart.Text);
+      Clipart.XML := LoadXML(edCfgRoot.Text + edCfgClipart.Text);
+
       PrepareClipart;
     end;
 
@@ -3732,7 +3826,8 @@ begin
 
 
   if ext='.SVG' then
-    FBufXml.SaveToFile(MainData.dlgSavePicture.FileName,  TEncoding.UTF8)
+    SaveXML(MainData.dlgSavePicture.FileName, FBufXml.Text)
+//    FBufXml.SaveToFile(MainData.dlgSavePicture.FileName,  TEncoding.UTF8)
   else
   try
     if ext='.PNG' then
@@ -3814,7 +3909,7 @@ begin
 
     end;
 
-    Config.SaveToFile(MainData.dlgSaveXML.FileName);
+    SaveXML(MainData.dlgSaveXML.FileName, Config.xml);
 
     if MainData.dlgSaveXML.FilterIndex=1 then
     begin
@@ -3823,11 +3918,11 @@ begin
 
       SVG.Node['svg'].Attribute['xmlns:dekart']:='http://127.0.0.1';
       if SVG.Node['svg'].Nodes.Count>0 then
-        SVG.SaveToFile(edCfgRoot.Text+edCfgPropotype.text);
+        SaveXML(edCfgRoot.Text+edCfgPropotype.text, SVG.xml);
 
       Clipart.Node['svg'].Attribute['xmlns:dekart']:='http://127.0.0.1';
       if (Clipart.Node['svg'].Nodes.Count>0) and (edCfgClipart.text<>'') then
-        Clipart.SaveToFile(edCfgRoot.Text+edCfgClipart.text);
+        SaveXML(edCfgRoot.Text+edCfgClipart.text, Clipart.XML);
     end;
   end;
 end;

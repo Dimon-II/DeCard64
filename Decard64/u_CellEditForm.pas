@@ -108,6 +108,8 @@ type
     procedure seTranslateChange(Sender: TObject);
     procedure tbApplyClick(Sender: TObject);
     procedure FormResize(Sender: TObject);
+    procedure CellEditFrameSynEditorGutterGetText(Sender: TObject;
+      aLine: Integer; var aText: string);
   private
     FOldText:string;
     FGrid: TStringGrid;
@@ -358,6 +360,19 @@ begin
   Grid.Cells[Grid.Col, Grid.Row] := GetText;
 end;
 
+procedure TCellEditForm.CellEditFrameSynEditorGutterGetText(Sender: TObject;
+  aLine: Integer; var aText: string);
+var i: integer;
+  s,rs: string;
+begin
+  s := TSynEdit(Sender).Lines[aLine-1];
+  rs :='';
+  for i := 1 to  length(s) do
+    if s[i] in ['(',')'] then
+      rs := StringReplace(rs+s[i],'()','',[rfReplaceAll]);
+  aText := rs + atext;
+end;
+
 procedure TCellEditForm.CellEditFrameSynEditorKeyDown(Sender: TObject;
   var Key: Word; Shift: TShiftState);
 begin
@@ -413,7 +428,7 @@ end;
 
 function TCellEditForm.GetText: string;
 begin
-  Result := StringReplace(CellEditFrame.SynEditor.Text, #13#10,'',[rfReplaceAll]);
+  Result := StringReplace(CellEditFrame.SynEditor.Text, #13#10,' ',[rfReplaceAll]);
   Result := StringReplace(Result, #9, ' ',[rfReplaceAll]) ;
   Result := StringReplace(Result, '  ',' ',[rfReplaceAll]) ;
 end;
@@ -427,8 +442,6 @@ begin
     s :=  ^M + s;
   CellEditFrame.SynEditor.SelText := s;
   CellEditFrame.SynEditor.SetFocus;
-  SetCursorPos(Mouse.CursorPos.x, lbCommon.ClientToScreen(point(0,10)).y);
-
 end;
 
 procedure TCellEditForm.lbCommonDragDrop(Sender, Source: TObject; X,
