@@ -87,7 +87,7 @@ object XMLEditForm: TXMLEditForm
       end
       inherited pscrSysEdit: TPageScroller
         Width = 622
-        ExplicitWidth = 622
+        ExplicitWidth = 618
       end
     end
     object seTags: TSynEdit

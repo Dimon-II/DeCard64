@@ -225,6 +225,8 @@ type
     sbPageBlank: TSpeedButton;
     lblRange: TLabel;
     chbSplit: TCheckBox;
+    sbReloadFonts: TSpeedButton;
+    miInsertRow: TMenuItem;
     procedure sbOpenRootClick(Sender: TObject);
     procedure sbOpenTextClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -330,6 +332,8 @@ type
     procedure btnBleed2mmClick(Sender: TObject);
     procedure sbPageBlankClick(Sender: TObject);
     procedure SVGFrametbXMLClick(Sender: TObject);
+    procedure sbReloadFontsClick(Sender: TObject);
+    procedure miInsertRowClick(Sender: TObject);
   private
     { Private declarations }
     FSel:TRect;
@@ -1026,7 +1030,7 @@ begin
     if edBackTemplate.Text <> '' then
     begin
       if uppercase(ExtractFileExt(edBackTemplate.Text)) = '.SVG' then
-        BackXml.LoadFromFile(edCfgRoot.Text + edBackTemplate.Text)
+        BackXml.xml := LoadXML(edCfgRoot.Text + edBackTemplate.Text)
       else
         BackXml.xml := '<?xml version="1.0" encoding="UTF-8"?>' +
           '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">'
@@ -2230,13 +2234,33 @@ begin
     sgText.Cells[0,i]:= IntToStr(i);
 end;
 
+procedure TMainForm.miInsertRowClick(Sender: TObject);
+var i, r, n: Integer;
+begin
+  if MessageDlg('Insert row ['+IntToStr(sgText.Row)+']?',mtConfirmation,[mbYes, mbNo],0) = mrYes then
+  begin
+     r := sgText.Row;
+     n := StrToIntDef(sgText.Cells[0,r] ,0);
+     sgText.RowCount := sgText.RowCount+1;
+     sgText.Cells[0,sgText.RowCount-1]  := sgText.Cells[0,r];
+
+     THackGrid(sgText).RowMoved(sgText.RowCount-1, r);
+
+     for i := 1 to sgText.RowCount do
+       if (StrToIntDef(sgText.Cells[0,i] ,0) >= n) and (i<>r) then
+          sgText.Cells[0,i]  := IntToStr(StrToIntDef(sgText.Cells[0,i] ,0)+1)
+  end;
+end;
+
 procedure TMainForm.miTableHeadClick(Sender: TObject);
 var i:integer;
 begin
+  sgText.Rows[0].TrailingLineBreak := False;
   XMLEditForm.XML := sgText.Rows[0].Text;
   XMLEditForm.seTags.Visible := False;
   XMLEditForm.splTags.Visible := False;
   XMLEditForm.SynEditFrame.SynEditor.Lines.Delete(0);
+  XMLEditForm.SynEditFrame.SynEditor.Lines.Delete(XMLEditForm.SynEditFrame.SynEditor.Lines.Count-1);
   if XMLEditForm.ShowModal=mrOk then
   begin
     if sgText.ColCount<XMLEditForm.SynEditFrame.SynEditor.Lines.Count+1 then
@@ -2582,6 +2606,12 @@ begin
   BVL2.Top :=0;
   BVL2.Left :=0;
   Winapi.Windows.SetParent(BVL2.handle, dlgTextFind.Handle);
+
+  if seTo.MaxValue<>sgText.RowCount-1 then
+  begin
+    seTo.MaxValue := sgText.RowCount-1;
+    seTo.Value := seTo.MaxValue;
+  end;
 end;
 
 procedure TMainForm.pcMainChanging(Sender: TObject; var AllowChange: Boolean);
@@ -3282,6 +3312,11 @@ begin
   begin
     edPageBlank.Text := ExtractRelativePath(edCfgRoot.text, MainData.dlgOpenPicture.FileName);
   end;
+end;
+
+procedure TMainForm.sbReloadFontsClick(Sender: TObject);
+begin
+   ResetFonts(edCfgRoot.Text + edCfgTTF.Text);
 end;
 
 procedure TMainForm.sbOpenTemplateClick(Sender: TObject);

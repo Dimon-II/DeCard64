@@ -453,7 +453,7 @@ begin
   begin
     SVGNode := SVG.Node['svg'];
     InsertTag('<g id="Cutting1" stroke="#'+HexColor(MainData.dlgColor.Color)+'" stroke-width="2">'
-    + '<symbol id="cut-cross"><line x1="0" x2="0" y1="-30" y2="30"/><line x1="-30" x2="30" y1="0" y2="0"/></symbol>'
+    + '<defs><g id="cut-cross"><line x1="0" x2="0" y1="-30" y2="30"/><line x1="-30" x2="30" y1="0" y2="0"/></g></defs>'
 	  + '<use xlink:href="#cut-cross" x="'+IntToStr(FFrameSize)+'" y="'+IntToStr(FFrameSize)+'"/>'
     + '<use xlink:href="#cut-cross" x="'+IntToStr(StrToIntDef(SVG.Node['svg'].Attribute['width'],100)-FFrameSize)+'" y="'+IntToStr(FFrameSize)+'"/>'
 	  + '<use xlink:href="#cut-cross" x="'+IntToStr(FFrameSize)+'" y="'+IntToStr(StrToIntDef(SVG.Node['svg'].Attribute['height'],100)-FFrameSize)+'"/>'
@@ -479,7 +479,7 @@ begin
   begin
     SVGNode := SVG.Node['svg'];
     InsertTag('<g id="Cutting1" stroke="#'+HexColor(MainData.dlgColor.Color)+'" stroke-width="2">'
-    + '<symbol id="cut-cross"><line x1="0" x2="0" y1="-30" y2="30"/><line x1="-30" x2="30" y1="0" y2="0"/></symbol>'
+    + '<defs><g id="cut-cross"><line x1="0" x2="0" y1="-30" y2="30"/><line x1="-30" x2="30" y1="0" y2="0"/></g></defs>'
 		+ '<use xlink:href="#cut-cross" x="0" y="0"/>'
 		+ '<use xlink:href="#cut-cross" x="'+SVG.Node['svg'].Attribute['width']+'" y="0"/>'
 		+ '<use xlink:href="#cut-cross" x="0" y="'+SVG.Node['svg'].Attribute['height']+'"/>'

@@ -133,7 +133,7 @@ type
     function CurrentPath:string;
     procedure SvgArcTo(Curr:TPoint; rx,ry:Integer; ax:double; fa, fs:boolean; x,y:integer; Canvas:TCanvas);
     procedure DeltaPolyBezierTo(const Points: array of TPoint);
-    function StrToXY(s:string;Def:integer):double;
+    function StrToXY(ss:string;Def:integer):double;
   end;
 
 var
@@ -200,15 +200,25 @@ begin
 end;
 
 
-function TfrmPathEdit.StrToXY(s: string; Def:Integer): double;
+function TfrmPathEdit.StrToXY(ss: string; Def:Integer): double;
+var d:single;
+  err:Integer;
+  s:string;
 begin
-  if pos('%x',s)>0 then
-    Result := Roundto(sePrcX.Value /100 * StrToFloatDef(copy(s,1,Length(s)-2),Def),-3)
+  s := StringReplace(ss,'(','',[]);
+  s := StringReplace(s,')','',[]);
+  s := StringReplace(s,' ','',[rfReplaceAll]);
+  if pos('%',s)>0 then
+  begin
+    Val(Copy(s,pos('%',s)+2,Length(s)), d, err);
+    if pos('%x',s)>0 then
+      Result := Roundto(sePrcX.Value /100 * StrToFloatDef(copy(s,1,pos('%',s)-1),Def),-3) + d
+    else
+    if pos('%y',s)>0 then
+      Result := Roundto(sePrcY.Value /100 * StrToFloatDef(copy(s,1,pos('%',s)-1),Def),-3) + d;
+  end
   else
-  if pos('%y',s)>0 then
-    Result := Roundto(sePrcY.Value /100 * StrToFloatDef(copy(s,1,Length(s)-2),Def),-3)
-  else
-    Result := roundto(StrToFloatDef(s,Def),-4)
+    Result := roundto(StrToFloatDef(s,Def),-3)
 end;
 
 
@@ -1292,7 +1302,7 @@ begin
 end;
 
 procedure TfrmPathEdit.ParsePath(APath: string);
-var i,j,n:Integer;
+var i,j,n,z:Integer;
   s:string;
   r:double;
 begin
@@ -1308,14 +1318,25 @@ begin
     s:=StringReplace(s,'  ',' ',[rfReplaceAll]);
 
   n:=0;
-  for i := 1 to Length(s) do
+  i:=0;
+  while i<Length(s) do
   begin
+    Inc(i);
     if Pos(s[i], 'MLVHCSQTAZmlvhcsqtaz')>0 then
     begin
       inc(n);
       j:=2;
       sgDots.Rows[n].text := IntToStr(n);
       sgDots.Cells[1,n]:=s[i];
+      continue;
+    end
+    else
+    if (s[i]='(')and (Pos(')',s, i)>0) then
+    begin
+      z := Pos(')', s, i);
+      sgDots.Cells[j,n]:=Copy(s, i, z-i+1);
+      i:= z;
+      Inc(j);
       continue;
     end
     else
@@ -1371,6 +1392,7 @@ begin
 
     sgDots.Cells[j,n]:=sgDots.Cells[j,n]+s[i];
   end;
+
   if n=0 then
     sgDots.RowCount:=2
   else

@@ -19,6 +19,26 @@ u_ThreadRender, VCL.Forms, u_MainForm, Winapi.Windows, RegularExpressions;
 
 var   FBufXml:TStringList;
 
+function StrToXY(ss: string; Def,X,Y:single): single;
+var d:single;
+  err:Integer;
+  s:string;
+begin
+  s := StringReplace(ss,'(','',[]);
+  s := StringReplace(s,')','',[]);
+  s := StringReplace(s,' ','',[rfReplaceAll]);
+  if pos('%',s)>0 then
+  begin
+    Val(Copy(s,pos('%',s)+2,Length(s)), d, err);
+    if pos('%x',s)>0 then
+      Result := Roundto(X /100 * StrToFloatDef(copy(s,1,pos('%',s)-1),Def),-3) + d
+    else
+    if pos('%y',s)>0 then
+      Result := Roundto(Y /100 * StrToFloatDef(copy(s,1,pos('%',s)-1),Def),-3) + d;
+  end
+  else
+    Result := roundto(StrToFloatDef(s,Def),-3)
+end;
 
 function SvgFloat(d:double):string;
 begin
@@ -344,6 +364,7 @@ begin
   nod.Attribute['font-weight'] := ParentStyle(nod,'font-weight');
   nod.Attribute['font-style'] := ParentStyle(nod,'font-style');
   nod.Attribute['letter-spacing'] := ParentStyle(nod,'letter-spacing','0');
+  nod.Attribute['word-spacing'] := ParentStyle(nod,'word-spacing','0');
   nod.Attribute['font-variant'] := ParentStyle(nod,'font-variant');
 
   Nod.text := StringReplace(Nod.text,'[p]',' [p] ',[rfReplaceAll, rfIgnoreCase]);
@@ -420,6 +441,7 @@ begin
     FBufXml.Add('<g font-size="'+nod.Attribute['font-size']
               +'" font-family="'+nod.Attribute['font-family']
               +'" letter-spacing="'+nod.Attribute['letter-spacing']
+              +'" word-spacing="'+nod.Attribute['word-spacing']
               +'" font-weight="'+ nod.Attribute['font-weight']
               +'" font-style="'+ nod.Attribute['font-style']+'">');
     for i:=0 to sl.Count-1 do
@@ -694,6 +716,7 @@ begin
     AStyle := 'font-family="'+fnt2+'"'#$D#$A
             + 'font-size="'+IntToStr(-Cnv.Font.Height)+'"'#$D#$A
             + 'letter-spacing="'+ParentStyle(nod,'letter-spacing','0')+'"'#$D#$A
+            + 'word-spacing="'+ParentStyle(nod,'word-spacing','0')+'"'#$D#$A
             + 'style=" font-style:'+ParentStyle(nod,'font-style','normal')
             + ';  font-weight:'+ParentStyle(nod,'font-weight','normal')
             + ';  text-decoration:'+ParentStyle(nod,'text-decoration','none')+'; "'#$D#$A;
@@ -946,6 +969,7 @@ begin
       +'; font-size:'+ParentStyle(NOD, 'font-size')
 //      +'; fill:'+ParentStyle(NOD, 'fill')
       +'; letter-spacing:'+ParentStyle(NOD, 'letter-spacing')
+      +'; word-spacing:'+ParentStyle(NOD, 'word-spacing')
       +'; fill:'+ParentStyle(NOD, 'stroke') +' ', nod, Clipart, AClipartName, ARootName)+'; ';
       nod.Nodes.Clear;
       nod.text := s;
@@ -1411,7 +1435,7 @@ var
   DoZoom:boolean;
   AddZoom, r :Double;
   ImgRect: TRect;
-  i,si:integer;
+  i,si,ii:integer;
   fmt:string;
   OldNpp:Integer;
 
@@ -1449,6 +1473,7 @@ begin
     RST.Attribute['stroke'] := ParentStyle(NOD, 'stroke');
     RST.Attribute['lengthAdjust'] := ParentStyle(NOD, 'lengthAdjust');
     RST.Attribute['letter-spacing'] := ParentStyle(NOD, 'letter-spacing','0');
+    RST.Attribute['word-spacing'] := ParentStyle(NOD, 'word-spacing','0');
     RST.Attribute['font-variant'] := ParentStyle(NOD, 'font-variant','normal');
     RST.Attribute['id'] := NOD.Attribute['id'];
     RST.Attribute['x'] := '0';
@@ -1534,6 +1559,7 @@ begin
               end;
               n2 := n2.Next;
             end;
+{
             n2 := bkg;
             while n2<>nil do
             begin
@@ -1563,8 +1589,10 @@ begin
                     IntToStr(round(StrToFloatDef(bkg.Attribute['height'],0) / 100 * StrToFloatDef(s,0))),  [rfReplaceAll])
                 end;
 
-              end;               n2 := n2.Next;
+              end;
+              n2 := n2.Next;
             end;
+}
           end
           else
           if (xn.Attribute['img'] <> '') then
@@ -2008,6 +2036,57 @@ begin
         else
         if (hgh > StrToIntDef(Bkg.Attribute['height'],0)) then
           Bkg.Attribute['height'] := IntToStr(StrToIntDef(Bkg.Attribute['height'],0) +  hgh);
+
+      end;
+
+      n2 := bkg;
+      while n2<>nil do
+      begin
+        for i := 0 to n2.Attributes.Count-1 do
+        begin
+          while pos('%x', n2.Attributes[i].value)>0 do
+          begin
+            s := n2.Attributes[i].value;
+            ii := pos('%x', s);
+
+            for si:= ii-1 downto 1 do
+              if not (s[si] in ['0'..'9','-','.']) then
+                 break;
+
+            if s[si]='(' then
+              s := Copy(s,si,pos(')',s,ii)-si+1)
+            else
+              s := Copy(s,si+1,ii-si+1);
+
+            n2.Attributes[i].value :=  StringReplace(n2.Attributes[i].value, s,
+               FormatFloat('0.000',
+                  StrToXY(s,0,
+                          StrToFloatDef(bkg.Attribute['width'],0),
+                          StrToFloatDef(bkg.Attribute['height'],0))),  [rfReplaceAll])
+          end;
+
+          while pos('%y', n2.Attributes[i].value)>0 do
+          begin
+            s := n2.Attributes[i].value;
+            ii := pos('%y', s);
+
+            for si:= ii-1 downto 1 do
+              if not (s[si] in ['0'..'9','-','.']) then
+                 break;
+
+            if s[si]='(' then
+              s := Copy(s,si,pos(')',s,ii)-si+1)
+            else
+              s := Copy(s,si+1,ii-si+1);
+
+            n2.Attributes[i].value :=  StringReplace(n2.Attributes[i].value, s,
+               FormatFloat('0.000',
+                  StrToXY(s,0,
+                          StrToFloatDef(bkg.Attribute['width'],0),
+                          StrToFloatDef(bkg.Attribute['height'],0))),  [rfReplaceAll])
+          end;
+        end;
+        n2 := n2.Next;
       end;
 
 
@@ -2130,6 +2209,7 @@ begin
     RST.Attribute['stroke'] := ParentStyle(NOD, 'stroke');
     RST.Attribute['lengthAdjust'] := ParentStyle(NOD, 'lengthAdjust');
     RST.Attribute['letter-spacing'] := ParentStyle(NOD, 'letter-spacing','0');
+    RST.Attribute['word-spacing'] := ParentStyle(NOD, 'word-spacing','0');
     RST.Attribute['font-variant'] := ParentStyle(NOD, 'font-variant','normal');
 //    RST.Attribute['stroke-width'] := ParentStyle(NOD, 'stroke-width','0');
 
@@ -2205,6 +2285,7 @@ begin
            if xn.LocalName='font' then
            begin
              xn.LocalName:='g';
+             xn.Attribute['filter'] := xn.Attribute['filter'];
 
 
              if xn.Attribute['face'] <> '' then
@@ -2270,6 +2351,7 @@ begin
             +' font-weight="'+ ParentStyle(xn,'font-weight')+'"'
             +' font-style="'+ ParentStyle(xn,'font-style')+'"'
             +' letter-spacing="'+ ParentStyle(xn,'letter-spacing','0')+'"'
+            +' word-spacing="'+ ParentStyle(xn,'word-spacing','0')+'"'
             +' text-decoration="'+ ParentStyle(xn,'text-decoration')+'">'+ (xn.text) +'</text>');
           zz := zz  + xn.attribute['id']+',';
           FBufXml.Add('<text y="50" id="'+xn.attribute['id']+'Z"'
@@ -2278,6 +2360,7 @@ begin
             +' font-weight="'+ ParentStyle(xn,'font-weight')+'"'
             +' font-style="'+ ParentStyle(xn,'font-style')+'"'
             +' letter-spacing="'+ ParentStyle(xn,'letter-spacing','0')+'"'
+            +' word-spacing="'+ ParentStyle(xn,'word-spacing','0')+'"'
             +' text-decoration="'+ ParentStyle(xn,'text-decoration')+'">'+(xn.text)+ ' ' + (xn.text) +'</text>');
           zz := zz  + xn.attribute['id']+'Z,';
       end;
