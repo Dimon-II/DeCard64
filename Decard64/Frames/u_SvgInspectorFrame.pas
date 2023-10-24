@@ -6,7 +6,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes,
   Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls,
   Vcl.ExtCtrls, Vcl.Grids, Vcl.ComCtrls, Profixxml, u_SynEditFrame, Vcl.ToolWin,
-  system.UITYpes, System.Actions, Vcl.ActnList;
+  system.UITYpes, System.Actions, Vcl.ActnList, SynEditHighlighter,
+  SynHighlighterIni, SynEdit;
 
 type
   TStringGrid=class(Vcl.Grids.TStringGrid)
@@ -37,6 +38,11 @@ type
     tbFont: TToolButton;
     tbFileXlink: TToolButton;
     ToolButton28: TToolButton;
+    tsLangPack: TTabSheet;
+    SynEditor: TSynEdit;
+    SynIniSyn1: TSynIniSyn;
+    meLangHint: TMemo;
+    meReplaceHint: TMemo;
     procedure sgAttrSelectCell(Sender: TObject; ACol, ARow: Integer;
       var CanSelect: Boolean);
     procedure cbAtrShowClick(Sender: TObject);
@@ -53,6 +59,7 @@ type
     procedure sgAttrTopLeftChanged(Sender: TObject);
     procedure sgAttrKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure tbPipeClick(Sender: TObject);
+    procedure SynEditorChange(Sender: TObject);
   private
     FSVGNode: TXML_Nod;
     FEditNode: TXML_Nod;
@@ -662,6 +669,11 @@ end;
 procedure TSvgInspectorFrame.sgAttrTopLeftChanged(Sender: TObject);
 begin
   sgAttr.Invalidate;
+end;
+
+procedure TSvgInspectorFrame.SynEditorChange(Sender: TObject);
+begin
+  MainForm.PrepareLangpack;
 end;
 
 procedure TSvgInspectorFrame.tbSetColorClick(Sender: TObject);

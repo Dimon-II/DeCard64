@@ -227,6 +227,7 @@ type
     chbSplit: TCheckBox;
     sbReloadFonts: TSpeedButton;
     miInsertRow: TMenuItem;
+    cbLang: TComboBox;
     procedure sbOpenRootClick(Sender: TObject);
     procedure sbOpenTextClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -334,6 +335,7 @@ type
     procedure SVGFrametbXMLClick(Sender: TObject);
     procedure sbReloadFontsClick(Sender: TObject);
     procedure miInsertRowClick(Sender: TObject);
+    procedure cbLangClick(Sender: TObject);
   private
     { Private declarations }
     FSel:TRect;
@@ -357,6 +359,7 @@ type
     RenderReq:integer;
     FStartRender:TDateTime;
     GridMouse:boolean;
+    LangSet:array of Integer;
 
     procedure PrepareAtr(ANod: TXML_Nod);
     procedure ReadGrid(AFilename:string);
@@ -372,6 +375,9 @@ type
     procedure GridSort(ACol:integer;Srt:boolean);
     procedure SaveXML(AFilename, AXML:string);
     function LoadXML(AFilename:string):string;
+
+    procedure PrepareLangpack;
+    function LangpackIdx(AEng:integer):integer;
   end;
 
 
@@ -667,6 +673,7 @@ end;
 
 procedure TMainForm.aShowExecute(Sender: TObject);
 begin
+  PrepareLangpack;
   RenderRow(sgText.Row)
 end;
 
@@ -904,6 +911,9 @@ var
   end;
 
 begin
+
+  PrepareLangpack;
+
   PrevFile := '';
 
   if (SVG.Nodes.Count = 0) then
@@ -929,6 +939,7 @@ begin
   end;
 
   btnProcess.Enabled := false;
+  cbLang.Enabled := false;
   StopFlag := false;
   btnStop.Enabled := True;
   BackXml := TXML_Doc.Create;
@@ -1160,8 +1171,10 @@ begin
         if (n=0) and (x1.Nodes.Last.Nodes.ByID('imgPageBack')<>nil) then
         begin
           s := edPageBlank.Text;
+
           for k :=0 to sgText.ColCount-1 do
-            s := StringReplace(s, '[' + IntToStr(k)+']', sgText.Cells[k, i], [rfReplaceAll, rfIgnoreCase]);
+            s := StringReplace(s, '[' + IntToStr(k)+']', sgText.Cells[LangpackIdx(k), i], [rfReplaceAll, rfIgnoreCase]);
+
           x1.Nodes.Last.Nodes.ByID('imgPageBack').Attribute['xlink:href'] := s;
           if edBackTemplate.Text <> '' then
             x1bk.Nodes.Last.Nodes.ByID('imgPageBack').Attribute['xlink:href'] := s;
@@ -1238,6 +1251,7 @@ begin
 
   finally
     ProgressBar1.Visible := false;
+    cbLang.Enabled := true;
     btnStop.Enabled := false;
     ShowRendering(false);
     // Rendering2.Visible := False;
@@ -1274,6 +1288,12 @@ procedure TMainForm.cbDPIChange(Sender: TObject);
 begin
    cbPresetChange(nil);
    cbPaperChange(nil);
+end;
+
+procedure TMainForm.cbLangClick(Sender: TObject);
+begin
+  sgText.Invalidate;
+  PrepareLangpack;
 end;
 
 procedure TMainForm.cbPaperChange(Sender: TObject);
@@ -2196,6 +2216,11 @@ begin
   InspectorFrame.SetSize(FSel);
 end;
 
+function TMainForm.LangpackIdx(AEng: integer): integer;
+begin
+  Result := LangSet[AEng]
+end;
+
 function TMainForm.LoadXML(AFilename:string): string;
 var
   sl:TStringList;
@@ -2612,6 +2637,7 @@ begin
     seTo.MaxValue := sgText.RowCount-1;
     seTo.Value := seTo.MaxValue;
   end;
+  PrepareLangpack;
 end;
 
 procedure TMainForm.pcMainChanging(Sender: TObject; var AllowChange: Boolean);
@@ -2759,6 +2785,50 @@ begin
   ClipartFrame.SVG := Clipart;
 end;
 
+procedure TMainForm.PrepareLangpack;
+var
+  i: integer;
+  s: string;
+   sl1,sl2:TStringList;
+begin
+  s := cbLang.text;
+  cbLang.Items.Clear;
+  for i := 0 to InspectorFrame.SynEditor.Lines.Count-1 do
+    if Trim(InspectorFrame.SynEditor.Lines.Names[i])<>'' then
+      cbLang.Items.Add(InspectorFrame.SynEditor.Lines.Names[i]);
+
+  cbLang.Visible := cbLang.Items.Count >0;
+  cbLang.Enabled := cbLang.Items.Count >1;
+  cbLang.ItemIndex := cbLang.Items.IndexOf(s);
+  if cbLang.ItemIndex =-1 then  cbLang.ItemIndex := 0;
+  SetLength(LangSet, sgText.ColCount);
+  sl1:=TStringList.Create;
+  sl2:=TStringList.Create;
+  try
+    sl1.commatext:= InspectorFrame.SynEditor.Lines.Values[InspectorFrame.SynEditor.Lines.Names[0]];
+    sl2.commatext:= InspectorFrame.SynEditor.Lines.Values[InspectorFrame.SynEditor.Lines.Names[cbLang.ItemIndex]];
+
+    for i := 0 to sgText.ColCount-1 do
+    begin
+      LangSet[i]:=i;
+
+      if sl1.IndexOf(IntToStr(i))>-1 then
+         LangSet[i]:= StrToIntDef(sl2[sl1.IndexOf(IntToStr(i))] ,i);
+    end;
+  finally
+  sl1.free;
+  sl2.free;
+
+  end;
+
+
+  MainData.HyphenNod := MainData.HLP.Node['Hyphenation'].Nodes[0];
+
+  for i := 0 to MainData.HLP.Node['Hyphenation'].Nodes.Count-1 do
+    if MainData.HLP.Node['Hyphenation'].Nodes[i].Attribute['lang'] = s then
+      MainData.HyphenNod := MainData.HLP.Node['Hyphenation'].Nodes[i];
+end;
+
 procedure TMainForm.PrepareXML;
 begin
   InspectorFrame.SVGNode := Nil;
@@ -2868,7 +2938,8 @@ var sl:TStringList;
     cbCount.Items.Add('[' + IntToStr(i)+']');
 
   cbFileName.Items.Assign(cbCount.Items);
-  cbFileName.Items.Insert(0, ChangeFileExt(edCfgPropotype.Text,'')+'[count]x[npp]' );
+  cbFileName.Items.Insert(0, ChangeFileExt(edCfgPropotype.Text,'')+'[count]x[npp][lng]' );
+
 
 
 //  fCellChanged:=False;
@@ -2899,7 +2970,7 @@ begin
       ForceDirectories(edCfgRoot.text + edCfgTemp.Text);
       ChDir(edCfgRoot.text);
 
-      FBufXml.Text :=   Processcard(
+      FBufXml.Text := Processcard(
         sgText.Rows[sgText.Row],
         '',
         SVG,
@@ -2930,13 +3001,15 @@ begin
   result:=ChangeFileExt(s,'');
 
   for i:=0 to sgText.ColCount-1 do
-    result := StringReplace(result, '[' + IntToStr(i)+']', sgText.Cells[i, Npp], [rfReplaceAll, rfIgnoreCase]);
+    result := StringReplace(result, '[' + IntToStr(i)+']', sgText.Cells[LangpackIdx(i), Npp], [rfReplaceAll, rfIgnoreCase]);
 
   result := StringReplace(result, '[count]', IntToStr(Cnt), [rfReplaceAll, rfIgnoreCase]);
   if N > 1 then
     result := StringReplace(result, '[npp]', FormatFloat(Stringofchar('0', Length(IntToStr(Cnt))), Npp)+ '_'+IntToStr(n), [rfReplaceAll, rfIgnoreCase])
   else
     result := StringReplace(result, '[npp]', FormatFloat(Stringofchar('0', Length(IntToStr(Cnt))), Npp), [rfReplaceAll, rfIgnoreCase]);
+    result := StringReplace(result, '[lng]', cbLang.Text, [rfReplaceAll, rfIgnoreCase]);
+
 
   if result='' then
     result := 'CARD' + IntToStr(Cnt) + 'x'+ FormatFloat(Stringofchar('0', Length(IntToStr(Cnt))), Npp);
@@ -3177,7 +3250,27 @@ end;
 procedure TMainForm.sgTextDrawCell(Sender: TObject; ACol, ARow: Integer;
   Rect: TRect; State: TGridDrawState);
 var s: string;
+  i:Integer;
 begin
+  if (ARow=0) then
+  begin
+    for i := 1 to sgText.ColCount-1 do
+      if (LangSet[i]=ACol) and (i<>ACol) then
+      begin
+        sgText.Canvas.Brush.Style := bsClear;
+        sgText.Canvas.Pen.Color := clLime;
+        sgText.Canvas.Rectangle(sgText.CellRect(ACol,ARow));
+        break;
+      end;
+
+    if (LangSet[ACol]<>ACol) then
+    begin
+      sgText.Canvas.Brush.Style := bsClear;
+      sgText.Canvas.Pen.Color := clRed;
+      sgText.Canvas.Rectangle(sgText.CellRect(ACol,ARow));
+    end;
+  end;
+
   if (ACol=0)and (Arow>0) then
   begin
     s:= IntToStr(Arow);
@@ -3644,6 +3737,8 @@ begin
   MainData.dlgOpenXML.InitialDir := edCfgRoot.Text;
   if MainData.dlgOpenXML.Execute then
   begin
+    cbLang.text :='';
+    PrepareLangpack;
     Config.LoadFromFile(MainData.dlgOpenXML.FileName);
     with Config.Node['CONFIG'] do
     begin
@@ -3681,7 +3776,10 @@ begin
       lblEncoding.Caption := Attribute['encoding'];
       if Attribute['wrap']<>'' then
         CellEditForm.seWrap.Lines.CommaText :=Attribute['wrap'];
-
+      InspectorFrame.SynEditor.Text := StringReplace(Attribute['langpack'],' ','',[rfReplaceAll]);
+      PrepareLangpack;
+      if cbLang.Items.IndexOf(Attribute['lang'])>-1 then
+        cbLang.ItemIndex := cbLang.Items.IndexOf(Attribute['lang']);
     end;
     if lblEncoding.Caption = 'UTF8' then
         lblEncoding.Caption := 'UTF-8';
@@ -3939,9 +4037,9 @@ begin
       Attribute['LocalFonts'] := edCfgTTF.Text;
       Attribute['Engine'] :=  IntToStr(cbEngine.ItemIndex);
       Attribute['OutFormat'] :=  IntToStr(cbOutFormat.ItemIndex);
-     Attribute['wrap'] := CellEditForm.seWrap.Lines.CommaText;
-
-
+      Attribute['wrap'] := CellEditForm.seWrap.Lines.CommaText;
+      Attribute['langpack'] := InspectorFrame.SynEditor.Text;
+      Attribute['lang'] := cbLang.text;
     end;
 
     SaveXML(MainData.dlgSaveXML.FileName, Config.xml);

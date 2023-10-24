@@ -234,6 +234,8 @@ begin
     begin
       Grid.ColCount := Grid.ColCount+1;
       Grid.Cells[Grid.ColCount-1, 0] := '['+IntToStr(Grid.ColCount-1)+']';
+      SetLength(MainForm.LangSet, Grid.ColCount);
+      MainForm.LangSet[Grid.ColCount-1]:=Grid.ColCount-1;
     end;
   Grid.Col :=Grid.Col+1;
 

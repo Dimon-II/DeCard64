@@ -9,15 +9,51 @@ function GetSVGSize(const FileName, ID:string):string;
 function html2svg(ASvg,DPI,AFilter, TopStyle:string; NOD:TXML_Nod; Clipart:TXML_Doc; AClipartName, ARootName:string):string;
 function SvgFloat(d:double):string;
 procedure AddClipart(XML, Clipart:TXML_Doc;AClipartName:string);
+function SvgFontWidth(Atext, AStyle:string):Integer;
 
 implementation
 
 {$WARN IMPLICIT_STRING_CAST OFF}
 
 uses system.sysutils, system.strutils, System.Types, system.Math, Vcl.Graphics,
-u_ThreadRender, VCL.Forms, u_MainForm, Winapi.Windows, RegularExpressions;
+u_ThreadRender, VCL.Forms, u_MainForm, Winapi.Windows, RegularExpressions, u_MainData;
 
 var   FBufXml:TStringList;
+
+function SvgFontWidth(Atext, AStyle:string):Integer;
+var
+  s:string;
+  i:Integer;
+  z:double;
+
+begin
+  if Trim(Atext)='' then begin
+    result:=1;
+    exit;
+  end;
+
+  s := Atext;
+  if LeftStr(s,1)=' ' then s := '.'+s;
+  if RightStr(s,1)=' ' then s := Trim(s)+' .';
+
+  FBufXml.Clear;
+  FBufXml.Add('<?xml version="1.0" encoding="UTF-8"?>');
+  FBufXml.Add('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">');
+  FBufXml.Add('<svg xmlns:xlink="http://www.w3.org/1999/xlink" fill="black" font-weight="normal" stroke-width="1"  xmlns="http://www.w3.org/2000/svg" font-size="12"  width="1" height="1">');
+  FBufXml.Add('<text y="50" id="txt" '+AStyle+'>'+ (S) +'</text><rect id="dummy" width="100" height="100"/></svg>');
+  s := GetSVGSize( '###.svg', 'txt');
+  Delete(s,1,Pos(',',s));
+  Delete(s,1,Pos(',',s));
+  Delete(s,1,Pos(',',s));
+  Delete(s,Pos(',',s),256);
+
+  val(s,z,i);
+  Result := round(z);
+//  DeleteFile(Main.edCfgRoot.Text + Main.edCfgTemp.Text + '###.svg');
+
+//  StopAnalitics('Sizing');
+end;
+
 
 function StrToXY(ss: string; Def,X,Y:single): single;
 var d:single;
@@ -211,7 +247,7 @@ begin
     for i:=0 to row.Count-1 do
       if Pos('['+IntToStr(i)+']',s) >0 then
       begin
-        s := StringReplace(s,'['+IntToStr(i)+']', row[i],[rfReplaceAll]);
+        s := StringReplace(s,'['+IntToStr(i)+']', row[MainForm.LangpackIdx(i)],[rfReplaceAll]);
       end;
 
     Prnt := Nod;
@@ -280,49 +316,6 @@ begin
 //    sn.Free;
   end;
 //  StopAnalitics('Replace');
-end;
-
-function SvgFontWidth(Atext, AStyle:string):Integer;
-var
-  s:string;
-  i:Integer;
-  z:double;
-
-begin
-//  StartAnalitics('Sizing');
-{
-  i:= MyStack.IndexOf('<' + AStyle +'>'+Atext );
-  if i > -1 then
-  begin
-    Result := integer(MyStack.Objects[i]);
-    exit;
-  end;
-}
-  if Trim(Atext)='' then begin
-    result:=1;
-    exit;
-  end;
-
-  s := Atext;
-  if LeftStr(s,1)=' ' then s := '.'+s;
-  if RightStr(s,1)=' ' then s := Trim(s)+' .';
-
-  FBufXml.Clear;
-  FBufXml.Add('<?xml version="1.0" encoding="UTF-8"?>');
-  FBufXml.Add('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">');
-  FBufXml.Add('<svg xmlns:xlink="http://www.w3.org/1999/xlink" fill="black" font-weight="normal" stroke-width="1"  xmlns="http://www.w3.org/2000/svg" font-size="12"  width="1" height="1">');
-  FBufXml.Add('<text y="50" id="txt" '+AStyle+'>'+ (S) +'</text><rect id="dummy" width="100" height="100"/></svg>');
-  s := GetSVGSize(ATempFolder + '###.svg', 'txt');
-  Delete(s,1,Pos(',',s));
-  Delete(s,1,Pos(',',s));
-  Delete(s,1,Pos(',',s));
-  Delete(s,Pos(',',s),256);
-
-  val(s,z,i);
-  Result := round(z);
-//  DeleteFile(Main.edCfgRoot.Text + Main.edCfgTemp.Text + '###.svg');
-
-//  StopAnalitics('Sizing');
 end;
 
 procedure FormatText(nod:TXML_Nod);
@@ -1332,7 +1325,7 @@ var
     if n1.Attribute['align']='center' then
       x := x + (round(PercentWidth(ParentRight(n1,  nod.Attribute['width']),0)/ZoomValue) - PercentWidth(n1.Attribute['width'],0)) div 2
     else
-    if Align and (n1.Attribute['align']='width')  then
+    if Align and ((n1.Attribute['align']='width') or (n1.Attribute['align']='hyphen'))  then
     begin
       if nod.Attribute['lengthAdjust'] = 'spacing' then
       begin
@@ -1438,6 +1431,9 @@ var
   i,si,ii:integer;
   fmt:string;
   OldNpp:Integer;
+  Hpn:TStringList;
+  SrcHpn, RstHpn, AStyle:string;
+  HpnW:Word;
 
 begin
   hgh:=0;
@@ -1449,6 +1445,7 @@ begin
 
   bkg := nil;
   RST:=TXML_Nod.Create(nil);
+  Hpn:=TStringList.create;
   try
     ZoomValue := 1;
     fmt := nod.Attribute['decard-format'];
@@ -1616,16 +1613,56 @@ begin
 
         end;
 
-        if xn.LocalName='text' then
+        if (xn.LocalName='text') or (xn.LocalName='hyphen') then
         begin
           if n1= nil then NewRow(false, 0,0);
 
+          if (xn.LocalName='text') then
+          begin
+            xn.Nodes.Clear;
+            w1 := SizeParse(xn.Attribute['id']).Right+SizeParse(xn.Attribute['id']).Left;;
+            w2 := SizeParse(xn.Attribute['id']+'Z').Right+SizeParse(xn.Attribute['id']+'Z').Left;
+            w2 := round(w2 + (w2-2*w1)* WordSpacing);
+          end
+          else begin
+            w1 := Round(StrToIntDef(xn.Attribute['width'],0));
+            w2 := 2*w1 + w3;
+          end;
 
-           w1 := SizeParse(xn.Attribute['id']).Right+SizeParse(xn.Attribute['id']).Left;;
-           w2 := SizeParse(xn.Attribute['id']+'Z').Right+SizeParse(xn.Attribute['id']+'Z').Left;
-           w2 := round(w2 + (w2-2*w1)* WordSpacing);
+          SrcHpn := xn.text;
+          RstHpn := SrcHpn;
 
 
+           if (ParentStyle(xn,'align','')='hyphen') and
+              (n1.Attribute['width'] <> '0') and
+              ((PercentWidth(n1.Attribute['width'],0)) * ZoomValue * 0.8 < PercentWidth(ParentRight(n1,  RST.Attribute['width']),0)) and
+              ((PercentWidth(n1.Attribute['width'],0) + w5 + w1) * ZoomValue > PercentWidth(ParentRight(n1,  RST.Attribute['width']),0))
+           then
+             if MainData.Hyphenation(SrcHpn, Hpn) then
+             begin
+               AStyle :=  ' font-size="' + ParentStyle(xn,'font-size')
+                       + '" font-family="'+ParentStyle(xn,'font-family')
+                       + '" letter-spacing="'+ParentStyle(xn,'letter-spacing')
+                       + '" word-spacing="'+ParentStyle(xn,'word-spacing')
+                       + '" font-weight="'+ ParentStyle(xn,'font-weight')
+                       + '" font-style="'+ ParentStyle(xn,'font-style')+'" ';
+
+               for i:= 0 to Hpn.Count-1 do
+               begin
+                  HpnW :=  SvgFontWidth(Hpn[i]+'-', AStyle);
+
+                  if ((PercentWidth(n1.Attribute['width'],0) + w5 + HpnW) * ZoomValue <= PercentWidth(ParentRight(n1,  RST.Attribute['width']),0)) then
+                  begin
+                    w1 := HpnW;
+                    w2 := 2*w1 + w3;
+                    RstHpn := Hpn[i]+'-';
+                    n2 := xn.Add('hyphen');
+                    n2.text := Copy(SrcHpn,Length(RstHpn), Length(SrcHpn));
+                    n2.Attribute['width'] := IntToStr(SvgFontWidth(n2.text, AStyle));
+                    Break;
+                  end;
+               end;
+             end;
 
            if (w1*ZoomValue > PercentWidth(ParentRight(n1,  RST.Attribute['width']),0)- ParentLeft(xn)) then
               addzoom := min(addzoom,
@@ -1638,11 +1675,13 @@ begin
 
            n2 := n1.Add('text');
            n2.ResetXml(xn.xml);
+           n2.LocalName := 'text';
+           n2.text := RstHpn;
 
            n2.Attribute['font-size'] := ParentStyle(xn, 'font-size');
            n2.Attribute['font-family'] := ParentStyle(xn, 'font-family');
            n2.Attribute['font-weight'] := ParentStyle(xn, 'font-weight');
-           if ParentStyle(xn, 'align')<>'width' then
+           if (ParentStyle(xn, 'align')<>'width') and (ParentStyle(xn, 'align')<>'hyphen') then
              n2.Attribute['letter-spacing'] := ParentStyle(xn, 'letter-spacing');
            n2.Attribute['text-decoration'] := ParentStyle(xn, 'text-decoration');
            n2.Attribute['font-style'] := ParentStyle(xn, 'font-style');
@@ -1752,7 +1791,7 @@ begin
           n2 := n1.Add('image');
 
 
-          n2.Attribute['filter'] := xn.Attribute['filter'];
+          n2.Attribute['filter'] := ParentStyle(xn, 'filter');
           n2.Attribute['width'] := xn.Attribute['width'];
           n2.Attribute['height'] := xn.Attribute['height'];
           n2.Attribute['x'] := IntToStr(PercentWidth(n1.Attribute['width'],0) + w5  + Round(PercentWidth(xn.Attribute['dx'],0) * FontBase));
@@ -1911,9 +1950,14 @@ begin
             n2.Attribute['scale'] := SvgFloat(StrToFloatDef(n2.Attribute['scale'],1) * FontBase);
           end;
 
+
            if n2.Attribute['scale']<>'' then
            begin
+             if n2.Attribute['scale']='fixed' then
              n2.Attribute['transform'] := 'translate(' +n2.Attribute['x'] +','+n2.Attribute['y']+ ') '
+                                         +'scale('+SvgFloat(1/ZoomValue) +')'
+             else
+               n2.Attribute['transform'] := 'translate(' +n2.Attribute['x'] +','+n2.Attribute['y']+ ') '
                                          +'scale('+n2.Attribute['scale']+')';
              n2.Attribute['x'] := '';
              n2.Attribute['y'] := '';
@@ -2176,6 +2220,7 @@ begin
 
 
   finally
+    Hpn.Free;
     RST.Free;
   end;
 end;

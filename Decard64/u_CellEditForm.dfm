@@ -206,7 +206,7 @@ object CellEditForm: TCellEditForm
       ParentFont = False
     end
     object btnApply: TButton
-      Left = 612
+      Left = 604
       Top = 9
       Width = 75
       Height = 25
@@ -221,10 +221,10 @@ object CellEditForm: TCellEditForm
       ParentFont = False
       TabOrder = 0
       OnClick = btnApplyClick
-      ExplicitLeft = 608
+      ExplicitLeft = 600
     end
     object btnCancel: TButton
-      Left = 693
+      Left = 685
       Top = 9
       Width = 75
       Height = 25
@@ -238,7 +238,7 @@ object CellEditForm: TCellEditForm
       Font.Style = []
       ParentFont = False
       TabOrder = 1
-      ExplicitLeft = 689
+      ExplicitLeft = 681
     end
     object chbScrollPreview: TCheckBox
       Left = 82
@@ -276,7 +276,7 @@ object CellEditForm: TCellEditForm
     end
     inherited pscrSysEdit: TPageScroller
       Width = 492
-      ExplicitWidth = 488
+      ExplicitWidth = 492
       inherited tbrEditor: TToolBar
         inherited ToolButton3: TToolButton
           Hint = 'Add to Common (Ctrl+0)'
@@ -425,11 +425,11 @@ object CellEditForm: TCellEditForm
           '<b>...</b> <i>...</i> <u>...</u>'
           '<p>...</p> <br/> <hr/>'
           
-            '<div align="left / center/ right / width" line-height="normal / ' +
-            'pixels / %" html-width='#39'pixels'#39'>...</div>'
+            '<div align="left / center/ right / width / hyphen" line-height="' +
+            'normal / pixels / %" html-width='#39'pixels'#39'>...</div>'
           
-            '<font size="1..7" face="Arial / Comic Sans MS / ..." color="" te' +
-            'xt-indent="">...</font>'
+            '<font size="1..7" font-size="8..32..256" face="Arial / Comic San' +
+            's MS / ..." color="" text-indent="">...</font>'
           '<img src="bitmap file" width="xxx" height="yyy" dy='#39'...'#39'/>'
           '<use src="#defs ref" width="xxx" height="yyy"  dy='#39'...'#39'/>'
           '<use src="clipart.svg#ref" width="xxx" height="yyy"  dy='#39'...'#39'/>'

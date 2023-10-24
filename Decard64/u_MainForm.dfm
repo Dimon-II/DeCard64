@@ -18,13 +18,16 @@ object MainForm: TMainForm
   OnMouseWheel = FormMouseWheel
   OnResize = FormResize
   OnShow = FormShow
+  DesignSize = (
+    1093
+    641)
   TextHeight = 13
   object pcMain: TPageControl
     Left = 0
     Top = 0
     Width = 1093
     Height = 623
-    ActivePage = tsProject
+    ActivePage = tsDesigner
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -1989,6 +1992,7 @@ object MainForm: TMainForm
         inherited pcAtrInspector: TPageControl
           Width = 329
           Height = 418
+          ActivePage = InspectorFrame.tsAtr
           ExplicitWidth = 329
           ExplicitHeight = 418
           inherited tsAtr: TTabSheet
@@ -2021,13 +2025,59 @@ object MainForm: TMainForm
               inherited Panel2: TPanel
                 inherited cbAtrShow: TComboBox
                   Height = 21
+                  ExplicitHeight = 21
                 end
               end
               inherited tbrInspector: TToolBar
                 Width = 227
+                ButtonHeight = 36
+                ButtonWidth = 32
                 ExplicitWidth = 227
                 inherited tbResize: TToolButton
                   OnClick = InspectorFrametbResizeClick
+                  ExplicitWidth = 32
+                  ExplicitHeight = 36
+                end
+                inherited tbEdit: TToolButton
+                  Left = 32
+                  ExplicitLeft = 32
+                  ExplicitWidth = 32
+                  ExplicitHeight = 36
+                end
+                inherited ToolButton16: TToolButton
+                  Left = 64
+                  ExplicitLeft = 64
+                  ExplicitHeight = 36
+                end
+                inherited tbSetColor: TToolButton
+                  Left = 72
+                  ExplicitLeft = 72
+                  ExplicitWidth = 32
+                  ExplicitHeight = 36
+                end
+                inherited tbPipe: TToolButton
+                  Left = 104
+                  ExplicitLeft = 104
+                  ExplicitWidth = 32
+                  ExplicitHeight = 36
+                end
+                inherited tbFont: TToolButton
+                  Left = 136
+                  ExplicitLeft = 136
+                  ExplicitWidth = 32
+                  ExplicitHeight = 36
+                end
+                inherited tbFileXlink: TToolButton
+                  Left = 168
+                  ExplicitLeft = 168
+                  ExplicitWidth = 32
+                  ExplicitHeight = 36
+                end
+                inherited ToolButton28: TToolButton
+                  Left = 200
+                  ExplicitLeft = 200
+                  ExplicitWidth = 32
+                  ExplicitHeight = 36
                 end
               end
             end
@@ -2036,10 +2086,59 @@ object MainForm: TMainForm
             ExplicitTop = 24
             ExplicitHeight = 533
             inherited ReplaceFrame: TSynEditFrame
-              Height = 533
+              Height = 458
+              ExplicitHeight = 458
               inherited SynEditor: TSynEdit
-                Height = 505
+                Height = 430
+                ExplicitHeight = 430
               end
+            end
+            inherited meReplaceHint: TMemo
+              Top = 458
+              ExplicitTop = 458
+            end
+          end
+          inherited tsLangPack: TTabSheet
+            ExplicitTop = 24
+            ExplicitWidth = 321
+            ExplicitHeight = 390
+            inherited SynEditor: TSynEdit
+              Width = 321
+              Height = 179
+              Highlighter = InspectorFrame.ReplaceFrame.SynXMLSyn1
+              SearchEngine = InspectorFrame.ReplaceFrame.SynEditSearch1
+              ExplicitLeft = 0
+              ExplicitTop = 0
+              ExplicitWidth = 321
+              ExplicitHeight = 179
+            end
+            inherited meLangHint: TMemo
+              Top = 179
+              Width = 321
+              Lines.Strings = (
+                'SUPPORT FOR MULTIPLE LANGUAGES IN ONE TEMPLATE:'
+                'On the first line, enter the identifier of the base language '
+                'that '
+                'is used in the template and list the numbers of '
+                'the columns containing text data, which are used in the '
+                'template.'
+                'If you have text in 2 or more languages, add lines here with '
+                'the language identifier and column numbers in that '
+                'language that correspond to the columns in the first line.'
+                'The choice of language is made on the top right corner.'
+                ''
+                'Example:'
+                '[en]=15,16,17,18'
+                '[ru]=22,23,24,25'
+                '[es]=26,27,28,29'
+                ''
+                'In this example, there are 3 languages (English used in the '
+                'template and additional Russian and Spanish), 4 '
+                'columns each. That is, when choosing the Russian language, '
+                'columns [15],[16],[17],[18] are not used, and data '
+                'from [22],[23],[24],[25] are substituted instead.')
+              ExplicitTop = 179
+              ExplicitWidth = 321
             end
           end
         end
@@ -2443,6 +2542,7 @@ object MainForm: TMainForm
         inherited pcAtrInspector: TPageControl
           Width = 638
           Height = 595
+          ActivePage = ClipartInspectorFrame.tsAtr
           OnChange = ClipartInspectorFramepcAtrInspectorChange
           ExplicitWidth = 638
           ExplicitHeight = 595
@@ -2474,22 +2574,105 @@ object MainForm: TMainForm
               inherited Panel2: TPanel
                 inherited cbAtrShow: TComboBox
                   Height = 21
+                  ExplicitHeight = 21
                 end
               end
               inherited tbrInspector: TToolBar
                 Width = 542
+                ButtonHeight = 36
+                ButtonWidth = 32
                 ExplicitWidth = 542
+                inherited tbResize: TToolButton
+                  ExplicitWidth = 32
+                  ExplicitHeight = 36
+                end
+                inherited tbEdit: TToolButton
+                  Left = 32
+                  ExplicitLeft = 32
+                  ExplicitWidth = 32
+                  ExplicitHeight = 36
+                end
+                inherited ToolButton16: TToolButton
+                  Left = 64
+                  ExplicitLeft = 64
+                  ExplicitHeight = 36
+                end
+                inherited tbSetColor: TToolButton
+                  Left = 72
+                  ExplicitLeft = 72
+                  ExplicitWidth = 32
+                  ExplicitHeight = 36
+                end
+                inherited tbPipe: TToolButton
+                  Left = 104
+                  ExplicitLeft = 104
+                  ExplicitWidth = 32
+                  ExplicitHeight = 36
+                end
+                inherited tbFont: TToolButton
+                  Left = 136
+                  ExplicitLeft = 136
+                  ExplicitWidth = 32
+                  ExplicitHeight = 36
+                end
+                inherited tbFileXlink: TToolButton
+                  Left = 168
+                  ExplicitLeft = 168
+                  ExplicitWidth = 32
+                  ExplicitHeight = 36
+                end
+                inherited ToolButton28: TToolButton
+                  Left = 200
+                  ExplicitLeft = 200
+                  ExplicitWidth = 32
+                  ExplicitHeight = 36
+                end
               end
             end
           end
           inherited tsReplace: TTabSheet
             ExplicitTop = 24
-            ExplicitHeight = 533
+            ExplicitWidth = 630
+            ExplicitHeight = 567
             inherited ReplaceFrame: TSynEditFrame
-              Height = 533
+              Width = 630
+              Height = 492
+              ExplicitWidth = 630
+              ExplicitHeight = 492
               inherited SynEditor: TSynEdit
-                Height = 505
+                Width = 630
+                Height = 464
+                ExplicitWidth = 630
+                ExplicitHeight = 464
               end
+              inherited pscrSysEdit: TPageScroller
+                Width = 630
+                ExplicitWidth = 630
+              end
+            end
+            inherited meReplaceHint: TMemo
+              Top = 492
+              Width = 630
+              Visible = False
+              ExplicitTop = 492
+              ExplicitWidth = 630
+            end
+          end
+          inherited tsLangPack: TTabSheet
+            TabVisible = False
+            ExplicitTop = 24
+            ExplicitHeight = 533
+            inherited SynEditor: TSynEdit
+              Height = 322
+              Highlighter = ClipartInspectorFrame.ReplaceFrame.SynXMLSyn1
+              SearchEngine = ClipartInspectorFrame.ReplaceFrame.SynEditSearch1
+              ExplicitLeft = 0
+              ExplicitTop = 0
+              ExplicitHeight = 322
+            end
+            inherited meLangHint: TMemo
+              Top = 322
+              ExplicitTop = 322
             end
           end
         end
@@ -2781,6 +2964,19 @@ object MainForm: TMainForm
     Visible = False
     ExplicitTop = 622
     ExplicitWidth = 1089
+  end
+  object cbLang: TComboBox
+    Left = 1041
+    Top = 0
+    Width = 48
+    Height = 21
+    Hint = 'Column with count of copies (default 1)'
+    Style = csDropDownList
+    Anchors = [akTop, akRight]
+    TabOrder = 2
+    Visible = False
+    OnClick = cbLangClick
+    ExplicitLeft = 1037
   end
   object dlgTextFind: TFindDialog
     OnClose = dlgTextFindClose

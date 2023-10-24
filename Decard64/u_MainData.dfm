@@ -1,5 +1,4 @@
 object MainData: TMainData
-  OldCreateOrder = False
   OnCreate = DataModuleCreate
   OnDestroy = DataModuleDestroy
   Height = 597

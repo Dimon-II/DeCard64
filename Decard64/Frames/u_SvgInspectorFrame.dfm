@@ -9,7 +9,7 @@ object SvgInspectorFrame: TSvgInspectorFrame
     Top = 0
     Width = 618
     Height = 561
-    ActivePage = tsAtr
+    ActivePage = tsLangPack
     Align = alClient
     TabOrder = 0
     OnChange = pcAtrInspectorChange
@@ -18,7 +18,7 @@ object SvgInspectorFrame: TSvgInspectorFrame
       OnResize = tsAtrResize
       object splInspector: TSplitter
         Left = 0
-        Top = 429
+        Top = 427
         Width = 610
         Height = 6
         Cursor = crVSplit
@@ -30,7 +30,7 @@ object SvgInspectorFrame: TSvgInspectorFrame
         Left = 0
         Top = 36
         Width = 610
-        Height = 393
+        Height = 391
         Align = alClient
         BevelInner = bvNone
         ColCount = 4
@@ -51,15 +51,15 @@ object SvgInspectorFrame: TSvgInspectorFrame
       end
       object meHint: TMemo
         Left = 0
-        Top = 435
+        Top = 433
         Width = 610
         Height = 98
         Align = alBottom
         BevelInner = bvNone
         BevelOuter = bvNone
         BorderStyle = bsNone
-        Color = clBtnFace
-        Ctl3D = True
+        Color = clInfoBk
+        Ctl3D = False
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
         Font.Height = -13
@@ -91,7 +91,7 @@ object SvgInspectorFrame: TSvgInspectorFrame
             Left = 3
             Top = 6
             Width = 80
-            Height = 21
+            Height = 23
             Style = csDropDownList
             ItemIndex = 0
             TabOrder = 0
@@ -109,8 +109,8 @@ object SvgInspectorFrame: TSvgInspectorFrame
           Height = 36
           Align = alClient
           AutoSize = True
-          ButtonHeight = 36
-          ButtonWidth = 32
+          ButtonHeight = 38
+          ButtonWidth = 36
           Caption = 'tbrInspector'
           Images = MainData.ilHelper
           ShowCaptions = True
@@ -123,12 +123,12 @@ object SvgInspectorFrame: TSvgInspectorFrame
             ImageIndex = 22
           end
           object tbEdit: TToolButton
-            Left = 32
+            Left = 36
             Top = 0
             Action = aEdit
           end
           object ToolButton16: TToolButton
-            Left = 64
+            Left = 72
             Top = 0
             Width = 8
             Caption = 'ToolButton16'
@@ -136,14 +136,14 @@ object SvgInspectorFrame: TSvgInspectorFrame
             Style = tbsSeparator
           end
           object tbSetColor: TToolButton
-            Left = 72
+            Left = 80
             Top = 0
             Caption = 'Color'
             ImageIndex = 12
             OnClick = tbSetColorClick
           end
           object tbPipe: TToolButton
-            Left = 104
+            Left = 116
             Top = 0
             Hint = 'Color picker'
             Caption = 'Pike'
@@ -152,21 +152,21 @@ object SvgInspectorFrame: TSvgInspectorFrame
             OnClick = tbPipeClick
           end
           object tbFont: TToolButton
-            Left = 136
+            Left = 152
             Top = 0
             Caption = 'Font'
             ImageIndex = 19
             OnClick = tbFontClick
           end
           object tbFileXlink: TToolButton
-            Left = 168
+            Left = 188
             Top = 0
             Caption = 'File'
             ImageIndex = 18
             OnClick = tbFileXlinkClick
           end
           object ToolButton28: TToolButton
-            Left = 200
+            Left = 224
             Top = 0
             Caption = 'Defs'
             ImageIndex = 21
@@ -182,23 +182,147 @@ object SvgInspectorFrame: TSvgInspectorFrame
         Left = 0
         Top = 0
         Width = 610
-        Height = 533
+        Height = 456
         Align = alClient
         TabOrder = 0
         ExplicitWidth = 610
-        ExplicitHeight = 533
+        ExplicitHeight = 531
         inherited SynEditor: TSynEdit
           Width = 610
-          Height = 505
+          Height = 428
           ReadOnly = True
           WordWrap = False
           ExplicitWidth = 610
-          ExplicitHeight = 505
+          ExplicitHeight = 503
         end
         inherited pscrSysEdit: TPageScroller
           Width = 610
           ExplicitWidth = 610
         end
+      end
+      object meReplaceHint: TMemo
+        Left = 0
+        Top = 456
+        Width = 610
+        Height = 75
+        Align = alBottom
+        BorderStyle = bsNone
+        Color = clInfoBk
+        Ctl3D = False
+        Lines.Strings = (
+          'REPLACEMENT SYNTAX:'
+          '[Caption] Beginning of named block'
+          'macro=value (case insensitive)'
+          'Macros==value (case sensitive)'
+          'macro=$regexp')
+        ParentCtl3D = False
+        ReadOnly = True
+        TabOrder = 1
+        ExplicitTop = 455
+      end
+    end
+    object tsLangPack: TTabSheet
+      Caption = 'LangPack'
+      ImageIndex = 2
+      object SynEditor: TSynEdit
+        Left = 0
+        Top = 0
+        Width = 610
+        Height = 320
+        Align = alClient
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'Courier New'
+        Font.Style = []
+        Font.Quality = fqClearTypeNatural
+        TabOrder = 0
+        CodeFolding.ShowCollapsedLine = True
+        UseCodeFolding = False
+        Gutter.Font.Charset = DEFAULT_CHARSET
+        Gutter.Font.Color = clWindowText
+        Gutter.Font.Height = -11
+        Gutter.Font.Name = 'Courier New'
+        Gutter.Font.Style = []
+        Gutter.Font.Quality = fqClearTypeNatural
+        Gutter.ShowLineNumbers = True
+        Gutter.Bands = <
+          item
+            Kind = gbkMarks
+            Width = 13
+          end
+          item
+            Kind = gbkLineNumbers
+          end
+          item
+            Kind = gbkFold
+          end
+          item
+            Kind = gbkTrackChanges
+          end
+          item
+            Kind = gbkMargin
+            Width = 3
+          end>
+        Highlighter = SynIniSyn1
+        Options = [eoAutoIndent, eoDragDropEditing, eoGroupUndo, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
+        SearchEngine = ReplaceFrame.SynEditSearch1
+        SelectedColor.Alpha = 0.400000005960464500
+        OnChange = SynEditorChange
+        ExplicitLeft = 3
+        ExplicitTop = -96
+        ExplicitHeight = 354
+        RemovedKeystrokes = <
+          item
+            Command = ecLineBreak
+            ShortCut = 8205
+          end
+          item
+            Command = ecContextHelp
+            ShortCut = 112
+          end>
+        AddedKeystrokes = <>
+      end
+      object meLangHint: TMemo
+        Left = 0
+        Top = 320
+        Width = 610
+        Height = 211
+        Align = alBottom
+        BorderStyle = bsNone
+        Color = clInfoBk
+        Ctl3D = False
+        Lines.Strings = (
+          'SUPPORT FOR MULTIPLE LANGUAGES IN ONE TEMPLATE:'
+          
+            'On the first line, enter the identifier of the base language tha' +
+            't is used in the template and list the numbers of '
+          
+            'the columns containing text data, which are used in the template' +
+            '.'
+          
+            'If you have text in 2 or more languages, add lines here with the' +
+            ' language identifier and column numbers in that '
+          'language that correspond to the columns in the first line.'
+          'The choice of language is made on the top right corner.'
+          ''
+          'Example:'
+          '[en]=15,16,17,18'
+          '[ru]=22,23,24,25'
+          '[es]=26,27,28,29'
+          ''
+          
+            'In this example, there are 3 languages (English used in the temp' +
+            'late and additional Russian and Spanish), 4 '
+          
+            'columns each. That is, when choosing the Russian language, colum' +
+            'ns [15],[16],[17],[18] are not used, and data '
+          'from [22],[23],'
+          '[24],[25] are substituted instead.')
+        ParentCtl3D = False
+        ReadOnly = True
+        ScrollBars = ssVertical
+        TabOrder = 1
       end
     end
   end
@@ -211,5 +335,9 @@ object SvgInspectorFrame: TSvgInspectorFrame
       ImageIndex = 15
       OnExecute = aEditExecute
     end
+  end
+  object SynIniSyn1: TSynIniSyn
+    Left = 204
+    Top = 306
   end
 end
