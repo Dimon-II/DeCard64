@@ -1658,7 +1658,7 @@ begin
                     RstHpn := Hpn[i]+'-';
                     n2 := xn.Add('hyphen');
                     n2.text := Copy(SrcHpn,Length(RstHpn), Length(SrcHpn));
-                    n2.Attribute['width'] := IntToStr(SvgFontWidth(n2.text, AStyle));
+                    n2.Attribute['width'] := IntToStr(w3+SvgFontWidth(n2.text, AStyle));
                     Break;
                   end;
                end;

@@ -137,10 +137,10 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <Icon_MainIcon>Decard64_Icon.ico</Icon_MainIcon>
         <DCC_Namespace>VCL;System;$(DCC_Namespace)</DCC_Namespace>
-        <VerInfo_MinorVer>1</VerInfo_MinorVer>
-        <VerInfo_Release>2</VerInfo_Release>
-        <VerInfo_Build>9</VerInfo_Build>
-        <VerInfo_Keys>CompanyName=Dmitry Yatsenko;FileDescription=Card game design/translate tool;FileVersion=1.1.2.9;InternalName=Decard;LegalCopyright=feeware opensource;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.1.2.0;Comments=</VerInfo_Keys>
+        <VerInfo_MinorVer>2</VerInfo_MinorVer>
+        <VerInfo_Release>1</VerInfo_Release>
+        <VerInfo_Build>11</VerInfo_Build>
+        <VerInfo_Keys>CompanyName=Dmitry Yatsenko;FileDescription=Card game design/translate tool;FileVersion=1.2.1.11;InternalName=Decard;LegalCopyright=feeware opensource;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.1.2.0;Comments=</VerInfo_Keys>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">

@@ -206,7 +206,7 @@ object CellEditForm: TCellEditForm
       ParentFont = False
     end
     object btnApply: TButton
-      Left = 604
+      Left = 600
       Top = 9
       Width = 75
       Height = 25
@@ -221,10 +221,10 @@ object CellEditForm: TCellEditForm
       ParentFont = False
       TabOrder = 0
       OnClick = btnApplyClick
-      ExplicitLeft = 600
+      ExplicitLeft = 596
     end
     object btnCancel: TButton
-      Left = 685
+      Left = 681
       Top = 9
       Width = 75
       Height = 25
@@ -238,7 +238,7 @@ object CellEditForm: TCellEditForm
       Font.Style = []
       ParentFont = False
       TabOrder = 1
-      ExplicitLeft = 681
+      ExplicitLeft = 677
     end
     object chbScrollPreview: TCheckBox
       Left = 82
@@ -425,15 +425,24 @@ object CellEditForm: TCellEditForm
           '<b>...</b> <i>...</i> <u>...</u>'
           '<p>...</p> <br/> <hr/>'
           
-            '<div align="left / center/ right / width / hyphen" line-height="' +
-            'normal / pixels / %" html-width='#39'pixels'#39'>...</div>'
+            '<div align="left / center/ right / width / hyphen " line-height=' +
+            '"normal / pixels / %" html-width='#39'pixels'#39' left="pixels" rigth="p' +
+            'ixels">...</div>'
           
-            '<font size="1..7" font-size="8..32..256" face="Arial / Comic San' +
-            's MS / ..." color="" text-indent="">...</font>'
-          '<img src="bitmap file" width="xxx" height="yyy" dy='#39'...'#39'/>'
-          '<use src="#defs ref" width="xxx" height="yyy"  dy='#39'...'#39'/>'
-          '<use src="clipart.svg#ref" width="xxx" height="yyy"  dy='#39'...'#39'/>'
-          '<bkg src="bitmap file" or any rect attributes />')
+            '<font font-size="8 16 32" font-family="Arial / Comic Sans MS / .' +
+            '.." color="" text-indent="">...</font>'
+          
+            '<img src="bitmap file" width="xxx" height="yyy"  dx dy x1 x2 y1 ' +
+            'y2.../>'
+          
+            '<use src="#defs ref" width="xxx" height="yyy"  dx dy x1 x2 y1 y2' +
+            '.../>'
+          
+            '<use src="clipart.svg#ref" width="xxx" height="yyy"  dx dy x1 x2' +
+            ' y1 y2.../>'
+          '<bkg src="bitmap file" or any rect attributes outline="..."/>'
+          '<bkg patch="reference to defs supported %x/%y"  outline="..."/>'
+          '<html width="xxx" height="yyy"  any rect attributes >...</html>')
         Options = [eoAutoIndent, eoEnhanceEndKey, eoGroupUndo, eoScrollPastEol, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
         ReadOnly = True
         SelectedColor.Alpha = 0.400000005960464500

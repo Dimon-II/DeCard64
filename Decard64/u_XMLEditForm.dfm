@@ -87,7 +87,7 @@ object XMLEditForm: TXMLEditForm
       end
       inherited pscrSysEdit: TPageScroller
         Width = 622
-        ExplicitWidth = 618
+        ExplicitWidth = 622
       end
     end
     object seTags: TSynEdit
@@ -136,19 +136,26 @@ object XMLEditForm: TXMLEditForm
         '<b>...</b> <i>...</i> <u>...</u>'
         '<p>...</p> <br/> <hr/>'
         
-          '<div align="left / center/ right / width" line-height="normal / ' +
-          'pixels / %" html-width='#39'pixels'#39'>...</div>'
+          '<div align="left / center/ right / width / hyphen " line-height=' +
+          '"normal / pixels / %" html-width='#39'pixels'#39' left="pixels" rigth="p' +
+          'ixels">...</div>'
         
-          '<font size="1..7" face="Arial / Comic Sans MS / ..." color="" te' +
-          'xt-indent="">...</font>'
-        '<img src="bitmap file" width="xxx" height="yyy" dy='#39'...'#39'/>'
-        '<use src="#defs ref" width="xxx" height="yyy"  dy='#39'...'#39'/>'
-        '<use src="clipart.svg#ref" width="xxx" height="yyy"  dy='#39'...'#39'/>'
-        '<bkg src="bitmap file" or any rect attributes />')
+          '<font font-size="8 16 32" font-family="Arial / Comic Sans MS / .' +
+          '.." color="" text-indent="">...</font>'
+        
+          '<img src="bitmap file" width="xxx" height="yyy"  dx dy x1 x2 y1 ' +
+          'y2.../>'
+        
+          '<use src="#defs ref" width="xxx" height="yyy"  dx dy x1 x2 y1 y2' +
+          '.../>'
+        
+          '<use src="clipart.svg#ref" width="xxx" height="yyy"  dx dy x1 x2' +
+          ' y1 y2.../>'
+        '<bkg src="bitmap file" or any rect attributes outline="..."/>'
+        '<bkg patch="reference to defs supported %x/%y"  outline="..."/>'
+        '<html width="xxx" height="yyy"  any rect attributes >...</html>')
       ReadOnly = True
       SelectedColor.Alpha = 0.400000005960464500
-      ExplicitTop = 248
-      ExplicitWidth = 618
     end
   end
 end
