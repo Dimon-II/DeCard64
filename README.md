@@ -31,7 +31,10 @@ https://github.com/synopse/SynPDF
 
 Text editor with syntax highlighting (Delphi package)
 https://github.com/SynEdit/SynEdit
-Install this package into Delphi manually or through the menu [Tools]-[GetIt package manager...].
+<br>Install this package into Delphi manually ([Tools]-[GetIt package manager...] turned out to be **incompatible with syntax checking**)
+
+SynEdit interface to checking system **Hunspell** 
+https://github.com/jrathlev/SynEdit-Spell-Checker
 
 Icon pack
 https://www.flaticon.com/
