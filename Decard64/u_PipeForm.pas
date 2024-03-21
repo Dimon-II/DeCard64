@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, System.Actions, Vcl.ActnList,
-  Vcl.ExtCtrls, Vcl.StdCtrls;
+  Vcl.ExtCtrls, Vcl.StdCtrls, system.types;
 
 type
   TPipeForm = class(TForm)

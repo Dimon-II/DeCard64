@@ -27,7 +27,7 @@ object MainForm: TMainForm
     Top = 0
     Width = 1093
     Height = 623
-    ActivePage = tsDesigner
+    ActivePage = tsProject
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -933,11 +933,12 @@ object MainForm: TMainForm
             Top = 0
             Width = 360
             Height = 105
+            Hint = 'Temporary double width to display non-translated card'
             Align = alLeft
             Caption = 'Card size'
             TabOrder = 0
             object lblCardWidth: TLabel
-              Left = 5
+              Left = 3
               Top = 20
               Width = 28
               Height = 13
@@ -946,29 +947,29 @@ object MainForm: TMainForm
             end
             object lblCardHeight: TLabel
               Left = 5
-              Top = 47
+              Top = 51
               Width = 31
               Height = 13
               Caption = 'Height'
             end
             object lblDPI: TLabel
-              Left = 256
-              Top = 19
+              Left = 265
+              Top = 20
               Width = 17
               Height = 13
               Caption = 'DPI'
               FocusControl = cbDPI
             end
             object lblCardPreset: TLabel
-              Left = 5
-              Top = 76
+              Left = 3
+              Top = 79
               Width = 31
               Height = 13
               Caption = 'Preset'
             end
             object lblCard: TLabel
               Left = 326
-              Top = 47
+              Top = 51
               Width = 23
               Height = 13
               Alignment = taRightJustify
@@ -976,7 +977,7 @@ object MainForm: TMainForm
             end
             object seWidth: TSpinEdit
               Left = 49
-              Top = 15
+              Top = 14
               Width = 94
               Height = 26
               Hint = 'Width'
@@ -996,7 +997,7 @@ object MainForm: TMainForm
             end
             object seHeight: TSpinEdit
               Left = 48
-              Top = 44
+              Top = 45
               Width = 94
               Height = 26
               Hint = 'Height'
@@ -1036,7 +1037,7 @@ object MainForm: TMainForm
             end
             object cbPreset: TComboBox
               Left = 48
-              Top = 75
+              Top = 76
               Width = 304
               Height = 20
               Style = csDropDownList
@@ -1076,8 +1077,8 @@ object MainForm: TMainForm
             end
             object chbLOCK: TCheckBox
               Left = 150
-              Top = 20
-              Width = 68
+              Top = 18
+              Width = 62
               Height = 17
               Caption = 'LOCK'
               Font.Charset = DEFAULT_CHARSET
@@ -1091,14 +1092,23 @@ object MainForm: TMainForm
             end
             object btnBleed2mm: TButton
               Left = 150
-              Top = 44
-              Width = 83
+              Top = 45
+              Width = 77
               Height = 25
-              Caption = '+ 2 mm Bleed'
+              Caption = '+2 mm Bleed'
               Enabled = False
-              TabOrder = 5
+              TabOrder = 6
               Visible = False
               OnClick = btnBleed2mmClick
+            end
+            object chk2x: TCheckBox
+              Left = 218
+              Top = 18
+              Width = 38
+              Height = 17
+              Caption = '2x'
+              TabOrder = 5
+              OnClick = chk2xClick
             end
           end
           object Panel7: TPanel
@@ -1541,6 +1551,8 @@ object MainForm: TMainForm
               Width = 89
               Height = 17
               Caption = 'Filename split'
+              Checked = True
+              State = cbChecked
               TabOrder = 11
             end
           end
@@ -1898,7 +1910,6 @@ object MainForm: TMainForm
           Align = alBottom
           Control = tbrCellGrid
           TabOrder = 1
-          ExplicitTop = 371
           object tbrCellGrid: TToolBar
             Left = 0
             Top = 0
@@ -2084,37 +2095,42 @@ object MainForm: TMainForm
           end
           inherited tsReplace: TTabSheet
             ExplicitTop = 24
-            ExplicitHeight = 533
+            ExplicitWidth = 321
+            ExplicitHeight = 390
             inherited ReplaceFrame: TSynEditFrame
-              Height = 458
-              ExplicitHeight = 458
+              Width = 321
+              Height = 307
+              ExplicitWidth = 321
+              ExplicitHeight = 307
               inherited SynEditor: TSynEdit
-                Height = 430
-                ExplicitHeight = 430
+                Width = 321
+                Height = 279
+                ExplicitWidth = 321
+                ExplicitHeight = 279
+              end
+              inherited pscrSysEdit: TPageScroller
+                Width = 321
+                ExplicitWidth = 321
               end
             end
             inherited meReplaceHint: TMemo
-              Top = 458
-              ExplicitTop = 458
+              Top = 307
+              Width = 321
+              ExplicitTop = 307
+              ExplicitWidth = 321
             end
           end
           inherited tsLangPack: TTabSheet
             ExplicitTop = 24
-            ExplicitWidth = 321
-            ExplicitHeight = 390
+            ExplicitHeight = 533
             inherited SynEditor: TSynEdit
-              Width = 321
-              Height = 179
+              Height = 322
               Highlighter = InspectorFrame.ReplaceFrame.SynXMLSyn1
               SearchEngine = InspectorFrame.ReplaceFrame.SynEditSearch1
-              ExplicitLeft = 0
-              ExplicitTop = 0
-              ExplicitWidth = 321
-              ExplicitHeight = 179
+              ExplicitHeight = 322
             end
             inherited meLangHint: TMemo
-              Top = 179
-              Width = 321
+              Top = 322
               Lines.Strings = (
                 'SUPPORT FOR MULTIPLE LANGUAGES IN ONE TEMPLATE:'
                 'On the first line, enter the identifier of the base language '
@@ -2137,8 +2153,7 @@ object MainForm: TMainForm
                 'columns each. That is, when choosing the Russian language, '
                 'columns [15],[16],[17],[18] are not used, and data '
                 'from [22],[23],[24],[25] are substituted instead.')
-              ExplicitTop = 179
-              ExplicitWidth = 321
+              ExplicitTop = 322
             end
           end
         end
@@ -2636,14 +2651,14 @@ object MainForm: TMainForm
             ExplicitHeight = 567
             inherited ReplaceFrame: TSynEditFrame
               Width = 630
-              Height = 492
+              Height = 484
               ExplicitWidth = 630
-              ExplicitHeight = 492
+              ExplicitHeight = 484
               inherited SynEditor: TSynEdit
                 Width = 630
-                Height = 464
+                Height = 456
                 ExplicitWidth = 630
-                ExplicitHeight = 464
+                ExplicitHeight = 456
               end
               inherited pscrSysEdit: TPageScroller
                 Width = 630
@@ -2651,10 +2666,10 @@ object MainForm: TMainForm
               end
             end
             inherited meReplaceHint: TMemo
-              Top = 492
+              Top = 484
               Width = 630
               Visible = False
-              ExplicitTop = 492
+              ExplicitTop = 484
               ExplicitWidth = 630
             end
           end
@@ -2666,8 +2681,6 @@ object MainForm: TMainForm
               Height = 322
               Highlighter = ClipartInspectorFrame.ReplaceFrame.SynXMLSyn1
               SearchEngine = ClipartInspectorFrame.ReplaceFrame.SynEditSearch1
-              ExplicitLeft = 0
-              ExplicitTop = 0
               ExplicitHeight = 322
             end
             inherited meLangHint: TMemo
@@ -2931,6 +2944,15 @@ object MainForm: TMainForm
             ImageIndex = 53
             OnClick = tbPreviewMMClick
           end
+          object tbRotate: TToolButton
+            Left = 287
+            Top = 0
+            Hint = 'Default position'
+            Caption = 'tbRotate'
+            DropdownMenu = pmRotate
+            ImageIndex = 58
+            Style = tbsDropDown
+          end
         end
         object Rendering3: TPanel
           Left = 3
@@ -2980,7 +3002,6 @@ object MainForm: TMainForm
   end
   object dlgTextFind: TFindDialog
     OnClose = dlgTextFindClose
-    OnShow = dlgTextFindShow
     OnFind = dlgTextFindFind
     Left = 48
     Top = 544
@@ -3024,6 +3045,14 @@ object MainForm: TMainForm
       object miApplysorting: TMenuItem
         Caption = 'Apply sorting'
         OnClick = miApplysortingClick
+      end
+      object N3: TMenuItem
+        Caption = '-'
+      end
+      object Fontello1: TMenuItem
+        Caption = 'Fontello'
+        Visible = False
+        OnClick = Fontello1Click
       end
     end
   end
@@ -3106,6 +3135,38 @@ object MainForm: TMainForm
     object DeleteRow1: TMenuItem
       Caption = 'Delete Row'
       OnClick = DeleteRow1Click
+    end
+  end
+  object pmRotate: TPopupMenu
+    Images = MainData.ilDecard
+    Left = 476
+    Top = 197
+    object miRotate_0: TMenuItem
+      Caption = '0'#176
+      Hint = 'Default position'
+      ImageIndex = 58
+      OnClick = miRotate_270Click
+    end
+    object miRotate_90: TMenuItem
+      Tag = 90
+      Caption = '90'#176
+      Hint = 'Rotate 90'#176
+      ImageIndex = 56
+      OnClick = miRotate_270Click
+    end
+    object miRotate_180: TMenuItem
+      Tag = 180
+      Caption = '180'#176
+      Hint = 'Rotate 180'#176
+      ImageIndex = 59
+      OnClick = miRotate_270Click
+    end
+    object miRotate_270: TMenuItem
+      Tag = 270
+      Caption = '-90'#176
+      Hint = 'Rotate -90'#176
+      ImageIndex = 57
+      OnClick = miRotate_270Click
     end
   end
 end

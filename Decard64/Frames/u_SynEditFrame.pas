@@ -128,6 +128,7 @@ type
     FindCaption:string;
     procedure Apply;
     property SVGNode: TXML_Nod read FSVGNode write SetSVGNode;
+    procedure Reset;
 
   end;
 
@@ -179,13 +180,32 @@ begin
 end;
 
 procedure TSynEditFrame.actEditPasteExecute(Sender: TObject);
+var
+  Data: THandle;
+  TextData: string;
 begin
-  SynEditor.PasteFromClipboard
+  OpenClipboard(0);
+  try
+    Data := GetClipboardData(50070);
+    if Data <> 0 then
+    begin
+      try
+        SynEditor.Seltext := Utf8Decode(Copy(PAnsiChar(GlobalLock(Data)),1, LocalSize(Data)));
+      finally
+        GlobalUnlock(Data);
+      end;
+    end
+    else
+     SynEditor.PasteFromClipboard;
+  finally
+    CloseClipboard;
+  end;
 end;
 
 procedure TSynEditFrame.actEditPasteUpdate(Sender: TObject);
+var buf:array[0..255] of Char;
 begin
-  actEditPaste.Enabled := SynEditor.CanPaste;
+  actEditPaste.Enabled := SynEditor.CanPaste or (GetClipboardFormatName(50070,@buf,256)>0);
 end;
 
 procedure TSynEditFrame.actEditDeleteExecute(Sender: TObject);
@@ -363,6 +383,11 @@ var
 begin
   GetWindowText(ReplaceDialog.Handle, Buffer, SizeOf(Buffer));
   SetWindowText(ReplaceDialog.Handle, PChar(@Buffer)+Findcaption);
+end;
+
+procedure TSynEditFrame.Reset;
+begin
+  FSVGNode := Nil;
 end;
 
 procedure TSynEditFrame.SetSVGNode(const Value: TXML_Nod);

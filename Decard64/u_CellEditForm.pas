@@ -68,6 +68,41 @@ type
     tbMerge: TToolButton;
     tbApply: TToolButton;
     seTranslate: TSynEdit;
+    SynEdit1: TSynEdit;
+    N2: TMenuItem;
+    miOpenFile: TMenuItem;
+    miSaveFile: TMenuItem;
+    Distinctfill1: TMenuItem;
+    miPaste1: TMenuItem;
+    pmText: TPopupMenu;
+    pmiAddToDictionary: TMenuItem;
+    pmiSuggestions: TMenuItem;
+    pmiMisspelling: TMenuItem;
+    pmiSelectLanguage: TMenuItem;
+    pmiNoSpellcheck: TMenuItem;
+    N3: TMenuItem;
+    pmiRemove: TMenuItem;
+    tsReplace: TTabSheet;
+    pnButtons: TPanel;
+    btnReplaceAll: TButton;
+    btnReplace: TButton;
+    btnFind: TButton;
+    btnFindUp: TButton;
+    pnReplace: TPanel;
+    gbOptions: TGroupBox;
+    chbColumn: TCheckBox;
+    chbPromt: TCheckBox;
+    chbMatchCase: TCheckBox;
+    chbWholeCell: TCheckBox;
+    pbReplaceText: TPanel;
+    lblFind: TLabel;
+    lblReplace: TLabel;
+    edFind: TComboBox;
+    edReplace: TComboBox;
+    chbFindBack: TCheckBox;
+    aGridFindNext: TAction;
+    aGridFindPrev: TAction;
+    aGridReplace: TAction;
     procedure FormCreate(Sender: TObject);
     procedure CellEditFrameSynEditorChange(Sender: TObject);
     procedure lbMacrosDblClick(Sender: TObject);
@@ -110,10 +145,30 @@ type
     procedure FormResize(Sender: TObject);
     procedure CellEditFrameSynEditorGutterGetText(Sender: TObject;
       aLine: Integer; var aText: string);
+    procedure miOpenFileClick(Sender: TObject);
+    procedure miSaveFileClick(Sender: TObject);
+    procedure Distinctfill1Click(Sender: TObject);
+    procedure miPaste1Click(Sender: TObject);
+    procedure pmiAddToDictionaryClick(Sender: TObject);
+    procedure pmiMisspellingClick(Sender: TObject);
+    procedure pmiNoSpellcheckClick(Sender: TObject);
+    procedure SelectDictLangClick(Sender: TObject);
+    procedure pmTextPopup(Sender: TObject);
+    procedure SuggestionOnClick(Sender: TObject);
+    procedure pmiRemoveClick(Sender: TObject);
+    procedure btnFindClick(Sender: TObject);
+    procedure btnReplaceClick(Sender: TObject);
+    procedure btnReplaceAllClick(Sender: TObject);
+    procedure aGridFindNextExecute(Sender: TObject);
+    procedure aGridFindPrevExecute(Sender: TObject);
+    procedure aGridReplaceExecute(Sender: TObject);
+    procedure aGridFindNextUpdate(Sender: TObject);
+    procedure aGridFindPrevUpdate(Sender: TObject);
+    procedure aGridReplaceUpdate(Sender: TObject);
   private
     FOldText:string;
     FGrid: TStringGrid;
-    FRow,RowDisplay: integer;
+    FRow: integer;
     FRepl:TStringList;
     FNodeName: string;
     function GetText: string;
@@ -122,11 +177,18 @@ type
     procedure ResetCombo;
     procedure PrepareCombo;
     procedure SetNodeName(const Value: string);
+    function Compare(txt: string; var i: integer): Boolean;
+    procedure SelectReplace;
     { Private declarations }
   public
     { Public declarations }
     StartingPoint : TPoint;
     Doing:string;
+    RowDisplay: integer;
+    miSuggest,
+    miMisspelling,
+    miRemove,
+    miAddWord:TMenuItem;
     procedure PrepareMacro(ANod:TXML_Nod);
     procedure btnCancelClick(Sender: TObject);
     property Text:string read GetText write SetText;
@@ -144,7 +206,8 @@ implementation
 
 {$R *.dfm}
 
-uses u_MainData, u_MainForm, u_XMLEditForm, Clipbrd, u_TraceReplace;
+uses u_MainData, u_MainForm, u_XMLEditForm, Clipbrd, u_TraceReplace,
+SynEditSpell, SynEditHighlighter;
 
 { TCellEditForm }
 
@@ -190,6 +253,17 @@ begin
   TraceReplForm.ShowModal;
 end;
 
+procedure TCellEditForm.aGridReplaceExecute(Sender: TObject);
+begin
+  btnReplaceClick(nil)
+end;
+
+procedure TCellEditForm.aGridReplaceUpdate(Sender: TObject);
+begin
+  aGridReplace.Enabled := (edFind.Text<>'') and (edFind.Text<>edReplace.text);
+  btnReplaceAll.Enabled := (edFind.Text<>'') and (edFind.Text<>edReplace.text);
+end;
+
 procedure TCellEditForm.Action1Execute(Sender: TObject);
 begin
   if lbCommon.Count > TAction(Sender).tag + lbCommon.TopIndex-1 then
@@ -223,6 +297,26 @@ begin
   if chbScrollPreview.Checked then
      aPreview.Execute
 }
+end;
+
+procedure TCellEditForm.aGridFindNextExecute(Sender: TObject);
+begin
+  btnFindClick(btnFind);
+end;
+
+procedure TCellEditForm.aGridFindNextUpdate(Sender: TObject);
+begin
+  aGridFindNext.Enabled := edFind.Text <> '';
+end;
+
+procedure TCellEditForm.aGridFindPrevExecute(Sender: TObject);
+begin
+  btnFindClick(btnFindUp);
+end;
+
+procedure TCellEditForm.aGridFindPrevUpdate(Sender: TObject);
+begin
+  aGridFindPrev.Enabled := edFind.Text <> '';
 end;
 
 procedure TCellEditForm.aGridRightExecute(Sender: TObject);
@@ -308,6 +402,123 @@ begin
   Close;
 end;
 
+procedure TCellEditForm.btnFindClick(Sender: TObject);
+var i,j,step:integer;
+   s1,s2,txt:string;
+begin
+  if edFind.Items.IndexOf(edFind.Text)=-1 then
+    edFind.Items.Insert(0,edFind.Text);
+
+
+  if chbColumn.Checked then
+     step := Grid.ColCount
+  else
+     step := 1;
+
+  if chbFindBack.Checked XOR  (Sender = btnFindUp) then
+     step := -step;
+
+  if not chbWholeCell.Checked then
+  begin
+    txt := CellEditFrame.SynEditor.text;
+    if chbMatchCase.Checked then
+    begin
+      s1 := edFind.Text;
+      s2 :=txt;
+    end
+    else
+    begin
+      s1 := WideUpperCase(edFind.Text);
+      s2 := WideUpperCase(txt);
+    end;
+
+    if step >0 then
+      j := pos(s1, s2, CellEditFrame.SynEditor.SelStart+CellEditFrame.SynEditor.SelLength+1)
+    else
+    for i := CellEditFrame.SynEditor.SelStart downto 0 do
+    begin
+      j := pos(s1, s2, i);
+      if (j>0) and (j<CellEditFrame.SynEditor.SelStart) then
+        Break
+      else
+        j := 0;
+    end;
+    if j > 0 then
+    begin
+      CellEditFrame.SynEditor.SelStart := j-1;
+      CellEditFrame.SynEditor.SelLength := Length(edFind.text);
+      exit;
+    end;
+
+  end;
+
+
+  i:=(Grid.Row) * Grid.ColCount + Grid.Col;
+  while True do
+  begin
+    inc(i,step);
+    if i<Grid.ColCount then exit;
+    if i >= Grid.ColCount * Grid.RowCount then exit;
+    Compare(Grid.Cells[i mod Grid.ColCount, i div Grid.ColCount],i)
+  end;
+end;
+
+procedure TCellEditForm.btnReplaceAllClick(Sender: TObject);
+var acol,arow,qry:Integer;
+
+begin
+  if edReplace.Items.IndexOf(edReplace.Text)=-1 then
+    edReplace.Items.Insert(0,edReplace.Text);
+
+  if MessageDlg('Replace ALL '''+edFind.Text+''' to '''+edReplace.text+'''?', mtConfirmation, [mbYes, mbNo],0)=mrNo then exit;
+
+
+  qry := mrYes;
+  if edFind.Text<> edReplace.text then
+  repeat
+    while (CellEditFrame.SynEditor.SelLength=Length(edFind.Text)) do
+    begin
+      if chbPromt.Checked and (qry <> mrAll)then
+       qry := MessageDlg('Replace selected to '''+edReplace.text+'''?', mtConfirmation, [mbYes, mbNo, mbAbort, mbAll],0);
+      if qry=mrAbort then Abort;
+
+      if not chbWholeCell.Checked or (Length(CellEditFrame.SynEditor.Text)=Length(edFind.Text)) then
+      if (CellEditFrame.SynEditor.SelLength=Length(edFind.Text)) and (qry in [mrYes,mrAll]) then
+        CellEditFrame.SynEditor.SelText :=edReplace.Text
+       else
+        CellEditFrame.SynEditor.SelStart := CellEditFrame.SynEditor.SelStart+Length(edFind.Text);
+      SelectReplace
+    end;
+
+
+
+    acol:=Grid.Col;
+    arow:=Grid.Row;
+    try
+      btnFindClick(nil);
+    except
+
+    end;
+   SelectReplace;
+  until (acol=Grid.Col) and (arow=Grid.Row);
+
+end;
+
+procedure TCellEditForm.btnReplaceClick(Sender: TObject);
+begin
+  if edReplace.Items.IndexOf(edReplace.Text)=-1 then
+    edReplace.Items.Insert(0,edReplace.Text);
+
+  if not chbWholeCell.Checked or (Length(CellEditFrame.SynEditor.Text)=Length(edFind.Text)) then
+  if (CellEditFrame.SynEditor.SelLength=Length(edFind.Text)) and
+     (not chbPromt.Checked or (MessageDlg('Replace selected to '''+edReplace.text+'''?', mtConfirmation, [mbYes,mbNo],0)=mrYes)) then
+     begin
+       CellEditFrame.SynEditor.SelText :=edReplace.Text;
+     end
+   else CellEditFrame.SynEditor.SelStart := CellEditFrame.SynEditor.SelStart+Length(edFind.Text);
+   SelectReplace
+end;
+
 procedure TCellEditForm.cbHelperChange(Sender: TObject);
 begin
   if cbHelper.ItemIndex=-1 then
@@ -360,6 +571,14 @@ end;
 procedure TCellEditForm.CellEditFrameSynEditorChange(Sender: TObject);
 begin
   Grid.Cells[Grid.Col, Grid.Row] := GetText;
+
+//  if pcHelpher.ActivePage = tsReplace then
+//    SelectReplace;
+
+
+
+
+
 end;
 
 procedure TCellEditForm.CellEditFrameSynEditorGutterGetText(Sender: TObject;
@@ -382,6 +601,7 @@ begin
     aAddCommon.Execute
 end;
 
+
 procedure TCellEditForm.Clear1Click(Sender: TObject);
 begin
  lbCommon.Clear;
@@ -391,6 +611,23 @@ procedure TCellEditForm.Del1Click(Sender: TObject);
 begin
  if lbCommon.ItemIndex<>-1 then
    lbCommon.Items.Delete(lbCommon.ItemIndex);
+end;
+
+procedure TCellEditForm.Distinctfill1Click(Sender: TObject);
+var i:integer;
+begin
+  for i := 1 to  Grid.RowCount-1 do
+    if Trim(Grid.Cells[Grid.Col, i])<>'' then
+      if lbCommon.Items.IndexOf(Grid.Cells[Grid.Col, i])=-1 then
+      begin
+        lbCommon.Items.Add(Grid.Cells[Grid.Col, i]);
+        if lbCommon.Items.Count mod 10 = 0 then
+          if MessageDlg(IntToStr(lbCommon.Items.Count)+' list items, Continue scanning?', mtConfirmation,[mbYes, mbNo],0) = mrNo then
+            Abort
+      end;
+  lbCommon.Sorted := true;
+  lbCommon.Sorted := False;
+
 end;
 
 procedure TCellEditForm.FillbyCol1Click(Sender: TObject);
@@ -405,10 +642,85 @@ begin
 end;
 
 procedure TCellEditForm.FormCreate(Sender: TObject);
+
+procedure MergeMenus(SrcMenu, DstMenu: TPopupMenu);
+var
+  i, i2, i3: Integer;
+  Menu, SubMenu  : TMenuItem;
+begin
+  DstMenu.OnPopup :=SrcMenu.OnPopup;
+  for i := 0 to SrcMenu.Items.Count - 1 do
+  begin
+          Menu := TMenuItem.Create(DstMenu.Owner);
+          // copy another properties if necessery
+          Menu.Name := SrcMenu.Items[i].Name;
+          Menu.Caption := SrcMenu.Items[i].Caption;
+          Menu.ShortCut := SrcMenu.Items[i].ShortCut;
+          Menu.OnClick := SrcMenu.Items[i].OnClick;
+          Menu.RadioItem:=SrcMenu.Items[i].RadioItem;
+          Menu.Tag:=SrcMenu.Items[i].Tag;
+          Menu.Enabled := SrcMenu.Items[i].Enabled;
+          Menu.Visible := SrcMenu.Items[i].Visible;
+          Menu.GroupIndex:=SrcMenu.Items[i].GroupIndex;
+
+          if SrcMenu.Items[i] = pmiSuggestions then
+            miSuggest := Menu;
+          if SrcMenu.Items[i] = pmiAddToDictionary then
+            miAddWord := Menu;
+          if SrcMenu.Items[i] = pmiMisspelling then
+            miMisspelling := Menu;
+          if SrcMenu.Items[i] = pmiRemove then
+            miRemove := Menu;
+
+
+
+          DstMenu.Items.Add(Menu);
+        for i3 := 0 to SrcMenu.Items[i].Count - 1 do
+        begin
+          SubMenu := TMenuItem.Create(DstMenu.Owner);
+          // copy another properties if necessery
+          SubMenu.Name := SrcMenu.Items[i].Items[i3].Name;
+          SubMenu.Caption := SrcMenu.Items[i].Items[i3].Caption;
+          SubMenu.ShortCut := SrcMenu.Items[i].Items[i3].ShortCut;
+          SubMenu.OnClick := SrcMenu.Items[i].Items[i3].OnClick;
+          SubMenu.RadioItem:=SrcMenu.Items[i].Items[i3].RadioItem;
+          SubMenu.Tag:=SrcMenu.Items[i].Items[i3].Tag;
+          SubMenu.GroupIndex:=SrcMenu.Items[i].Items[i3].GroupIndex;
+          SubMenu.Checked:=SrcMenu.Items[i].Items[i3].Checked;
+
+          Menu.Add(SubMenu);
+        end;
+      end;
+end;
+var
+  mi      : TMenuItem;
+  i       : integer;
+
 begin
   btnCancel.OnClick := btnCancelClick;
   CellEditFrame.FindCaption := ': Edited Text [table cell]';
   FRepl := TStringList.Create;
+
+  with MainData.DictLangList do
+    for i:=0 to Count-1 do
+    begin
+        mi:=TMenuItem.Create(Self);
+        with mi do begin
+          Caption:=Strings[i];
+          GroupIndex:=82;
+          RadioItem:=true;
+          Tag:=integer(Objects[i]);
+          OnClick:=SelectDictLangClick;
+          end;
+        pmiSelectLanguage.Add(mi);
+    end;
+  TDrawAutoSpellCheckPlugin.Create(CellEditFrame.SynEditor,MainData.SynEditSpellCheck);
+  CellEditFrame.SynEditor.Tag:=0;
+  CellEditFrame.SynEditor.Highlighter.AdditionalWordBreakChars:=['«', '»', '“', '”'];
+  CellEditFrame.SynEditor.AdditionalWordBreakChars:=['«', '»', '“', '”'];
+  CellEditFrame.SynEditor.Highlighter.AdditionalIdentChars:=['[',']'];
+
+  MergeMenus(pmText, CellEditFrame.SynEditor.PopupMenu);
 end;
 
 procedure TCellEditForm.FormDeactivate(Sender: TObject);
@@ -442,7 +754,7 @@ begin
   s := lbCommon.Items[lbCommon.ItemIndex];
   if seWrap.Lines.IndexOf(s)>-1 then
     s :=  ^M + s;
-  CellEditFrame.SynEditor.SelText := s;
+  CellEditFrame.SynEditor.SelText := StringReplace(s,'[selected]',CellEditFrame.SynEditor.SelText,[]);
   CellEditFrame.SynEditor.SetFocus;
 end;
 
@@ -457,9 +769,9 @@ begin
     with Source as TListBox do
     begin
       StartPosition := ItemAtPos(StartingPoint,True) ;
-      DropPosition := ItemAtPos(DropPoint,True) ;
-
-      Items.Move(StartPosition, DropPosition) ;
+      DropPosition := ItemAtPos(DropPoint,True);
+      if (StartPosition<>-1) and (DropPosition<>-1) then
+        Items.Move(StartPosition, DropPosition) ;
     end;
 end;
 
@@ -488,7 +800,7 @@ begin
   if seWrap.Lines.IndexOf(s)>-1 then
     s :=  ^M + s;
 
-  CellEditFrame.SynEditor.SelText := s;
+  CellEditFrame.SynEditor.SelText := StringReplace(s,'[selected]',CellEditFrame.SynEditor.SelText,[]);
   CellEditFrame.SynEditor.SetFocus;
 end;
 
@@ -508,6 +820,163 @@ begin
        lbFiltered.Items.Add(lbMacros.Items[i])
 
   end;
+end;
+
+procedure TCellEditForm.miOpenFileClick(Sender: TObject);
+begin
+  if MainData.dlgOpenCommon.execute then
+  begin
+    if MainData.dlgOpenCommon.Encodings[MainData.dlgOpenCommon.encodingindex] ='UTF-8' then
+      lbCommon.Items.LoadFromFile(MainData.dlgOpenCommon.filename, TEncoding.UTF8)
+    else
+      lbCommon.Items.LoadFromFile(MainData.dlgOpenCommon.filename);
+    MainData.dlgSaveCommon.filename := MainData.dlgOpenCommon.filename;
+  end;
+end;
+
+procedure TCellEditForm.miPaste1Click(Sender: TObject);
+var sl:TStringList;
+    i:Integer;
+begin
+  sl:=TStringList.Create;
+  sl.Text := Clipboard.AsText;
+   for i:= 0 to sl.Count-1 do
+     if Trim(sl[i])<>''  then
+       if lbCommon.Items.IndexOf(sl[i])=-1 then
+         lbCommon.Items.Add(sl[i]);
+  sl.free;
+end;
+
+procedure TCellEditForm.miSaveFileClick(Sender: TObject);
+begin
+  if MainData.dlgSaveCommon.execute then
+  begin
+    if MainData.dlgOpenCommon.Encodings[MainData.dlgOpenCommon.encodingindex] ='UTF-8' then
+      lbCommon.Items.SaveToFile(MainData.dlgSaveCommon.filename, TEncoding.UTF8)
+    else
+      lbCommon.Items.SaveToFile(MainData.dlgSaveCommon.filename);
+  end;
+
+end;
+
+procedure TCellEditForm.pmiAddToDictionaryClick(Sender: TObject);
+var
+  xy : TBufferCoord;
+begin
+  with CellEditFrame.SynEditor do
+  begin
+    xy:=CaretXY;
+    MainData.SynEditSpellCheck.AddDictWord(GetWordAtRowCol(xy));
+    CaretXY:=xy;
+    Invalidate;
+    MainData.SynEditSpellCheck.Modified := False;
+  end;
+end;
+
+procedure TCellEditForm.pmiMisspellingClick(Sender: TObject);
+var
+  sWord,sToken : string;
+  PosXY : TBufferCoord;
+  Attri : TSynHighlighterAttributes;
+  fnd   : boolean;
+begin
+  with CellEditFrame.SynEditor do
+  begin
+    fnd:=false; PosXY:=CaretXY;
+    repeat
+      PosXY:=NextWordPosEx(PosXY);
+      if PosXY.Char>0 then begin
+        sWord:=GetWordAtRowCol(PosXY);
+        with MainData.SynEditSpellCheck do if Highlighter = nil then fnd:=not CheckWord(sWord)
+        else begin
+          if not GetHighlighterAttriAtRowCol(PosXY,sToken,Attri) then
+            Attri:=Highlighter.WhitespaceAttribute;
+          fnd:=Assigned(Attri) and CheckHighlighterAttribute(Attri.Name) and
+            not CheckWord(sWord);
+          end;
+        end;
+      until fnd or (PosXY.Line>Lines.Count) or (PosXY=NextWordPosEx(PosXY));
+    if fnd then CaretXY:=PosXY
+    else begin
+      Beep;
+//      ShowMessage('No more misspellings found!');
+      end;
+  end;
+end;
+
+procedure TCellEditForm.pmiNoSpellcheckClick(Sender: TObject);
+begin
+  SelectDictLangClick(Sender);
+  CellEditFrame.SynEditor.Highlighter.AdditionalIdentChars:=['[',']'];
+  miMisspelling.Enabled := False;
+end;
+
+procedure TCellEditForm.pmiRemoveClick(Sender: TObject);
+var i:Integer;
+begin
+  MainData.SynEditSpellCheck.EraseDictWord(MainData.SynEditSpellCheck.UserDict[miRemove.Tag]);
+  MainData.SynEditSpellCheck.Modified := False;
+  CellEditFrame.SynEditor.Invalidate;
+end;
+
+type TMyMenu=class(TPopupMenu) end;
+
+procedure TCellEditForm.pmTextPopup(Sender: TObject);
+var
+  sword : string;
+  mnu   : TMenuItem;
+  i     : Integer;
+  suggList: TStringList;
+  p:tpoint;
+  p1:TDisplayCoord;
+begin
+
+  p1 := CellEditFrame.SynEditor.DisplayXY;
+  p1.row := p1.row+1;
+  p := CellEditFrame.SynEditor.ClientToScreen(CellEditFrame.SynEditor.RowColumnToPixels(p1));
+
+  with CellEditFrame.SynEditor do
+    sword:=GetWordAtRowCol(CaretXY);
+
+    miAddWord.Visible:=(not MainData.SynEditSpellCheck.CheckWord(sword)) and (Trim(sword) <> '');
+    miAddWord.Caption :=  '&Add word ''' +trim(sword) + ''' to dictionary';
+
+    miRemove.tag := MainData.SynEditSpellCheck.UserDict.IndexOf(trim(sword));
+    miRemove.Visible :=miRemove.tag > -1;
+    miRemove.Caption :=  '&Erase ''' +trim(sword) + ''' from dictionary';
+
+    with miSuggest do begin
+      while Count>0 do Items[Count-1].Free;
+      Visible:=false;
+      end;
+    if length(Trim(sword))=0 then Exit;
+    suggList := TStringList.Create;
+    if miAddWord.Visible and (MainData.SynEditSpellCheck.GetSuggestions(sword,suggList)>0) then
+    begin
+      mnu := TMenuItem.Create(Self);
+      mnu.Caption:='( '+sword+ ' )';
+      mnu.Enabled := False;
+
+      miSuggest.Add(mnu);
+      mnu := TMenuItem.Create(Self);
+      mnu.Caption:='-';
+      miSuggest.Add(mnu);
+      for i := 0 to suggList.Count-1 do begin
+        mnu := TMenuItem.Create(Self);
+        if suggList.Strings[i]<>sword then begin
+          mnu.Caption:=suggList.Strings[i];
+          mnu.OnClick:=SuggestionOnClick;
+          miSuggest.Add(mnu);
+          end
+        else mnu.Free;
+        end;
+      miSuggest.Visible:=miSuggest.Count>2;
+    end;
+    suggList.Free;
+
+//    TMyMenu(sender).SetPopupPoint(p);
+//    Mouse.CursorPos := p;
+
 end;
 
 procedure TCellEditForm.PrepareCombo;
@@ -727,6 +1196,16 @@ end;
 
 
 
+procedure TCellEditForm.SuggestionOnClick(Sender: TObject);
+begin
+  with CellEditFrame.SynEditor do
+  begin
+    BlockBegin:=WordStartEx(CaretXY);
+    BlockEnd:=WordEndEx(CaretXY);
+    SelText:=StringReplace(TMenuItem(Sender).Caption,'&','',[]);
+  end;
+end;
+
 procedure TCellEditForm.tbApplyClick(Sender: TObject);
 begin
   text := StringReplace(seTranslate.Lines.text, #13#10,'',[rfReplaceAll]);
@@ -903,5 +1382,103 @@ begin
     list2.Free;
   end;
 end;
+
+procedure TCellEditForm.SelectDictLangClick(Sender: TObject);
+var
+  lid : word;
+  i: integer;
+begin
+  with Sender as TMenuItem do
+  begin
+    lid:=Tag;
+    Checked:=true;
+  end;
+
+  with TStringList.Create do
+  try
+    CommaText := MainData.SynEditSpellCheck.UserDict.CommaText;
+    MainData.SynEditSpellCheck.SelectDictionary(lid);
+    for i:=0 to Count-1 do
+      MainData.SynEditSpellCheck.AddDictWord(Strings[i]);
+  finally
+    Free;
+  end;
+
+  MainData.SynEditSpellCheck.Modified := False;
+
+  with CellEditFrame.SynEditor do
+  begin
+    Tag:=lid;
+    Invalidate;
+  end;
+  CellEditFrame.SynEditor.Highlighter.AdditionalIdentChars:=[];
+  miMisspelling.Enabled := lid > 0;
+  CellEditFrame.SynEditor.Highlighter.AdditionalWordBreakChars:=['«', '»', '“', '”'];
+end;
+
+function TCellEditForm.Compare(txt:string; var i:integer):Boolean;
+var
+  s1,s2:string;
+begin
+  if chbMatchCase.Checked then
+  begin
+    s1 := edFind.Text;
+    s2 := txt;
+  end
+  else
+  begin
+    s1 := WideUpperCase(edFind.Text);
+    s2 := WideUpperCase(txt);
+  end;
+  if chbWholeCell.Checked then
+    result := s1 = s2
+  else
+    result := pos(s1,s2)>0;
+
+  if result then
+  begin
+    Grid.Row := i div Grid.ColCount;
+    Grid.Col := i mod Grid.ColCount;
+    CellEditFrame.SynEditor.SelStart :=1;
+    SelectReplace;
+    abort;
+  end;
+end;
+
+procedure TCellEditForm.SelectReplace;
+var
+  s1,s2:string;
+  bl:Boolean;
+begin
+  if chbMatchCase.Checked then
+  begin
+    s1 := edFind.Text;
+    s2 := CellEditFrame.SynEditor.Text;
+  end
+  else
+  begin
+    s1 := WideUpperCase(edFind.Text);
+    s2 := WideUpperCase(CellEditFrame.SynEditor.Text);
+  end;
+
+  if (chbWholeCell.Checked and (s1 = s2))
+  or (not chbWholeCell.Checked and (pos(s1,s2)>0))
+  then
+    if   pos(s1, s2, CellEditFrame.SynEditor.SelStart)>0 then
+  begin
+    CellEditFrame.SynEditor.SelStart := pos(s1, s2, CellEditFrame.SynEditor.SelStart)-1;
+    CellEditFrame.SynEditor.SelLength := Length(s1);
+  end;
+
+{
+  if CellEditFrame.SynEditor.Modified then
+  begin
+    sgText.Cells[sgText.Col, sgText.Row] := SynEditor.Text;
+    sgText.OnSelectCell(sgText, sgText.Col, sgText.Row,bl);
+  end;
+}
+
+end;
+
 
 end.

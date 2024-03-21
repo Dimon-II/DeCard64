@@ -12,7 +12,6 @@ object PipeForm: TPipeForm
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   OnClose = FormClose
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -22,7 +21,6 @@ object PipeForm: TPipeForm
   OnMouseMove = FormMouseMove
   OnPaint = FormPaint
   OnShow = FormShow
-  PixelsPerInch = 96
   TextHeight = 13
   object Panel1: TPanel
     Left = 0
@@ -44,7 +42,7 @@ object PipeForm: TPipeForm
     object Label1: TLabel
       Left = 6
       Top = 30
-      Width = 200
+      Width = 100
       Height = 12
       Align = alBottom
       Caption = 'Arrows: precise move'
@@ -55,12 +53,11 @@ object PipeForm: TPipeForm
       Font.Pitch = fpFixed
       Font.Style = []
       ParentFont = False
-      ExplicitWidth = 127
     end
     object lblColor: TLabel
       Left = 6
       Top = 6
-      Width = 200
+      Width = 115
       Height = 12
       Align = alBottom
       Caption = '000000: L-Click / Enter'
@@ -71,12 +68,11 @@ object PipeForm: TPipeForm
       Font.Pitch = fpFixed
       Font.Style = []
       ParentFont = False
-      ExplicitWidth = 127
     end
     object Label2: TLabel
       Left = 6
       Top = 18
-      Width = 200
+      Width = 110
       Height = 12
       Align = alBottom
       Caption = 'Cancel: R-Click / Esc '
@@ -87,8 +83,6 @@ object PipeForm: TPipeForm
       Font.Pitch = fpFixed
       Font.Style = []
       ParentFont = False
-      ExplicitTop = 12
-      ExplicitWidth = 127
     end
   end
   object Panel2: TPanel

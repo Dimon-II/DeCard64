@@ -214,6 +214,7 @@
 	<style>Set of attributes that can be specified on any visible SVG element.</style>
 	<letter-spacing>Sets the spacing behavior between text characters.</letter-spacing>
         <font-variant>Indicates the variant in which the text or font is to be rendered. (normal, small, caps)</font-variant>
+	<paint-order>Support control of the order of filling, stroke and painting markers on shapes (normal, fill, stroke, markers).</paint-order>
   </attributes>
 </help>
 <config>
@@ -282,6 +283,7 @@
 			<stroke/>
 			<stroke-opacity/>
 			<stroke-width/>
+			<paint-order/>
 			<opacity/>
 			<mask/>
 			<text/>
@@ -337,6 +339,7 @@
 			<stroke/>
 			<stroke-opacity/>
 			<stroke-width/>
+			<paint-order/>
 			<stop-opacity/>
 			<stop-color/>
 			<flood-color/>

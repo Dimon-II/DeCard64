@@ -28,28 +28,9 @@ object SynEditFrame: TSynEditFrame
     Gutter.Font.Style = []
     Gutter.Font.Quality = fqClearTypeNatural
     Gutter.ShowLineNumbers = True
-    Gutter.Bands = <
-      item
-        Kind = gbkMarks
-        Width = 13
-      end
-      item
-        Kind = gbkLineNumbers
-      end
-      item
-        Kind = gbkFold
-      end
-      item
-        Kind = gbkTrackChanges
-      end
-      item
-        Kind = gbkMargin
-        Width = 3
-      end>
     Highlighter = SynXMLSyn1
     Options = [eoAutoIndent, eoDragDropEditing, eoGroupUndo, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
     SearchEngine = SynEditSearch1
-    SelectedColor.Alpha = 0.400000005960464500
     WordWrap = True
     RemovedKeystrokes = <
       item

@@ -455,9 +455,9 @@ begin
     InsertTag('<g id="Cutting1" stroke="#'+HexColor(MainData.dlgColor.Color)+'" stroke-width="2">'
     + '<defs><g id="cut-cross"><line x1="0" x2="0" y1="-30" y2="30"/><line x1="-30" x2="30" y1="0" y2="0"/></g></defs>'
 	  + '<use xlink:href="#cut-cross" x="'+IntToStr(FFrameSize)+'" y="'+IntToStr(FFrameSize)+'"/>'
-    + '<use xlink:href="#cut-cross" x="'+IntToStr(StrToIntDef(SVG.Node['svg'].Attribute['width'],100)-FFrameSize)+'" y="'+IntToStr(FFrameSize)+'"/>'
+    + '<use xlink:href="#cut-cross" x="'+IntToStr(StrToIntDef(SVG.Node['svg'].Attribute['width'],100) div w2x  -FFrameSize)+'" y="'+IntToStr(FFrameSize)+'"/>'
 	  + '<use xlink:href="#cut-cross" x="'+IntToStr(FFrameSize)+'" y="'+IntToStr(StrToIntDef(SVG.Node['svg'].Attribute['height'],100)-FFrameSize)+'"/>'
-		+ '<use xlink:href="#cut-cross" x="'+IntToStr(StrToIntDef(SVG.Node['svg'].Attribute['width'],100)-FFrameSize)+'" y="'+IntToStr(StrToIntDef(SVG.Node['svg'].Attribute['height'],100)-FFrameSize)+'"/></g>');
+		+ '<use xlink:href="#cut-cross" x="'+IntToStr(StrToIntDef(SVG.Node['svg'].Attribute['width'],100) div w2x-FFrameSize)+'" y="'+IntToStr(StrToIntDef(SVG.Node['svg'].Attribute['height'],100)-FFrameSize)+'"/></g>');
   end;
 end;
 
@@ -481,9 +481,13 @@ begin
     InsertTag('<g id="Cutting1" stroke="#'+HexColor(MainData.dlgColor.Color)+'" stroke-width="2">'
     + '<defs><g id="cut-cross"><line x1="0" x2="0" y1="-30" y2="30"/><line x1="-30" x2="30" y1="0" y2="0"/></g></defs>'
 		+ '<use xlink:href="#cut-cross" x="0" y="0"/>'
-		+ '<use xlink:href="#cut-cross" x="'+SVG.Node['svg'].Attribute['width']+'" y="0"/>'
+		+ '<use xlink:href="#cut-cross" x="'
+    + IntToStr(StrToIntDef(SVG.Node['svg'].Attribute['width'],100) div w2x)
+    +'" y="0"/>'
 		+ '<use xlink:href="#cut-cross" x="0" y="'+SVG.Node['svg'].Attribute['height']+'"/>'
-		+ '<use xlink:href="#cut-cross" x="'+SVG.Node['svg'].Attribute['width']+'" y="'+SVG.Node['svg'].Attribute['height']+'"/></g>');
+		+ '<use xlink:href="#cut-cross" x="'
+     +IntToStr(StrToIntDef(SVG.Node['svg'].Attribute['width'],100) div w2x)
+    +'" y="'+SVG.Node['svg'].Attribute['height']+'"/></g>');
   end;
 end;
 
@@ -705,10 +709,24 @@ begin
 end;
 
 procedure TSvgTreeFrame.tbXMLClick(Sender: TObject);
+var s:string;
+  nod:TXML_Nod;
 begin
+  nod:=SVGNode;
+  s := '';
+  if nod.LocalName <> 'svg' then
+  repeat
+    if Nod.Attribute['id'] = '' then
+       s := '.<'+Nod.LocalName+'>' + s
+    else
+       s := '.' + Nod.Attribute['id'] + s;
+    Nod := Nod.parent;
+  until nod.LocalName = 'svg';
+
   XMLEditForm.XML := SVGNode.xml;
   XMLEditForm.seTags.Visible := False;
   XMLEditForm.splTags.Visible := False;
+  XMLEditForm.Caption := '<svg>' + s;
   if XMLEditForm.ShowModal=mrOk then
   begin
     SVGNode.ResetXml(XMLEditForm.XML);

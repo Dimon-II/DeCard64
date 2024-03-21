@@ -327,28 +327,9 @@ object frmPathEdit: TfrmPathEdit
       Gutter.Font.Height = -11
       Gutter.Font.Name = 'Consolas'
       Gutter.Font.Style = []
-      Gutter.Bands = <
-        item
-          Kind = gbkMarks
-          Width = 13
-        end
-        item
-          Kind = gbkLineNumbers
-        end
-        item
-          Kind = gbkFold
-        end
-        item
-          Kind = gbkTrackChanges
-        end
-        item
-          Kind = gbkMargin
-          Width = 3
-        end>
       Highlighter = SynGeneralSyn1
       Lines.Strings = (
         'M 0,0')
-      SelectedColor.Alpha = 0.400000005960464500
       WordWrap = True
       OnChange = mePATHChange
       ExplicitTop = 244

@@ -4,8 +4,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, System.ImageList, Vcl.ImgList, Vcl.Controls,
-  Vcl.ExtDlgs, Vcl.Dialogs, Profixxml;
-
+  Vcl.ExtDlgs, Vcl.Dialogs, Profixxml, HunSpellLib, SynEditSpell;
 type
   TMainData = class(TDataModule)
     ilDecard: TImageList;
@@ -23,19 +22,28 @@ type
     dlgSaveXML: TSaveDialog;
     dlgSaveContent: TSaveTextFileDialog;
     dlgSaveSVG: TSaveDialog;
+    dlgOpenCommon: TOpenTextFileDialog;
+    dlgSaveCommon: TSaveTextFileDialog;
     procedure DataModuleCreate(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);
+    procedure OnCheckWord(Sender: TObject; AWord: String; ASuggestions: TStringList; var ACorrectWord: String; var AAction: Integer;
+    const AUndoEnabled: Boolean = True);
+
   private
     { Private declarations }
   public
     { Public declarations }
     XSD, HLP: TXML_Doc;
     HyphenNod:TXML_Nod;
+    SynEditSpellCheck : TSynEditSpellCheck;
+    DictLangList      : TStringList;
    function Hyphenation(s: string; sl:TStringList):boolean;
   end;
 
 var
   MainData: TMainData;
+  w2x: integer;
+
 
 implementation
 
@@ -53,10 +61,24 @@ begin
 
   HyphenNod := HLP.Node['Hyphenation'].Nodes[0];
 
+
+  SynEditSpellCheck:=TSynEditSpellCheck.Create(self,[caText]);
+  with SynEditSpellCheck do begin
+    UseUserDictionary:=True;
+//    UnderlineColor:=clGreen;
+//    UnderlineStyle:=usCorelWordPerfect;
+    Options:=[sscoAutoSpellCheck, sscoHourGlass, sscoIgnoreSingleChars, sscoSuggestWords];
+    LoadDictionaries(ExtractFilePath(ParamStr(0))+'dict\');
+    DictLangList:=TStringList.Create;
+    GetDictLanguages(DictLangList);
+  end;
 end;
+
 
 procedure TMainData.DataModuleDestroy(Sender: TObject);
 begin
+  SynEditSpellCheck.Free;
+  DictLangList.Free;
   HLP.Free;
   XSD.Free;
 end;
@@ -121,6 +143,13 @@ begin
 end;
 
 
+
+procedure TMainData.OnCheckWord(Sender: TObject; AWord: String;
+  ASuggestions: TStringList; var ACorrectWord: String; var AAction: Integer;
+  const AUndoEnabled: Boolean);
+begin
+//
+end;
 
 end.
 

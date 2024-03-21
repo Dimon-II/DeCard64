@@ -50,28 +50,9 @@ object TraceReplForm: TTraceReplForm
     Gutter.Font.Style = []
     Gutter.Font.Quality = fqClearTypeNatural
     Gutter.ShowLineNumbers = True
-    Gutter.Bands = <
-      item
-        Kind = gbkMarks
-        Width = 13
-      end
-      item
-        Kind = gbkLineNumbers
-      end
-      item
-        Kind = gbkFold
-      end
-      item
-        Kind = gbkTrackChanges
-      end
-      item
-        Kind = gbkMargin
-        Width = 3
-      end>
     Highlighter = SynXMLSyn1
     Options = [eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoScrollPastEol, eoShowScrollHint, eoShowSpecialChars, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
     ReadOnly = True
-    SelectedColor.Alpha = 0.400000005960464500
     ExplicitWidth = 253
     ExplicitHeight = 556
   end
@@ -98,27 +79,8 @@ object TraceReplForm: TTraceReplForm
     Gutter.Font.Style = []
     Gutter.Font.Quality = fqClearTypeNatural
     Gutter.ShowLineNumbers = True
-    Gutter.Bands = <
-      item
-        Kind = gbkMarks
-        Width = 13
-      end
-      item
-        Kind = gbkLineNumbers
-      end
-      item
-        Kind = gbkFold
-      end
-      item
-        Kind = gbkTrackChanges
-      end
-      item
-        Kind = gbkMargin
-        Width = 3
-      end>
     Highlighter = SynXMLSyn1
     Options = [eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoScrollPastEol, eoShowScrollHint, eoShowSpecialChars, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
-    SelectedColor.Alpha = 0.400000005960464500
     ExplicitHeight = 556
   end
   object seRepl: TSynEdit
@@ -144,27 +106,8 @@ object TraceReplForm: TTraceReplForm
     Gutter.Font.Style = []
     Gutter.Font.Quality = fqClearTypeNatural
     Gutter.ShowLineNumbers = True
-    Gutter.Bands = <
-      item
-        Kind = gbkMarks
-        Width = 13
-      end
-      item
-        Kind = gbkLineNumbers
-      end
-      item
-        Kind = gbkFold
-      end
-      item
-        Kind = gbkTrackChanges
-      end
-      item
-        Kind = gbkMargin
-        Width = 3
-      end>
     Highlighter = SynXMLSyn1
     Options = [eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoScrollPastEol, eoShowScrollHint, eoShowSpecialChars, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
-    SelectedColor.Alpha = 0.400000005960464500
     OnGutterGetText = seReplGutterGetText
     OnSpecialLineColors = seReplSpecialLineColors
     ExplicitHeight = 556

@@ -65,14 +65,14 @@ begin
 
 //  sz:=GetTextSize(Grid.Canvas.Handle, PWideChar(wc),1);
 
-  sz.cx:=24;
-  sz.cy:=24;
 
 
-  if Grid.ColWidths[acol]<sz.cx+3 then
+  sz:=Grid.Canvas.TextExtent(PWideChar(wc));
+
+  if Grid.ColWidths[acol] < sz.cx+3 then
     Grid.ColWidths[acol]:=sz.cx+3;
 
-  if Grid.RowHeights[arow]<sz.cy+3 then
+  if Grid.RowHeights[arow] < sz.cy+3 then
     Grid.RowHeights[arow]:=sz.cy+3;
 
   TextOutW(Grid.Canvas.Handle, Rect.Left + Grid.ColWidths[acol] div 2 - sz.cx div 2+1, Rect.Top+1, PWideChar(wc),1);
@@ -146,6 +146,11 @@ begin
    Grid.RowCount := 1+ ChrMap.Count;
  FreeMem(GS);
  Caption := 'Glyph font: '+IntToStr(cnt);
+ for i:=0 to Grid.RowCount-1 do
+   Grid.RowHeights[i]:=32;
+ for i:=0 to Grid.ColCount-1 do
+   Grid.ColWidths[i]:=19;
+
 end;
 
 procedure TformGlyph.BitBtn1Click(Sender: TObject);
@@ -154,6 +159,7 @@ begin
     Grid.Font := dlgFont.Font;
 
     cbFont.Text := dlgFont.Font.Name;
+    Grid.Font.Size := dlgFont.Font.Size;
     cbFontChange(cbFont);
   end;
 end;

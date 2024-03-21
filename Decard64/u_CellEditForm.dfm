@@ -3,10 +3,10 @@ object CellEditForm: TCellEditForm
   Top = 0
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'CellEditForm'
-  ClientHeight = 280
-  ClientWidth = 784
+  ClientHeight = 282
+  ClientWidth = 788
   Color = clBtnFace
-  Constraints.MinHeight = 240
+  Constraints.MinHeight = 320
   Constraints.MinWidth = 480
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -15,31 +15,33 @@ object CellEditForm: TCellEditForm
   Font.Style = []
   FormStyle = fsStayOnTop
   Position = poMainFormCenter
+  ShowHint = True
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnDeactivate = FormDeactivate
   OnResize = FormResize
   TextHeight = 13
   object Splitter2: TSplitter
-    Left = 492
+    Left = 496
     Top = 0
-    Height = 238
+    Height = 240
     Align = alRight
     ExplicitLeft = 336
     ExplicitTop = 3
+    ExplicitHeight = 238
   end
   object pnBottom: TPanel
     Left = 0
-    Top = 238
-    Width = 784
+    Top = 240
+    Width = 788
     Height = 42
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitTop = 237
-    ExplicitWidth = 780
+    ExplicitTop = 239
+    ExplicitWidth = 784
     DesignSize = (
-      784
+      788
       42)
     object sbaLeftCell: TSpeedButton
       Left = 3
@@ -206,7 +208,7 @@ object CellEditForm: TCellEditForm
       ParentFont = False
     end
     object btnApply: TButton
-      Left = 600
+      Left = 552
       Top = 9
       Width = 75
       Height = 25
@@ -221,10 +223,10 @@ object CellEditForm: TCellEditForm
       ParentFont = False
       TabOrder = 0
       OnClick = btnApplyClick
-      ExplicitLeft = 596
+      ExplicitLeft = 548
     end
     object btnCancel: TButton
-      Left = 681
+      Left = 633
       Top = 9
       Width = 75
       Height = 25
@@ -238,7 +240,7 @@ object CellEditForm: TCellEditForm
       Font.Style = []
       ParentFont = False
       TabOrder = 1
-      ExplicitLeft = 677
+      ExplicitLeft = 629
     end
     object chbScrollPreview: TCheckBox
       Left = 82
@@ -258,24 +260,24 @@ object CellEditForm: TCellEditForm
   inline CellEditFrame: TSynEditFrame
     Left = 0
     Top = 0
-    Width = 492
-    Height = 238
+    Width = 496
+    Height = 240
     Align = alClient
     TabOrder = 1
-    ExplicitWidth = 492
-    ExplicitHeight = 238
+    ExplicitWidth = 496
+    ExplicitHeight = 240
     inherited SynEditor: TSynEdit
-      Width = 492
-      Height = 210
+      Width = 496
+      Height = 212
       Constraints.MinWidth = 340
       OnKeyDown = CellEditFrameSynEditorKeyDown
       OnChange = CellEditFrameSynEditorChange
       OnGutterGetText = CellEditFrameSynEditorGutterGetText
-      ExplicitWidth = 488
-      ExplicitHeight = 209
+      ExplicitWidth = 492
+      ExplicitHeight = 211
     end
     inherited pscrSysEdit: TPageScroller
-      Width = 492
+      Width = 496
       ExplicitWidth = 492
       inherited tbrEditor: TToolBar
         inherited ToolButton3: TToolButton
@@ -288,23 +290,22 @@ object CellEditForm: TCellEditForm
     end
   end
   object pcHelpher: TPageControl
-    Left = 495
+    Left = 499
     Top = 0
     Width = 289
-    Height = 238
-    Hint = 'Restore unnecessarily translated macros, parentheses analysis.'
-    ActivePage = tsCommon
+    Height = 240
+    ActivePage = tsReplace
     Align = alRight
     TabOrder = 2
-    ExplicitLeft = 491
-    ExplicitHeight = 237
+    ExplicitLeft = 495
+    ExplicitHeight = 239
     object tsCommon: TTabSheet
       Caption = 'Common'
       object lbCommon: TListBox
         Left = 41
         Top = 0
         Width = 240
-        Height = 210
+        Height = 191
         Align = alClient
         DragMode = dmAutomatic
         ItemHeight = 13
@@ -314,13 +315,12 @@ object CellEditForm: TCellEditForm
         OnDragDrop = lbCommonDragDrop
         OnDragOver = lbCommonDragOver
         OnMouseDown = lbCommonMouseDown
-        ExplicitHeight = 209
       end
       object lbCommonIdx: TListBox
         Left = 0
         Top = 0
         Width = 41
-        Height = 210
+        Height = 191
         Align = alLeft
         Color = clBtnFace
         Enabled = False
@@ -336,7 +336,244 @@ object CellEditForm: TCellEditForm
           'Ctrl-8'
           'Ctrl-9')
         TabOrder = 1
-        ExplicitHeight = 209
+      end
+      object SynEdit1: TSynEdit
+        Left = 0
+        Top = 191
+        Width = 281
+        Height = 21
+        Align = alBottom
+        Color = clBtnFace
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'Courier New'
+        Font.Style = []
+        Font.Quality = fqClearTypeNatural
+        TabOrder = 2
+        CodeFolding.GutterShapeSize = 11
+        CodeFolding.CollapsedLineColor = clGrayText
+        CodeFolding.FolderBarLinesColor = clGrayText
+        CodeFolding.IndentGuidesColor = clGray
+        CodeFolding.IndentGuides = True
+        CodeFolding.ShowCollapsedLine = True
+        CodeFolding.ShowHintMark = True
+        UseCodeFolding = False
+        Gutter.Font.Charset = DEFAULT_CHARSET
+        Gutter.Font.Color = clWindowText
+        Gutter.Font.Height = -11
+        Gutter.Font.Name = 'Courier New'
+        Gutter.Font.Style = []
+        Gutter.Font.Quality = fqClearTypeNatural
+        Highlighter = CellEditFrame.SynXMLSyn1
+        Lines.Strings = (
+          '[selected] substitute selected text ')
+        Options = [eoAutoIndent, eoEnhanceEndKey, eoGroupUndo, eoScrollPastEol, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
+        ReadOnly = True
+        ScrollBars = ssNone
+        FontSmoothing = fsmNone
+      end
+    end
+    object tsReplace: TTabSheet
+      Caption = 'Replace'
+      ImageIndex = 5
+      object pnButtons: TPanel
+        Left = 210
+        Top = 77
+        Width = 71
+        Height = 135
+        Align = alRight
+        BevelOuter = bvNone
+        BorderWidth = 5
+        TabOrder = 0
+        ExplicitHeight = 134
+        object btnReplaceAll: TButton
+          AlignWithMargins = True
+          Left = 5
+          Top = 107
+          Width = 61
+          Height = 25
+          Margins.Left = 0
+          Margins.Right = 0
+          Margins.Bottom = 12
+          Align = alTop
+          Caption = 'Replace All'
+          TabOrder = 2
+          OnClick = btnReplaceAllClick
+        end
+        object btnReplace: TButton
+          AlignWithMargins = True
+          Left = 5
+          Top = 76
+          Width = 61
+          Height = 25
+          Margins.Left = 0
+          Margins.Right = 0
+          Action = aGridReplace
+          Align = alTop
+          TabOrder = 1
+        end
+        object btnFind: TButton
+          AlignWithMargins = True
+          Left = 5
+          Top = 8
+          Width = 61
+          Height = 25
+          Margins.Left = 0
+          Margins.Right = 0
+          Action = aGridFindNext
+          Align = alTop
+          TabOrder = 0
+        end
+        object btnFindUp: TButton
+          AlignWithMargins = True
+          Left = 5
+          Top = 39
+          Width = 61
+          Height = 25
+          Margins.Left = 0
+          Margins.Right = 0
+          Margins.Bottom = 9
+          Action = aGridFindPrev
+          Align = alTop
+          TabOrder = 3
+        end
+      end
+      object pnReplace: TPanel
+        Left = 0
+        Top = 77
+        Width = 210
+        Height = 135
+        Align = alClient
+        BevelOuter = bvNone
+        TabOrder = 1
+        ExplicitHeight = 134
+        object gbOptions: TGroupBox
+          Left = 0
+          Top = 0
+          Width = 210
+          Height = 135
+          Align = alClient
+          Caption = 'Options:'
+          TabOrder = 0
+          ExplicitHeight = 134
+          object chbColumn: TCheckBox
+            AlignWithMargins = True
+            Left = 11
+            Top = 18
+            Width = 194
+            Height = 17
+            Margins.Left = 9
+            Align = alTop
+            Caption = 'Search only in focused column'
+            TabOrder = 0
+          end
+          object chbPromt: TCheckBox
+            AlignWithMargins = True
+            Left = 11
+            Top = 110
+            Width = 194
+            Height = 17
+            Margins.Left = 9
+            Align = alTop
+            Caption = 'Prompt on replace'
+            Checked = True
+            State = cbChecked
+            TabOrder = 4
+          end
+          object chbMatchCase: TCheckBox
+            AlignWithMargins = True
+            Left = 11
+            Top = 87
+            Width = 194
+            Height = 17
+            Margins.Left = 9
+            Align = alTop
+            Caption = 'Match case'
+            TabOrder = 3
+          end
+          object chbWholeCell: TCheckBox
+            AlignWithMargins = True
+            Left = 11
+            Top = 64
+            Width = 194
+            Height = 17
+            Margins.Left = 9
+            Align = alTop
+            Caption = 'Match whole cell only'
+            TabOrder = 2
+          end
+          object chbFindBack: TCheckBox
+            AlignWithMargins = True
+            Left = 11
+            Top = 41
+            Width = 194
+            Height = 17
+            Margins.Left = 9
+            Align = alTop
+            Caption = 'Backward search'
+            TabOrder = 1
+          end
+        end
+      end
+      object pbReplaceText: TPanel
+        Left = 0
+        Top = 0
+        Width = 281
+        Height = 77
+        Align = alTop
+        AutoSize = True
+        BevelOuter = bvNone
+        TabOrder = 2
+        object lblFind: TLabel
+          AlignWithMargins = True
+          Left = 3
+          Top = 0
+          Width = 275
+          Height = 13
+          Margins.Top = 0
+          Margins.Bottom = 0
+          Align = alTop
+          Caption = 'Find what:'
+          FocusControl = edFind
+          ExplicitWidth = 51
+        end
+        object lblReplace: TLabel
+          AlignWithMargins = True
+          Left = 3
+          Top = 40
+          Width = 275
+          Height = 13
+          Margins.Top = 0
+          Margins.Bottom = 0
+          Align = alTop
+          Caption = 'Replace with:'
+          FocusControl = edReplace
+          ExplicitWidth = 65
+        end
+        object edFind: TComboBox
+          AlignWithMargins = True
+          Left = 0
+          Top = 16
+          Width = 276
+          Height = 21
+          Margins.Left = 0
+          Margins.Right = 5
+          Align = alTop
+          TabOrder = 0
+        end
+        object edReplace: TComboBox
+          AlignWithMargins = True
+          Left = 0
+          Top = 56
+          Width = 276
+          Height = 21
+          Margins.Left = 0
+          Margins.Right = 5
+          Margins.Bottom = 0
+          Align = alTop
+          TabOrder = 1
+        end
       end
     end
     object tsMacros: TTabSheet
@@ -346,7 +583,7 @@ object CellEditForm: TCellEditForm
         Left = 0
         Top = 0
         Width = 87
-        Height = 210
+        Height = 212
         Align = alLeft
         ItemHeight = 13
         TabOrder = 0
@@ -357,7 +594,7 @@ object CellEditForm: TCellEditForm
         Left = 216
         Top = 0
         Width = 65
-        Height = 210
+        Height = 212
         Align = alRight
         ItemHeight = 13
         Items.Strings = (
@@ -369,7 +606,7 @@ object CellEditForm: TCellEditForm
         Left = 87
         Top = 0
         Width = 129
-        Height = 210
+        Height = 212
         Align = alClient
         ItemHeight = 13
         TabOrder = 2
@@ -383,7 +620,7 @@ object CellEditForm: TCellEditForm
         Left = 0
         Top = 0
         Width = 281
-        Height = 210
+        Height = 212
         Align = alClient
         Color = clBtnFace
         Font.Charset = DEFAULT_CHARSET
@@ -393,7 +630,13 @@ object CellEditForm: TCellEditForm
         Font.Style = []
         Font.Quality = fqClearTypeNatural
         TabOrder = 0
+        CodeFolding.GutterShapeSize = 11
+        CodeFolding.CollapsedLineColor = clGrayText
+        CodeFolding.FolderBarLinesColor = clGrayText
+        CodeFolding.IndentGuidesColor = clGray
+        CodeFolding.IndentGuides = True
         CodeFolding.ShowCollapsedLine = True
+        CodeFolding.ShowHintMark = True
         UseCodeFolding = False
         Gutter.Font.Charset = DEFAULT_CHARSET
         Gutter.Font.Color = clWindowText
@@ -401,24 +644,6 @@ object CellEditForm: TCellEditForm
         Gutter.Font.Name = 'Courier New'
         Gutter.Font.Style = []
         Gutter.Font.Quality = fqClearTypeNatural
-        Gutter.Bands = <
-          item
-            Kind = gbkMarks
-            Width = 13
-          end
-          item
-            Kind = gbkLineNumbers
-          end
-          item
-            Kind = gbkFold
-          end
-          item
-            Kind = gbkTrackChanges
-          end
-          item
-            Kind = gbkMargin
-            Width = 3
-          end>
         Highlighter = CellEditFrame.SynXMLSyn1
         Lines.Strings = (
           'Known tags:'
@@ -445,7 +670,7 @@ object CellEditForm: TCellEditForm
           '<html width="xxx" height="yyy"  any rect attributes >...</html>')
         Options = [eoAutoIndent, eoEnhanceEndKey, eoGroupUndo, eoScrollPastEol, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
         ReadOnly = True
-        SelectedColor.Alpha = 0.400000005960464500
+        FontSmoothing = fsmNone
       end
     end
     object tsWrap: TTabSheet
@@ -455,7 +680,7 @@ object CellEditForm: TCellEditForm
         Left = 0
         Top = 0
         Width = 281
-        Height = 210
+        Height = 212
         Align = alClient
         Color = clWhite
         Font.Charset = DEFAULT_CHARSET
@@ -465,7 +690,13 @@ object CellEditForm: TCellEditForm
         Font.Style = []
         Font.Quality = fqClearTypeNatural
         TabOrder = 0
+        CodeFolding.GutterShapeSize = 11
+        CodeFolding.CollapsedLineColor = clGrayText
+        CodeFolding.FolderBarLinesColor = clGrayText
+        CodeFolding.IndentGuidesColor = clGray
+        CodeFolding.IndentGuides = True
         CodeFolding.ShowCollapsedLine = True
+        CodeFolding.ShowHintMark = True
         UseCodeFolding = False
         Gutter.Font.Charset = DEFAULT_CHARSET
         Gutter.Font.Color = clWindowText
@@ -473,24 +704,6 @@ object CellEditForm: TCellEditForm
         Gutter.Font.Name = 'Courier New'
         Gutter.Font.Style = []
         Gutter.Font.Quality = fqClearTypeNatural
-        Gutter.Bands = <
-          item
-            Kind = gbkMarks
-            Width = 13
-          end
-          item
-            Kind = gbkLineNumbers
-          end
-          item
-            Kind = gbkFold
-          end
-          item
-            Kind = gbkTrackChanges
-          end
-          item
-            Kind = gbkMargin
-            Width = 3
-          end>
         Highlighter = CellEditFrame.SynXMLSyn1
         Lines.Strings = (
           '<br/>'
@@ -498,7 +711,7 @@ object CellEditForm: TCellEditForm
           '<p/>'
           '<p ')
         Options = [eoAutoIndent, eoEnhanceEndKey, eoGroupUndo, eoScrollPastEol, eoShowScrollHint, eoShowSpecialChars, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
-        SelectedColor.Alpha = 0.400000005960464500
+        FontSmoothing = fsmNone
       end
     end
     object tsTranslate: TTabSheet
@@ -507,7 +720,7 @@ object CellEditForm: TCellEditForm
       Constraints.MinWidth = 120
       object splRevers: TSplitter
         Left = 0
-        Top = 206
+        Top = 208
         Width = 281
         Height = 4
         Cursor = crVSplit
@@ -548,7 +761,7 @@ object CellEditForm: TCellEditForm
         Left = 0
         Top = 21
         Width = 281
-        Height = 185
+        Height = 187
         Align = alClient
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -557,7 +770,13 @@ object CellEditForm: TCellEditForm
         Font.Style = []
         Font.Quality = fqClearTypeNatural
         TabOrder = 1
+        CodeFolding.GutterShapeSize = 11
+        CodeFolding.CollapsedLineColor = clGrayText
+        CodeFolding.FolderBarLinesColor = clGrayText
+        CodeFolding.IndentGuidesColor = clGray
+        CodeFolding.IndentGuides = True
         CodeFolding.ShowCollapsedLine = True
+        CodeFolding.ShowHintMark = True
         UseCodeFolding = False
         Gutter.Font.Charset = DEFAULT_CHARSET
         Gutter.Font.Color = clWindowText
@@ -566,31 +785,13 @@ object CellEditForm: TCellEditForm
         Gutter.Font.Style = []
         Gutter.Font.Quality = fqClearTypeNatural
         Gutter.ShowLineNumbers = True
-        Gutter.Bands = <
-          item
-            Kind = gbkMarks
-            Width = 13
-          end
-          item
-            Kind = gbkLineNumbers
-          end
-          item
-            Kind = gbkFold
-          end
-          item
-            Kind = gbkTrackChanges
-          end
-          item
-            Kind = gbkMargin
-            Width = 3
-          end>
         Highlighter = CellEditFrame.SynXMLSyn1
         Options = [eoAutoIndent, eoDragDropEditing, eoGroupUndo, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
         SearchEngine = CellEditFrame.SynEditSearch1
-        SelectedColor.Alpha = 0.400000005960464500
         WordWrap = True
         OnChange = seTranslateChange
         OnGutterGetText = seTranslateGutterGetText
+        FontSmoothing = fsmNone
         RemovedKeystrokes = <
           item
             Command = ecLineBreak
@@ -655,7 +856,7 @@ object CellEditForm: TCellEditForm
       OnUpdate = aPreviewUpdate
     end
     object aChkRepl: TAction
-      Caption = 'Replaces F9'
+      Caption = 'Evaluate F9'
       ShortCut = 120
       OnExecute = aChkReplExecute
     end
@@ -734,11 +935,32 @@ object CellEditForm: TCellEditForm
       ShortCut = 16432
       OnExecute = aAddCommonExecute
     end
+    object aGridFindNext: TAction
+      Caption = 'Find next'
+      Hint = 'Find next match'
+      ShortCut = 118
+      OnExecute = aGridFindNextExecute
+      OnUpdate = aGridFindNextUpdate
+    end
+    object aGridFindPrev: TAction
+      Caption = 'Find prev'
+      Hint = 'Find previous match'
+      ShortCut = 8310
+      OnExecute = aGridFindPrevExecute
+      OnUpdate = aGridFindPrevUpdate
+    end
+    object aGridReplace: TAction
+      Caption = 'Replace'
+      Hint = 'Replace next match'
+      ShortCut = 119
+      OnExecute = aGridReplaceExecute
+      OnUpdate = aGridReplaceUpdate
+    end
   end
   object pmCommon: TPopupMenu
     Images = MainData.ilEditor
-    Left = 579
-    Top = 104
+    Left = 427
+    Top = 192
     object Add1: TMenuItem
       Action = aAddCommon
       Caption = 'Add'
@@ -763,8 +985,70 @@ object CellEditForm: TCellEditForm
     object FillbyCol1: TMenuItem
       Caption = 'Smart fill'
       Hint = 'Add all macro from focused grid column'
-      ImageIndex = 2
+      ImageIndex = 41
       OnClick = FillbyCol1Click
+    end
+    object Distinctfill1: TMenuItem
+      Caption = 'Distinct fill'
+      Hint = 'Add distinct values from focused grid column'
+      ImageIndex = 41
+      OnClick = Distinctfill1Click
+    end
+    object miPaste1: TMenuItem
+      Caption = 'Paste'
+      Hint = 'Paste from clipboard'
+      ImageIndex = 2
+      OnClick = miPaste1Click
+    end
+    object N2: TMenuItem
+      Caption = '-'
+    end
+    object miOpenFile: TMenuItem
+      Caption = 'Open list file'
+      ImageIndex = 7
+      OnClick = miOpenFileClick
+    end
+    object miSaveFile: TMenuItem
+      Caption = 'Save list file'
+      ImageIndex = 8
+      OnClick = miSaveFileClick
+    end
+  end
+  object pmText: TPopupMenu
+    OnPopup = pmTextPopup
+    Left = 377
+    Top = 173
+    object N3: TMenuItem
+      Caption = '-'
+    end
+    object pmiSuggestions: TMenuItem
+      Caption = '&Suggested corrections'
+      Visible = False
+    end
+    object pmiMisspelling: TMenuItem
+      Caption = '&Find next misspelling'
+      Enabled = False
+      ShortCut = 117
+      OnClick = pmiMisspellingClick
+    end
+    object pmiAddToDictionary: TMenuItem
+      Caption = '&Add word to dictionary'
+      Visible = False
+      OnClick = pmiAddToDictionaryClick
+    end
+    object pmiSelectLanguage: TMenuItem
+      Caption = 'Select &language'
+      object pmiNoSpellcheck: TMenuItem
+        Caption = 'None'
+        Checked = True
+        GroupIndex = 82
+        RadioItem = True
+        OnClick = pmiNoSpellcheckClick
+      end
+    end
+    object pmiRemove: TMenuItem
+      Caption = 'Erase from dictionary'
+      OnClick = pmiRemoveClick
     end
   end
 end

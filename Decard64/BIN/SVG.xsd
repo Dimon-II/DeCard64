@@ -500,6 +500,17 @@
     <attribute name="stroke-miterlimit" type="svg:StrokeMiterLimitValueType" use="optional"/>
     <attribute name="stroke-opacity" type="svg:OpacityValueType" use="optional"/>
     <attribute name="stroke-width" type="svg:StrokeWidthValueType" use="optional"/>
+    <attribute name="paint-order" use="optional">
+      <simpleType>
+        <restriction base="string">
+		<enumeration value="normal"/>
+		<enumeration value="fill"/>
+		<enumeration value="stroke"/>
+		<enumeration value="markers"/>
+        </restriction>
+      </simpleType>
+    </attribute>
+
   </attributeGroup>
   <attributeGroup name="PresentationAttributes-FontSpecification">
     <annotation>

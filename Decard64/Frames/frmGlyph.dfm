@@ -12,6 +12,7 @@ object formGlyph: TformGlyph
   Font.Style = []
   FormStyle = fsStayOnTop
   Position = poMainFormCenter
+  Scaled = False
   OnCreate = FormCreate
   TextHeight = 13
   object Image1: TImage
@@ -37,18 +38,18 @@ object formGlyph: TformGlyph
     ColCount = 16
     Ctl3D = False
     DefaultColWidth = 19
-    DefaultRowHeight = 29
+    DefaultRowHeight = 32
     FixedCols = 0
     RowCount = 1
     FixedRows = 0
-    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goDrawFocusSelected]
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goDrawFocusSelected, goRowSizing]
     ParentCtl3D = False
     PopupMenu = pmCopy
     TabOrder = 0
     OnDblClick = miCopyCharClick
     OnDrawCell = GridDrawCell
-    ExplicitWidth = 652
-    ExplicitHeight = 315
+    ExplicitWidth = 644
+    ExplicitHeight = 313
   end
   object Panel1: TPanel
     Left = 0
@@ -61,12 +62,12 @@ object formGlyph: TformGlyph
     Margins.Bottom = 2
     Align = alTop
     TabOrder = 1
-    ExplicitWidth = 652
+    ExplicitWidth = 644
     object cbFont: TComboBox
       Left = 92
       Top = 8
       Width = 286
-      Height = 25
+      Height = 21
       Margins.Left = 2
       Margins.Top = 2
       Margins.Right = 2

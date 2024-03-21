@@ -9,7 +9,7 @@ object SvgInspectorFrame: TSvgInspectorFrame
     Top = 0
     Width = 618
     Height = 561
-    ActivePage = tsLangPack
+    ActivePage = tsReplace
     Align = alClient
     TabOrder = 0
     OnChange = pcAtrInspectorChange
@@ -182,18 +182,18 @@ object SvgInspectorFrame: TSvgInspectorFrame
         Left = 0
         Top = 0
         Width = 610
-        Height = 456
+        Height = 448
         Align = alClient
         TabOrder = 0
         ExplicitWidth = 610
-        ExplicitHeight = 531
+        ExplicitHeight = 456
         inherited SynEditor: TSynEdit
           Width = 610
-          Height = 428
+          Height = 420
           ReadOnly = True
           WordWrap = False
           ExplicitWidth = 610
-          ExplicitHeight = 503
+          ExplicitHeight = 428
         end
         inherited pscrSysEdit: TPageScroller
           Width = 610
@@ -202,9 +202,9 @@ object SvgInspectorFrame: TSvgInspectorFrame
       end
       object meReplaceHint: TMemo
         Left = 0
-        Top = 456
+        Top = 448
         Width = 610
-        Height = 75
+        Height = 83
         Align = alBottom
         BorderStyle = bsNone
         Color = clInfoBk
@@ -214,11 +214,11 @@ object SvgInspectorFrame: TSvgInspectorFrame
           '[Caption] Beginning of named block'
           'macro=value (case insensitive)'
           'Macros==value (case sensitive)'
-          'macro=$regexp')
+          'macro=$regexp'
+          'Escape character "=" with \=  to use in macro name')
         ParentCtl3D = False
         ReadOnly = True
         TabOrder = 1
-        ExplicitTop = 455
       end
     end
     object tsLangPack: TTabSheet
@@ -246,32 +246,10 @@ object SvgInspectorFrame: TSvgInspectorFrame
         Gutter.Font.Style = []
         Gutter.Font.Quality = fqClearTypeNatural
         Gutter.ShowLineNumbers = True
-        Gutter.Bands = <
-          item
-            Kind = gbkMarks
-            Width = 13
-          end
-          item
-            Kind = gbkLineNumbers
-          end
-          item
-            Kind = gbkFold
-          end
-          item
-            Kind = gbkTrackChanges
-          end
-          item
-            Kind = gbkMargin
-            Width = 3
-          end>
         Highlighter = SynIniSyn1
         Options = [eoAutoIndent, eoDragDropEditing, eoGroupUndo, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
         SearchEngine = ReplaceFrame.SynEditSearch1
-        SelectedColor.Alpha = 0.400000005960464500
         OnChange = SynEditorChange
-        ExplicitLeft = 3
-        ExplicitTop = -96
-        ExplicitHeight = 354
         RemovedKeystrokes = <
           item
             Command = ecLineBreak

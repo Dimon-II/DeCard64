@@ -73,6 +73,7 @@ type
     property SVGNode:TXML_Nod read FSVGNode write SetSVGNode;
     procedure Initialize;
     procedure SetSize(ARect:TRect);
+    procedure Reset;
 
   end;
 
@@ -216,6 +217,12 @@ begin
   ReplaceFrame.SynEditor.ReadOnly := pcAtrInspector.ActivePage<>tsReplace;
 end;
 
+
+procedure TSvgInspectorFrame.Reset;
+begin
+  ReplaceFrame.Reset;
+  FSVGNode := Nil;
+end;
 
 procedure TSvgInspectorFrame.tbPipeClick(Sender: TObject);
 var dkr:string;

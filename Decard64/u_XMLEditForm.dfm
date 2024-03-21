@@ -87,7 +87,7 @@ object XMLEditForm: TXMLEditForm
       end
       inherited pscrSysEdit: TPageScroller
         Width = 622
-        ExplicitWidth = 622
+        ExplicitWidth = 618
       end
     end
     object seTags: TSynEdit
@@ -112,24 +112,6 @@ object XMLEditForm: TXMLEditForm
       Gutter.Font.Name = 'Courier New'
       Gutter.Font.Style = []
       Gutter.Font.Quality = fqClearTypeNatural
-      Gutter.Bands = <
-        item
-          Kind = gbkMarks
-          Width = 13
-        end
-        item
-          Kind = gbkLineNumbers
-        end
-        item
-          Kind = gbkFold
-        end
-        item
-          Kind = gbkTrackChanges
-        end
-        item
-          Kind = gbkMargin
-          Width = 3
-        end>
       Highlighter = SynEditFrame.SynXMLSyn1
       Lines.Strings = (
         'Known tags:'
@@ -155,7 +137,8 @@ object XMLEditForm: TXMLEditForm
         '<bkg patch="reference to defs supported %x/%y"  outline="..."/>'
         '<html width="xxx" height="yyy"  any rect attributes >...</html>')
       ReadOnly = True
-      SelectedColor.Alpha = 0.400000005960464500
+      ExplicitTop = 248
+      ExplicitWidth = 618
     end
   end
 end

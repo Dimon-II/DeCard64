@@ -133,7 +133,7 @@ function SpecialEntities(src:string;Entities:boolean):string;
 
 implementation
 
-uses system.Sysutils;
+uses system.Sysutils, system.math;
 
 { TXML_Doc }
 
@@ -508,6 +508,7 @@ begin
     Delete(s,Pos('>',s+'>'),128);
     Delete(s,Pos('/',s+'/'),128);
     Delete(s,Pos(' ',s+' '),128);
+    Delete(s,Pos(#13,s+#13),128);
     LocalName := s;
 
   finally
@@ -596,6 +597,7 @@ var oList:TStringlist;
     function clean(aText: string):string;
     begin
       result:=stringreplace(aText,crlf,' ',[rfreplaceall]);
+      result:=stringreplace(aText,cr,' ',[rfreplaceall]);
       result:=stringreplace(result,tab,' ',[rfreplaceall]);
       result:=trim(result);
     end;
@@ -755,7 +757,7 @@ Begin
       // Начало TAG
       nod:=nod.add;
       with nod do begin
-        LocalName:=copy(dat,1,pos(#32,dat+#32)-1);
+        LocalName:= copy(dat,1, Min(pos(#32,dat+#32),pos(#13,dat+#13))-1);
         AddAttributes(copy(dat,pos(#32,dat)+1,Length(dat)),Attributes);
       end;
     End else
