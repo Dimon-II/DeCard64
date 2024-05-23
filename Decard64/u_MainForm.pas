@@ -4003,7 +4003,7 @@ end;
 
 procedure TMainForm.tbPreviewMMClick(Sender: TObject);
 begin
-  ZoomPreview := PixelsPerInch / StrToIntDef(cbDPI.Text,300);
+  ZoomPreview := Screen.MonitorFromWindow(Handle).PixelsPerInch / StrToIntDef(cbDPI.Text,300);
   imgRender.Width := Round(imgRender.Picture.Width*ZoomPreview);
   imgRender.Height := Round(imgRender.Picture.Height*ZoomPreview);
 end;

@@ -5,7 +5,7 @@
         <FrameworkType>VCL</FrameworkType>
         <MainSource>Decard64.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">Release</Config>
+        <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win64</Platform>
         <TargetedPlatforms>3</TargetedPlatforms>
         <AppType>Application</AppType>
@@ -139,10 +139,10 @@
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <Icon_MainIcon>Decard64_Icon.ico</Icon_MainIcon>
         <DCC_Namespace>VCL;System;$(DCC_Namespace)</DCC_Namespace>
-        <VerInfo_MinorVer>2</VerInfo_MinorVer>
+        <VerInfo_MinorVer>3</VerInfo_MinorVer>
         <VerInfo_Release>1</VerInfo_Release>
         <VerInfo_Build>11</VerInfo_Build>
-        <VerInfo_Keys>CompanyName=Dmitry Yatsenko;FileDescription=Card game design/translate tool;FileVersion=1.2.1.11;InternalName=Decard;LegalCopyright=feeware opensource;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.1.2.0;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=Dmitry Yatsenko;FileDescription=Card game design/translate tool;FileVersion=1.3.1.11;InternalName=Decard;LegalCopyright=feeware opensource;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.3.1;Comments=</VerInfo_Keys>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -195,11 +195,14 @@
             <Form>TraceReplForm</Form>
         </DCCReference>
         <DCCReference Include="HunSpell\HunSpellLib.pas"/>
-        <DCCReference Include="HunSpell\SynEditSpell.pas"/>
         <DCCReference Include="u_GridSearch.pas">
             <Form>GridSearch</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="HunSpell\SynEditSpell.pas"/>
+        <DCCReference Include="HunSpell\SynEdit.pas"/>
+        <DCCReference Include="HunSpell\SynEditHighlighter.pas"/>
+        <DCCReference Include="src\FontsNameFunc.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
@@ -231,6 +234,12 @@
                 <DeployFile LocalName="Win64\Debug\Decard64.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win64">
                         <RemoteName>Decard64.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="Win64\Debug\Decard64.rsm" Configuration="Debug" Class="DebugSymbols">
+                    <Platform Name="Win64">
+                        <RemoteName>Decard64.rsm</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

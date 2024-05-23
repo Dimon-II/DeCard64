@@ -26,8 +26,11 @@ uses
   u_ForeignObject in 'src\u_ForeignObject.pas',
   u_TraceReplace in 'u_TraceReplace.pas' {TraceReplForm},
   HunSpellLib in 'HunSpell\HunSpellLib.pas',
+  u_GridSearch in 'u_GridSearch.pas' {GridSearch},
   SynEditSpell in 'HunSpell\SynEditSpell.pas',
-  u_GridSearch in 'u_GridSearch.pas' {GridSearch};
+  SynEdit in 'HunSpell\SynEdit.pas',
+  SynEditHighlighter in 'HunSpell\SynEditHighlighter.pas',
+  FontsNameFunc in 'src\FontsNameFunc.pas';
 
 {$R *.res}
 

@@ -19,7 +19,13 @@ object SynEditFrame: TSynEditFrame
     TabOrder = 0
     OnExit = SynEditorExit
     OnKeyPress = SynEditorKeyPress
+    CodeFolding.GutterShapeSize = 11
+    CodeFolding.CollapsedLineColor = clGrayText
+    CodeFolding.FolderBarLinesColor = clGrayText
+    CodeFolding.IndentGuidesColor = clGray
+    CodeFolding.IndentGuides = True
     CodeFolding.ShowCollapsedLine = True
+    CodeFolding.ShowHintMark = True
     UseCodeFolding = False
     Gutter.Font.Charset = DEFAULT_CHARSET
     Gutter.Font.Color = clWindowText
@@ -32,6 +38,7 @@ object SynEditFrame: TSynEditFrame
     Options = [eoAutoIndent, eoDragDropEditing, eoGroupUndo, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
     SearchEngine = SynEditSearch1
     WordWrap = True
+    FontSmoothing = fsmNone
     RemovedKeystrokes = <
       item
         Command = ecLineBreak
@@ -280,6 +287,9 @@ object SynEditFrame: TSynEditFrame
     end
   end
   object SynXMLSyn1: TSynXMLSyn
+    Options.AutoDetectEnabled = False
+    Options.AutoDetectLineLimit = 0
+    Options.Visible = False
     WantBracesParsed = False
     Left = 272
     Top = 56

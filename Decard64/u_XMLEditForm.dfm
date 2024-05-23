@@ -104,7 +104,13 @@ object XMLEditForm: TXMLEditForm
       Font.Style = []
       Font.Quality = fqClearTypeNatural
       TabOrder = 1
+      CodeFolding.GutterShapeSize = 11
+      CodeFolding.CollapsedLineColor = clGrayText
+      CodeFolding.FolderBarLinesColor = clGrayText
+      CodeFolding.IndentGuidesColor = clGray
+      CodeFolding.IndentGuides = True
       CodeFolding.ShowCollapsedLine = True
+      CodeFolding.ShowHintMark = True
       UseCodeFolding = False
       Gutter.Font.Charset = DEFAULT_CHARSET
       Gutter.Font.Color = clWindowText
@@ -137,6 +143,7 @@ object XMLEditForm: TXMLEditForm
         '<bkg patch="reference to defs supported %x/%y"  outline="..."/>'
         '<html width="xxx" height="yyy"  any rect attributes >...</html>')
       ReadOnly = True
+      FontSmoothing = fsmNone
       ExplicitTop = 248
       ExplicitWidth = 618
     end

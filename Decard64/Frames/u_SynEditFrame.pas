@@ -187,6 +187,9 @@ begin
   OpenClipboard(0);
   try
     Data := GetClipboardData(50070);
+  finally
+    CloseClipboard;
+  end;
     if Data <> 0 then
     begin
       try
@@ -197,9 +200,6 @@ begin
     end
     else
      SynEditor.PasteFromClipboard;
-  finally
-    CloseClipboard;
-  end;
 end;
 
 procedure TSynEditFrame.actEditPasteUpdate(Sender: TObject);

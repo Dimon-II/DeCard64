@@ -47,7 +47,7 @@ procedure ResetFonts(APath: string);
 implementation
 
 uses
-  u_MainForm, Vcl.Imaging.jpeg, system.Math, Messages;
+  u_MainForm, Vcl.Imaging.jpeg, system.Math, Messages, FontsNameFunc;;
 
 procedure TSkiaThread.ApplyRenderingOptions(opt: presvg_options);
 begin
@@ -198,143 +198,6 @@ begin
 end;
 
 
-function GetFontName(AFontFile: string): ansistring;
-// my own, based on PascalType Project
-type
-  // TrueType Table Directory Entry type
-  TTableType = array [0 .. 3] of AnsiChar;
-
-  TDirectoryTableEntry = packed record
-    TableType: TTableType; // Table type
-    CheckSum: Cardinal; // Table checksum
-    Offset: Cardinal; // Table file offset
-    length: Cardinal; // Table length
-  end;
-
-  function Swap16(Value: Word): Word;
-  begin
-    result := Swap(Value);
-  end;
-
-  function Swap32(Value: Cardinal): Cardinal;
-  type
-    TTwoWords = array [0 .. 1] of Word;
-  begin
-    TTwoWords(result)[1] := Swap16(TTwoWords(Value)[0]);
-    TTwoWords(result)[0] := Swap16(TTwoWords(Value)[1]);;
-  end;
-
-var
-  fs: TMemoryStream;
-  DirectoryTableEntry: TDirectoryTableEntry;
-
-  StoragePos: Int64;
-  NameIndex: Integer;
-
-  NumRecords: Word;
-  StrLength: Word;
-  StrOffset: Word;
-  Value16: Word;
-  plt: Word;
-
-  FNameID: Word;
-  FontsCount: Integer;
-  FNameString: WideString;
-
-begin
-  result := '';
-  fs := TMemoryStream.Create;
-  with fs do
-    try
-      LoadFromFile(AFontFile);
-//      AddFontResourceEx(PChar(AFontFile),nil, @FontsCount);
-      Position := 0;
-//      HFont :=
-      AddFontMemResourceEx(Memory, Size, nil, @FontsCount);
-
-      Position := 12; // sizeof(TDirectoryTable);
-      repeat
-        ReadBuffer(DirectoryTableEntry, sizeof(DirectoryTableEntry));
-        if Position = Size then
-          abort;
-      until DirectoryTableEntry.TableType = 'name';
-
-      Position := Swap32(DirectoryTableEntry.Offset);
-
-      StoragePos := Position;
-
-      // read format
-      Read(Value16, sizeof(Word));
-//      FFormat := Swap16(Value16);
-
-      // if not (FFormat in [0..1])
-      // then raise Exception.Create('Bad font format: '+AFontFile);
-
-      // internally store number of records
-      Read(Value16, sizeof(Word));
-      NumRecords := Swap16(Value16);
-
-      // read storage offset and add to preliminary storage position
-      Read(Value16, sizeof(Word));
-      StoragePos := StoragePos + Swap16(Value16);
-
-      // check for minimum table size
-      if Position + NumRecords * 12 > Size then
-        raise Exception.Create('Damaged: ' + AFontFile);
-
-      // name index list
-
-      for NameIndex := 0 to NumRecords - 1 do
-      begin
-        // read platform ID
-        Read(Value16, sizeof(Word));
-        plt := Swap16(Value16);
-
-        // skip encoding ID
-        Read(Value16, sizeof(Word));
-
-        // skip language ID
-        Read(Value16, sizeof(Word));
-
-        // read name ID
-        Read(Value16, sizeof(Word));
-        FNameID := Swap16(Value16);
-
-        // read length
-        Read(Value16, sizeof(Word));
-        StrLength := Swap16(Value16);
-
-        // read offset
-        Read(Value16, sizeof(Word));
-        StrOffset := Swap16(Value16);
-
-        // read fafe or fullname
-        if (FNameID in [1, 4]) then
-        begin
-          Position := StoragePos + StrOffset;
-          if (plt = 1) then
-          begin
-            SetLength(result, StrLength);
-            Read(result[1], StrLength);
-          end
-          else
-          begin
-            for StrOffset := 0 to StrLength div 2 - 1 do
-            begin
-              Read(Value16, sizeof(Word));
-              Value16 := Swap16(Value16);
-              FNameString := FNameString + WideChar(Value16);
-            end;
-            result := FNameString;
-          end;
-          if trim(result) <> '' then
-            exit;
-        end;
-      end;
-    finally
-      fs.free
-    end;
-end;
 
 procedure ResetFonts(APath: string);
 var
@@ -363,8 +226,8 @@ begin
           begin
             if resvg_options_load_font_file(opt, PChar(fn))=0 then
             begin
-              s :=   GetFontName(APath + sr.Name);
-              if Pos(s, LocalFonts) = 0 then
+              s :=   GetFontNameFromFile(APath + sr.Name);
+              if Pos(','+s+',', ','+LocalFonts+',') = 0 then
                 LocalFonts := LocalFonts + s + ',';
             end;
           end;

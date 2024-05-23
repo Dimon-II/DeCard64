@@ -210,6 +210,7 @@
 	<font-size>Refers to the size of the font from baseline to baseline when multiple lines of text are set solid in a multiline layout environment.</font-size>
 	<font-style>Specifies whether the text is to be rendered using a normal, italic, or oblique face.</font-style>
 	<font-weight>Refers to the boldness or lightness of the glyphs used to render the text, relative to other fonts in the same font family.</font-weight>
+        <font-stretch>Indicates the desired amount of condensing or expansion in the glyphs used to render the text. Works ONLY when the corresponding font file exists, does not change the glyphs of the regular font.</font-stretch>
 	<text-decoration>Defines whether text is decorated with an underline, overline and/or strike-through.</text-decoration>
 	<style>Set of attributes that can be specified on any visible SVG element.</style>
 	<letter-spacing>Sets the spacing behavior between text characters.</letter-spacing>
@@ -294,6 +295,7 @@
 			<font-size/>
 			<text-anchor/>
 			<font-family/>
+			<font-stretch/>
 			<font-style/>
 			<font-weight/>
 			<visibility/>
@@ -325,6 +327,7 @@
 			<font-size/>
 			<text-anchor/>
 			<font-family/>
+			<font-stretch/>
 			<font-style/>
 			<font-weight/>
 			<font-variant/>

@@ -376,6 +376,7 @@ begin
   nod.Attribute['font-size'] := ParentStyle(nod,'font-size');
   nod.Attribute['font-family'] := ParentStyle(nod,'font-family');
   nod.Attribute['font-weight'] := ParentStyle(nod,'font-weight');
+  nod.Attribute['font-stretch'] := ParentStyle(nod,'font-stretch');
   nod.Attribute['font-style'] := ParentStyle(nod,'font-style');
   nod.Attribute['letter-spacing'] := ParentStyle(nod,'letter-spacing','0');
   nod.Attribute['word-spacing'] := ParentStyle(nod,'word-spacing','0');
@@ -457,6 +458,7 @@ begin
               +'" letter-spacing="'+nod.Attribute['letter-spacing']
               +'" word-spacing="'+nod.Attribute['word-spacing']
               +'" font-weight="'+ nod.Attribute['font-weight']
+              +'" font-stretch="'+ nod.Attribute['font-stretch']
               +'" font-style="'+ nod.Attribute['font-style']+'">');
     for i:=0 to sl.Count-1 do
     begin
@@ -733,6 +735,7 @@ begin
             + 'word-spacing="'+ParentStyle(nod,'word-spacing','0')+'"'#$D#$A
             + 'style=" font-style:'+ParentStyle(nod,'font-style','normal')
             + ';  font-weight:'+ParentStyle(nod,'font-weight','normal')
+            + ';  font-stretch:'+ParentStyle(nod,'font-stretch','normal')
             + ';  text-decoration:'+ParentStyle(nod,'text-decoration','none')+'; "'#$D#$A;
     s := StringReplace(Nod.text,'[P]',#13#10,[rfReplaceAll, rfIgnoreCase]);
     s := StringReplace(s,'[C]','',[rfReplaceAll, rfIgnoreCase]);
@@ -885,7 +888,6 @@ begin
 
       if (s='attr') or (s='text') or (s='body') or (s='replace') or (s='background')
       then Continue;
-
 
       NOD.Attribute[s] := DoReplace(NOD.Attributes[i].value, NOD);
 
@@ -1492,6 +1494,7 @@ begin
     RST.Attribute['font-size'] := ParentStyle(NOD, 'font-size');
     RST.Attribute['font-family'] := ParentStyle(NOD, 'font-family');
     RST.Attribute['font-weight'] := ParentStyle(NOD, 'font-weight');
+    RST.Attribute['font-stretch'] := ParentStyle(NOD, 'font-stretch');
     RST.Attribute['text-decoration'] := ParentStyle(NOD, 'text-decoration');
     RST.Attribute['fill'] := ParentStyle(NOD, 'fill');
     RST.Attribute['stroke'] := ParentStyle(NOD, 'stroke');
@@ -1672,6 +1675,7 @@ begin
                        + '" letter-spacing="'+ParentStyle(xn,'letter-spacing')
                        + '" word-spacing="'+ParentStyle(xn,'word-spacing')
                        + '" font-weight="'+ ParentStyle(xn,'font-weight')
+                       + '" font-stretch="'+ ParentStyle(xn,'font-stretch')
                        + '" font-style="'+ ParentStyle(xn,'font-style')+'" ';
 
                for i:= 0 to Hpn.Count-1 do
@@ -1708,6 +1712,7 @@ begin
            n2.Attribute['font-size'] := ParentStyle(xn, 'font-size');
            n2.Attribute['font-family'] := ParentStyle(xn, 'font-family');
            n2.Attribute['font-weight'] := ParentStyle(xn, 'font-weight');
+           n2.Attribute['font-stretch'] := ParentStyle(xn, 'font-stretch');
            if (ParentStyle(xn, 'align')<>'width') and (ParentStyle(xn, 'align')<>'hyphen') then
              n2.Attribute['letter-spacing'] := ParentStyle(xn, 'letter-spacing');
            n2.Attribute['text-decoration'] := ParentStyle(xn, 'text-decoration');
@@ -2305,6 +2310,7 @@ begin
     RST.Attribute['font-size'] := ParentStyle(NOD, 'font-size');
     RST.Attribute['font-family'] := ParentStyle(NOD, 'font-family');
     RST.Attribute['font-weight'] := ParentStyle(NOD, 'font-weight');
+    RST.Attribute['font-stretch'] := ParentStyle(NOD, 'font-stretch');
     RST.Attribute['text-decoration'] := ParentStyle(NOD, 'text-decoration');
     RST.Attribute['fill'] := ParentStyle(NOD, 'fill');
     RST.Attribute['stroke'] := ParentStyle(NOD, 'stroke');
@@ -2450,6 +2456,7 @@ begin
             +' font-size="'+ ParentStyle(xn,'font-size')+'"'
             +' font-family="'+ ParentStyle(xn,'font-family')+'"'
             +' font-weight="'+ ParentStyle(xn,'font-weight')+'"'
+            +' font-stretch="'+ ParentStyle(xn,'font-stretch')+'"'
             +' font-style="'+ ParentStyle(xn,'font-style')+'"'
             +' letter-spacing="'+ ParentStyle(xn,'letter-spacing','0')+'"'
             +' word-spacing="'+ ParentStyle(xn,'word-spacing','0')+'"'
@@ -2459,6 +2466,7 @@ begin
             +' font-size="'+ ParentStyle(xn,'font-size')+'"'
             +' font-family="'+ ParentStyle(xn,'font-family')+'"'
             +' font-weight="'+ ParentStyle(xn,'font-weight')+'"'
+            +' font-stretch="'+ ParentStyle(xn,'font-stretch')+'"'
             +' font-style="'+ ParentStyle(xn,'font-style')+'"'
             +' letter-spacing="'+ ParentStyle(xn,'letter-spacing','0')+'"'
             +' word-spacing="'+ ParentStyle(xn,'word-spacing','0')+'"'
