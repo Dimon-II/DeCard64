@@ -155,7 +155,12 @@ begin
   resvg_parse_tree_from_data(@Svg[1], length(Svg), opt, @tree);
 
   if tree = nil then
-    raise Exception.Create('SVG parsing error');
+  begin
+    LogText := 'SVG parsing error';
+    if (fmt <> '') or (FImage <> nil) then
+      Synchronize(LogError);
+    raise Exception.Create(LogText);
+  end;
 
   Ftree := Pointer(tree);
 
@@ -218,7 +223,6 @@ begin
       exit;
 
     opt := resvg_options_create();
-    resvg_options_load_system_fonts(opt);
 
     if FindFirst(APath + '*.*', faAnyFile, sr) = 0 then
     begin
@@ -237,6 +241,7 @@ begin
       until FindNext(sr) <> 0;
       FindClose(sr);
     end;
+    resvg_options_load_system_fonts(opt);
   finally
   end;
 end;
@@ -255,7 +260,16 @@ end;
 
 procedure TSkiaThread.LogError;
 begin
-  MainForm.meLog.Lines.Add(LogText)
+  MainForm.meLog.Lines.Add(LogText);
+//  ShowMessage(LogText);
+  if FImage <> nil then
+  begin
+    FImage.Canvas.Brush.Color := clWhite;
+    FImage.Canvas.Rectangle(0,0,FImage.Width, FImage.Height);
+    FImage.Canvas.Font.Size := 32;
+    FImage.Canvas.Font.Color := clRed;
+    FImage.Canvas.TextOut(50,50,LogText)
+  end;
 end;
 
 procedure TSkiaThread.Apply;

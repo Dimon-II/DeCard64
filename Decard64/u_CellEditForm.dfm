@@ -208,7 +208,7 @@ object CellEditForm: TCellEditForm
       ParentFont = False
     end
     object btnApply: TButton
-      Left = 552
+      Left = 548
       Top = 9
       Width = 75
       Height = 25
@@ -223,10 +223,10 @@ object CellEditForm: TCellEditForm
       ParentFont = False
       TabOrder = 0
       OnClick = btnApplyClick
-      ExplicitLeft = 548
+      ExplicitLeft = 544
     end
     object btnCancel: TButton
-      Left = 633
+      Left = 629
       Top = 9
       Width = 75
       Height = 25
@@ -240,7 +240,7 @@ object CellEditForm: TCellEditForm
       Font.Style = []
       ParentFont = False
       TabOrder = 1
-      ExplicitLeft = 629
+      ExplicitLeft = 625
     end
     object chbScrollPreview: TCheckBox
       Left = 82
@@ -278,7 +278,7 @@ object CellEditForm: TCellEditForm
     end
     inherited pscrSysEdit: TPageScroller
       Width = 496
-      ExplicitWidth = 492
+      ExplicitWidth = 496
       inherited tbrEditor: TToolBar
         inherited ToolButton3: TToolButton
           Hint = 'Add to Common (Ctrl+0)'
@@ -294,11 +294,133 @@ object CellEditForm: TCellEditForm
     Top = 0
     Width = 289
     Height = 240
-    ActivePage = tsReplace
+    ActivePage = tsTransform
     Align = alRight
     TabOrder = 2
-    ExplicitLeft = 495
-    ExplicitHeight = 239
+    object tsTransform: TTabSheet
+      Caption = 'Transform'
+      ImageIndex = 6
+      object lblStep: TLabel
+        Left = 3
+        Top = 47
+        Width = 22
+        Height = 13
+        Caption = 'Step'
+        FocusControl = seStep
+      end
+      object sbMinusDX: TSpeedButton
+        Left = 1
+        Top = 12
+        Width = 23
+        Height = 24
+        Action = aMinusDX
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -33
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        ParentShowHint = False
+        ShowHint = True
+      end
+      object sbMinusDY: TSpeedButton
+        Left = 25
+        Top = 0
+        Width = 25
+        Height = 22
+        Action = aMinusDY
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        Layout = blGlyphBottom
+        ParentFont = False
+        ParentShowHint = False
+        ShowHint = True
+      end
+      object sbPlusDY: TSpeedButton
+        Left = 25
+        Top = 20
+        Width = 25
+        Height = 22
+        Action = aPlusDY
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        Layout = blGlyphTop
+        ParentFont = False
+        ParentShowHint = False
+        ShowHint = True
+      end
+      object sbPlusDX: TSpeedButton
+        Left = 51
+        Top = 12
+        Width = 23
+        Height = 24
+        Action = aPlusDX
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -33
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        Layout = blGlyphRight
+        ParentFont = False
+        ParentShowHint = False
+        ShowHint = True
+      end
+      object lblDX: TLabel
+        Left = 3
+        Top = 76
+        Width = 33
+        Height = 13
+        Caption = 'delta X'
+        FocusControl = seDX
+      end
+      object lblDY: TLabel
+        Left = 3
+        Top = 104
+        Width = 33
+        Height = 13
+        Caption = 'delta Y'
+        FocusControl = seDY
+      end
+      object seStep: TSpinEdit
+        Left = 40
+        Top = 42
+        Width = 58
+        Height = 22
+        MaxValue = 20
+        MinValue = 1
+        TabOrder = 0
+        Value = 1
+        OnChange = seStepChange
+      end
+      object seDX: TSpinEdit
+        Left = 40
+        Top = 71
+        Width = 58
+        Height = 22
+        MaxValue = 0
+        MinValue = 0
+        TabOrder = 1
+        Value = 0
+        OnChange = seDXChange
+      end
+      object seDY: TSpinEdit
+        Left = 40
+        Top = 99
+        Width = 58
+        Height = 22
+        MaxValue = 0
+        MinValue = 0
+        TabOrder = 2
+        Value = 0
+        OnChange = seDXChange
+      end
+    end
     object tsCommon: TTabSheet
       Caption = 'Common'
       object lbCommon: TListBox
@@ -955,6 +1077,30 @@ object CellEditForm: TCellEditForm
       ShortCut = 119
       OnExecute = aGridReplaceExecute
       OnUpdate = aGridReplaceUpdate
+    end
+    object aMinusDX: TAction
+      Hint = 'Translate Left'
+      ImageIndex = 3
+      ShortCut = 49189
+      OnExecute = aMinusDXExecute
+    end
+    object aPlusDX: TAction
+      Hint = 'Translate Right'
+      ImageIndex = 1
+      ShortCut = 49191
+      OnExecute = aPlusDXExecute
+    end
+    object aMinusDY: TAction
+      Hint = 'Translate Up'
+      ImageIndex = 0
+      ShortCut = 49190
+      OnExecute = aMinusDYExecute
+    end
+    object aPlusDY: TAction
+      Hint = 'Translate Down'
+      ImageIndex = 2
+      ShortCut = 49192
+      OnExecute = aPlusDYExecute
     end
   end
   object pmCommon: TPopupMenu

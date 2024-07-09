@@ -2,8 +2,8 @@ object MainForm: TMainForm
   Left = 0
   Top = 0
   Caption = 'DeCard64'
-  ClientHeight = 641
-  ClientWidth = 1093
+  ClientHeight = 640
+  ClientWidth = 1089
   Color = clWindow
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -19,15 +19,15 @@ object MainForm: TMainForm
   OnResize = FormResize
   OnShow = FormShow
   DesignSize = (
-    1093
-    641)
+    1089
+    640)
   TextHeight = 13
   object pcMain: TPageControl
     Left = 0
     Top = 0
-    Width = 1093
-    Height = 623
-    ActivePage = tsPreview
+    Width = 1089
+    Height = 622
+    ActivePage = tsDesigner
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -43,7 +43,7 @@ object MainForm: TMainForm
       object tbrProject: TToolBar
         Left = 0
         Top = 0
-        Width = 1085
+        Width = 1081
         Height = 44
         AutoSize = True
         ButtonHeight = 44
@@ -53,7 +53,6 @@ object MainForm: TMainForm
         ShowCaptions = True
         TabOrder = 0
         Transparent = True
-        ExplicitWidth = 1081
         object tbOpenProject: TToolButton
           Left = 0
           Top = 0
@@ -118,12 +117,11 @@ object MainForm: TMainForm
       object gbProjectFolders: TGroupBox
         Left = 0
         Top = 44
-        Width = 1085
+        Width = 1081
         Height = 164
         Align = alTop
         Caption = 'Folders / files'
         TabOrder = 1
-        ExplicitWidth = 1081
         object lblCfgRoot: TLabel
           Left = 13
           Top = 24
@@ -915,13 +913,12 @@ object MainForm: TMainForm
       object Panel1: TPanel
         Left = 0
         Top = 208
-        Width = 1085
+        Width = 1081
         Height = 184
         Align = alTop
         BevelOuter = bvNone
         ParentColor = True
         TabOrder = 2
-        ExplicitWidth = 1081
         object pnProjectSize: TPanel
           Left = 0
           Top = 0
@@ -1563,12 +1560,11 @@ object MainForm: TMainForm
         object gbSheet: TGroupBox
           Left = 857
           Top = 0
-          Width = 228
+          Width = 224
           Height = 184
           Align = alClient
           Caption = 'Sheet'
           TabOrder = 1
-          ExplicitWidth = 224
           object imgSheet: TImage
             Left = 9
             Top = 15
@@ -1600,16 +1596,14 @@ object MainForm: TMainForm
       end
       object gbRendering: TGroupBox
         Left = 0
-        Top = 544
-        Width = 1085
+        Top = 543
+        Width = 1081
         Height = 51
         Align = alBottom
         Caption = 'Rendering'
         TabOrder = 3
-        ExplicitTop = 543
-        ExplicitWidth = 1081
         DesignSize = (
-          1085
+          1081
           51)
         object lblEngine: TLabel
           Left = 167
@@ -1738,12 +1732,20 @@ object MainForm: TMainForm
           Height = 21
           TabOrder = 3
         end
+        object chbOuterCut: TCheckBox
+          Left = 796
+          Top = 20
+          Width = 85
+          Height = 17
+          Caption = 'Outer Cutting '
+          TabOrder = 5
+        end
       end
       object meAnalitics: TMemo
         Left = 0
         Top = 392
         Width = 417
-        Height = 152
+        Height = 151
         Align = alLeft
         BevelInner = bvNone
         BevelOuter = bvNone
@@ -1751,13 +1753,12 @@ object MainForm: TMainForm
         Color = clBtnFace
         ReadOnly = True
         TabOrder = 4
-        ExplicitHeight = 151
       end
       object meLog: TMemo
         Left = 417
         Top = 392
-        Width = 668
-        Height = 152
+        Width = 664
+        Height = 151
         Align = alClient
         BorderStyle = bsNone
         Color = clBtnFace
@@ -1766,8 +1767,6 @@ object MainForm: TMainForm
         ReadOnly = True
         ScrollBars = ssVertical
         TabOrder = 5
-        ExplicitWidth = 664
-        ExplicitHeight = 151
       end
     end
     object tsDesigner: TTabSheet
@@ -1777,16 +1776,16 @@ object MainForm: TMainForm
         Left = 285
         Top = 0
         Width = 5
-        Height = 418
+        Height = 417
         Beveled = True
         ExplicitLeft = 280
         ExplicitHeight = 471
       end
       object Splitter2: TSplitter
-        Left = 751
+        Left = 747
         Top = 0
         Width = 5
-        Height = 418
+        Height = 417
         Align = alRight
         Beveled = True
         ExplicitLeft = 566
@@ -1794,8 +1793,8 @@ object MainForm: TMainForm
       end
       object Splitter3: TSplitter
         Left = 0
-        Top = 418
-        Width = 1085
+        Top = 417
+        Width = 1081
         Height = 5
         Cursor = crVSplit
         Align = alBottom
@@ -1807,7 +1806,7 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 285
-        Height = 418
+        Height = 417
         Align = alLeft
         Caption = 'Template'
         Constraints.MinWidth = 50
@@ -1816,21 +1815,21 @@ object MainForm: TMainForm
           Left = 2
           Top = 15
           Width = 281
-          Height = 357
+          Height = 356
           Align = alClient
           Constraints.MinHeight = 200
           TabOrder = 0
           ExplicitLeft = 2
           ExplicitTop = 15
           ExplicitWidth = 281
-          ExplicitHeight = 357
+          ExplicitHeight = 356
           inherited treeTemplate: TTreeView
             Width = 281
-            Height = 308
+            Height = 307
             OnChange = SvgTreeFrame1treeTemplateChange
             OnExit = SVGFrametreeTemplateExit
             ExplicitWidth = 281
-            ExplicitHeight = 308
+            ExplicitHeight = 306
           end
           inherited pscrTemplate: TPageScroller
             Width = 281
@@ -1913,7 +1912,7 @@ object MainForm: TMainForm
         end
         object pscrCellGrid: TPageScroller
           Left = 2
-          Top = 372
+          Top = 371
           Width = 281
           Height = 44
           Align = alBottom
@@ -1998,45 +1997,45 @@ object MainForm: TMainForm
         end
       end
       inline InspectorFrame: TSvgInspectorFrame
-        Left = 756
+        Left = 752
         Top = 0
         Width = 329
-        Height = 418
+        Height = 417
         Align = alRight
         Constraints.MinHeight = 200
         Constraints.MinWidth = 50
         TabOrder = 1
-        ExplicitLeft = 756
+        ExplicitLeft = 752
         ExplicitWidth = 329
-        ExplicitHeight = 418
+        ExplicitHeight = 417
         inherited pcAtrInspector: TPageControl
           Width = 329
-          Height = 418
+          Height = 417
           ActivePage = InspectorFrame.tsAtr
           ExplicitWidth = 329
-          ExplicitHeight = 418
+          ExplicitHeight = 417
           inherited tsAtr: TTabSheet
             AlignWithMargins = True
             ExplicitLeft = 7
             ExplicitTop = 27
             ExplicitWidth = 315
-            ExplicitHeight = 384
+            ExplicitHeight = 383
             inherited splInspector: TSplitter
-              Top = 280
+              Top = 279
               Width = 315
               ExplicitTop = 464
               ExplicitWidth = 392
             end
             inherited sgAttr: TStringGrid
               Width = 315
-              Height = 244
+              Height = 243
               ExplicitWidth = 315
-              ExplicitHeight = 244
+              ExplicitHeight = 242
             end
             inherited meHint: TMemo
-              Top = 286
+              Top = 285
               Width = 315
-              ExplicitTop = 286
+              ExplicitTop = 284
               ExplicitWidth = 315
             end
             inherited Panel1: TPanel
@@ -2105,17 +2104,17 @@ object MainForm: TMainForm
           inherited tsReplace: TTabSheet
             ExplicitTop = 24
             ExplicitWidth = 321
-            ExplicitHeight = 390
+            ExplicitHeight = 389
             inherited ReplaceFrame: TSynEditFrame
               Width = 321
-              Height = 307
+              Height = 306
               ExplicitWidth = 321
-              ExplicitHeight = 307
+              ExplicitHeight = 306
               inherited SynEditor: TSynEdit
                 Width = 321
-                Height = 279
+                Height = 278
                 ExplicitWidth = 321
-                ExplicitHeight = 279
+                ExplicitHeight = 278
               end
               inherited pscrSysEdit: TPageScroller
                 Width = 321
@@ -2123,23 +2122,26 @@ object MainForm: TMainForm
               end
             end
             inherited meReplaceHint: TMemo
-              Top = 307
+              Top = 306
               Width = 321
-              ExplicitTop = 307
+              ExplicitTop = 306
               ExplicitWidth = 321
             end
           end
           inherited tsLangPack: TTabSheet
             ExplicitTop = 24
-            ExplicitHeight = 533
+            ExplicitWidth = 321
+            ExplicitHeight = 389
             inherited SynEditor: TSynEdit
-              Height = 322
+              Width = 321
+              Height = 178
               Highlighter = InspectorFrame.ReplaceFrame.SynXMLSyn1
               SearchEngine = InspectorFrame.ReplaceFrame.SynEditSearch1
               ExplicitHeight = 322
             end
             inherited meLangHint: TMemo
-              Top = 322
+              Top = 178
+              Width = 321
               Lines.Strings = (
                 'SUPPORT FOR MULTIPLE LANGUAGES IN ONE TEMPLATE:'
                 'On the first line, enter the identifier of the base language '
@@ -2170,22 +2172,25 @@ object MainForm: TMainForm
       object gbPreview: TGroupBox
         Left = 290
         Top = 0
-        Width = 461
-        Height = 418
+        Width = 457
+        Height = 417
         Align = alClient
         Caption = 'Preview'
         Constraints.MinHeight = 200
         Constraints.MinWidth = 50
         TabOrder = 2
+        ExplicitWidth = 453
+        ExplicitHeight = 416
         object Panel3: TPanel
           Left = 2
           Top = 15
-          Width = 457
+          Width = 453
           Height = 47
           Align = alTop
           AutoSize = True
           BevelOuter = bvNone
           TabOrder = 0
+          ExplicitWidth = 449
           object Label1: TLabel
             Left = 110
             Top = 4
@@ -2320,14 +2325,16 @@ object MainForm: TMainForm
         object scrlPreview: TScrollBox
           Left = 2
           Top = 62
-          Width = 457
-          Height = 354
+          Width = 453
+          Height = 353
           Align = alClient
           TabOrder = 1
+          ExplicitWidth = 449
+          ExplicitHeight = 352
           object shpBkg: TShape
             Left = 0
             Top = 0
-            Width = 436
+            Width = 432
             Height = 529
             Align = alClient
             Brush.Color = clSilver
@@ -2398,16 +2405,18 @@ object MainForm: TMainForm
       end
       object pnGridDown: TPanel
         Left = 0
-        Top = 423
-        Width = 1085
+        Top = 422
+        Width = 1081
         Height = 172
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 3
+        ExplicitTop = 421
+        ExplicitWidth = 1077
         object sgText: TStringGrid
           Left = 0
           Top = 0
-          Width = 1085
+          Width = 1081
           Height = 172
           Align = alClient
           ColCount = 2
@@ -2426,6 +2435,7 @@ object MainForm: TMainForm
           OnFixedCellClick = sgTextFixedCellClick
           OnKeyPress = sgTextKeyPress
           OnSelectCell = sgTextSelectCell
+          ExplicitWidth = 1077
         end
       end
     end
@@ -2435,7 +2445,7 @@ object MainForm: TMainForm
       object Splitter4: TSplitter
         Left = 444
         Top = 0
-        Height = 595
+        Height = 594
         ExplicitLeft = 544
         ExplicitTop = 136
         ExplicitHeight = 100
@@ -2444,14 +2454,14 @@ object MainForm: TMainForm
         Left = 0
         Top = 0
         Width = 444
-        Height = 595
+        Height = 594
         Align = alLeft
         TabOrder = 0
-        ExplicitHeight = 595
+        ExplicitHeight = 594
         inherited treeTemplate: TTreeView
-          Height = 546
+          Height = 545
           OnChange = ClipartFrametreeTemplateChange
-          ExplicitHeight = 546
+          ExplicitHeight = 545
         end
         inherited pscrTemplate: TPageScroller
           inherited tbrTemplate: TToolBar
@@ -2548,45 +2558,45 @@ object MainForm: TMainForm
       inline ClipartInspectorFrame: TSvgInspectorFrame
         Left = 447
         Top = 0
-        Width = 638
-        Height = 595
+        Width = 634
+        Height = 594
         Align = alClient
         TabOrder = 1
         ExplicitLeft = 447
-        ExplicitWidth = 638
-        ExplicitHeight = 595
+        ExplicitWidth = 634
+        ExplicitHeight = 594
         inherited pcAtrInspector: TPageControl
-          Width = 638
-          Height = 595
+          Width = 634
+          Height = 594
           ActivePage = ClipartInspectorFrame.tsAtr
           OnChange = ClipartInspectorFramepcAtrInspectorChange
-          ExplicitWidth = 638
-          ExplicitHeight = 595
+          ExplicitWidth = 634
+          ExplicitHeight = 594
           inherited tsAtr: TTabSheet
             ExplicitTop = 24
-            ExplicitWidth = 630
-            ExplicitHeight = 567
+            ExplicitWidth = 626
+            ExplicitHeight = 566
             inherited splInspector: TSplitter
-              Top = 463
-              Width = 630
+              Top = 462
+              Width = 626
               ExplicitTop = 435
               ExplicitWidth = 514
             end
             inherited sgAttr: TStringGrid
-              Width = 630
-              Height = 427
-              ExplicitWidth = 630
-              ExplicitHeight = 427
+              Width = 626
+              Height = 426
+              ExplicitWidth = 626
+              ExplicitHeight = 426
             end
             inherited meHint: TMemo
-              Top = 469
-              Width = 630
-              ExplicitTop = 469
-              ExplicitWidth = 630
+              Top = 468
+              Width = 626
+              ExplicitTop = 468
+              ExplicitWidth = 626
             end
             inherited Panel1: TPanel
-              Width = 630
-              ExplicitWidth = 630
+              Width = 626
+              ExplicitWidth = 626
               inherited Panel2: TPanel
                 inherited cbAtrShow: TComboBox
                   Height = 21
@@ -2594,10 +2604,10 @@ object MainForm: TMainForm
                 end
               end
               inherited tbrInspector: TToolBar
-                Width = 542
+                Width = 538
                 ButtonHeight = 36
                 ButtonWidth = 32
-                ExplicitWidth = 542
+                ExplicitWidth = 538
                 inherited tbResize: TToolButton
                   ExplicitWidth = 32
                   ExplicitHeight = 36
@@ -2648,30 +2658,30 @@ object MainForm: TMainForm
           end
           inherited tsReplace: TTabSheet
             ExplicitTop = 24
-            ExplicitWidth = 630
-            ExplicitHeight = 567
+            ExplicitWidth = 626
+            ExplicitHeight = 566
             inherited ReplaceFrame: TSynEditFrame
-              Width = 630
-              Height = 484
-              ExplicitWidth = 630
-              ExplicitHeight = 484
+              Width = 626
+              Height = 483
+              ExplicitWidth = 626
+              ExplicitHeight = 483
               inherited SynEditor: TSynEdit
-                Width = 630
-                Height = 456
-                ExplicitWidth = 630
-                ExplicitHeight = 456
+                Width = 626
+                Height = 455
+                ExplicitWidth = 626
+                ExplicitHeight = 455
               end
               inherited pscrSysEdit: TPageScroller
-                Width = 630
-                ExplicitWidth = 630
+                Width = 626
+                ExplicitWidth = 626
               end
             end
             inherited meReplaceHint: TMemo
-              Top = 484
-              Width = 630
+              Top = 483
+              Width = 626
               Visible = False
-              ExplicitTop = 484
-              ExplicitWidth = 630
+              ExplicitTop = 483
+              ExplicitWidth = 626
             end
           end
           inherited tsLangPack: TTabSheet
@@ -2793,10 +2803,10 @@ object MainForm: TMainForm
       Caption = 'Preview'
       ImageIndex = 3
       object Splitter5: TSplitter
-        Left = 767
+        Left = 763
         Top = 0
         Width = 5
-        Height = 595
+        Height = 594
         Align = alRight
         Beveled = True
         ExplicitLeft = 653
@@ -2804,10 +2814,10 @@ object MainForm: TMainForm
         ExplicitHeight = 567
       end
       object pnGridRight: TPanel
-        Left = 772
+        Left = 768
         Top = 0
         Width = 313
-        Height = 595
+        Height = 594
         Align = alRight
         BevelOuter = bvNone
         Ctl3D = True
@@ -2817,8 +2827,8 @@ object MainForm: TMainForm
       object Panel4: TPanel
         Left = 0
         Top = 0
-        Width = 767
-        Height = 595
+        Width = 763
+        Height = 594
         Align = alClient
         BevelOuter = bvNone
         Caption = 'Panel4'
@@ -2828,15 +2838,15 @@ object MainForm: TMainForm
         object scrlPreview1: TScrollBox
           Left = 0
           Top = 29
-          Width = 767
-          Height = 566
+          Width = 763
+          Height = 565
           Align = alClient
           TabOrder = 0
           TabStop = True
           object shpPreview: TShape
             Left = 0
             Top = 0
-            Width = 746
+            Width = 742
             Height = 592
             Align = alClient
             Brush.Color = clSilver
@@ -2858,7 +2868,7 @@ object MainForm: TMainForm
         object ToolBar2: TToolBar
           Left = 0
           Top = 0
-          Width = 767
+          Width = 763
           Height = 29
           ParentCustomHint = False
           ButtonHeight = 30
@@ -2979,17 +2989,17 @@ object MainForm: TMainForm
   end
   object ProgressBar1: TProgressBar
     Left = 0
-    Top = 623
-    Width = 1093
+    Top = 622
+    Width = 1089
     Height = 18
     Align = alBottom
     TabOrder = 1
     Visible = False
-    ExplicitTop = 622
-    ExplicitWidth = 1089
+    ExplicitTop = 621
+    ExplicitWidth = 1085
   end
   object cbLang: TComboBox
-    Left = 1041
+    Left = 1033
     Top = 0
     Width = 48
     Height = 21
@@ -2999,7 +3009,7 @@ object MainForm: TMainForm
     TabOrder = 2
     Visible = False
     OnClick = cbLangClick
-    ExplicitLeft = 1037
+    ExplicitLeft = 1029
   end
   object dlgTextFind: TFindDialog
     OnClose = dlgTextFindClose

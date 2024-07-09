@@ -237,6 +237,98 @@ var i,deep:integer;
   s,n,r,z:string;
   sn, idx:TStringList;
   Prnt:TXML_Nod;
+
+function HTMLDecode(const AStr: String): String;
+var
+  Sp, Rp, Cp, Tp: PChar;
+  S: String;
+  I, Code: Integer;
+begin
+  Result := AStr;
+  SetLength(Result, Length(AStr));
+  Sp := PChar(AStr);
+  Rp := PChar(Result);
+  Cp := Sp;
+  try
+    while Sp^ <> #0 do
+    begin
+      case Sp^ of
+        '&': begin
+               Cp := Sp;
+               Inc(Sp);
+               case Sp^ of
+                 'a': if AnsiStrPos(Sp, 'amp;') = Sp then  { do not localize }
+                      begin
+                        Inc(Sp, 3);
+                        Rp^ := '&';
+                      end;
+                 'l',
+                 'g': if (AnsiStrPos(Sp, 'lt;') = Sp) or (AnsiStrPos(Sp, 'gt;') = Sp) then { do not localize }
+                      begin
+                        Cp := Sp;
+                        Inc(Sp, 2);
+                        while (Sp^ <> ';') and (Sp^ <> #0) do
+                          Inc(Sp);
+                        if Cp^ = 'l' then
+                          Rp^ := '<'
+                        else
+                          Rp^ := '>';
+                      end;
+                 'n': if AnsiStrPos(Sp, 'nbsp;') = Sp then  { do not localize }
+                      begin
+                        Inc(Sp, 4);
+                        Rp^ := ' ';
+                      end;
+                 'q': if AnsiStrPos(Sp, 'quot;') = Sp then  { do not localize }
+                      begin
+                        Inc(Sp,4);
+                        Rp^ := '"';
+                      end;
+                 '#': begin
+                        Tp := Sp;
+                        Inc(Tp);
+                        while (Sp^ <> ';') and (Sp^ <> #0) do
+                          Inc(Sp);
+                        SetString(S, Tp, Sp - Tp);
+                        Val(S, I, Code);
+                        Rp^ := Chr((I));
+                      end;
+                 else
+                   Exit;
+               end;
+           end
+      else
+        Rp^ := Sp^;
+      end;
+      Inc(Rp);
+      Inc(Sp);
+    end;
+  except
+  end;
+  SetLength(Result, Rp - PChar(Result));
+end;
+
+  function TestAmpersand(s:string):string;
+  var p1,p2:Integer;
+    s1,s2:string;
+  begin
+    Result := s;
+    p1 := 0;
+    repeat
+      p1:=Pos('&', Result, p1+1);
+      if p1 >0 then
+      begin
+        p2 := Pos(';', Result, p1+1) - p1 + 1;
+        s1:=copy(Result, p1, p2);
+        s2:=HTMLDecode(s1);
+//        p3 := Pos('>', Result, p1+1) - p1;
+        if (p2 < 2) or (s1=s2) or (s2<#32) then
+          Result := copy(Result, 1, p1) + 'amp;'+copy(Result, p1+1, Length(Result));
+      end;
+    until p1=0;
+
+
+  end;
 begin
 
 //  sn:=TStringList.Create;
@@ -334,6 +426,7 @@ begin
 
   finally
     idx.Free;
+    Result := TestAmpersand(Result);
 //    sn.Free;
   end;
 //  StopAnalitics('Replace');

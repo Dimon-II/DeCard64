@@ -6,7 +6,8 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, u_SynEditFrame,
   Vcl.ExtCtrls, Vcl.Grids, Profixxml, Vcl.Buttons, System.Actions,
-  Vcl.ActnList, System.UITypes, Vcl.ComCtrls, SynEdit, Vcl.Menus, Vcl.ToolWin;
+  Vcl.ActnList, System.UITypes, Vcl.ComCtrls, SynEdit, Vcl.Menus, Vcl.ToolWin,
+  Vcl.Samples.Spin;
 
 type
 
@@ -103,6 +104,21 @@ type
     aGridFindNext: TAction;
     aGridFindPrev: TAction;
     aGridReplace: TAction;
+    tsTransform: TTabSheet;
+    lblStep: TLabel;
+    sbMinusDX: TSpeedButton;
+    sbMinusDY: TSpeedButton;
+    sbPlusDY: TSpeedButton;
+    sbPlusDX: TSpeedButton;
+    seStep: TSpinEdit;
+    lblDX: TLabel;
+    seDX: TSpinEdit;
+    lblDY: TLabel;
+    seDY: TSpinEdit;
+    aMinusDX: TAction;
+    aPlusDX: TAction;
+    aMinusDY: TAction;
+    aPlusDY: TAction;
     procedure FormCreate(Sender: TObject);
     procedure CellEditFrameSynEditorChange(Sender: TObject);
     procedure lbMacrosDblClick(Sender: TObject);
@@ -165,6 +181,12 @@ type
     procedure aGridFindNextUpdate(Sender: TObject);
     procedure aGridFindPrevUpdate(Sender: TObject);
     procedure aGridReplaceUpdate(Sender: TObject);
+    procedure seStepChange(Sender: TObject);
+    procedure seDXChange(Sender: TObject);
+    procedure aMinusDYExecute(Sender: TObject);
+    procedure aPlusDYExecute(Sender: TObject);
+    procedure aPlusDXExecute(Sender: TObject);
+    procedure aMinusDXExecute(Sender: TObject);
   private
     FOldText:string;
     FGrid: TStringGrid;
@@ -189,6 +211,7 @@ type
     miMisspelling,
     miRemove,
     miAddWord:TMenuItem;
+    LockTransrform:Boolean;
     procedure PrepareMacro(ANod:TXML_Nod);
     procedure btnCancelClick(Sender: TObject);
     property Text:string read GetText write SetText;
@@ -375,6 +398,29 @@ begin
   ResetCombo;
 end;
 
+
+procedure TCellEditForm.aMinusDXExecute(Sender: TObject);
+begin
+ seDX.Value := seDX.Value - seStep.Value;
+
+end;
+
+procedure TCellEditForm.aMinusDYExecute(Sender: TObject);
+begin
+  seDY.Value := seDY.Value - seStep.Value;
+end;
+
+procedure TCellEditForm.aPlusDXExecute(Sender: TObject);
+begin
+ seDX.Value := seDX.Value + seStep.Value;
+
+end;
+
+procedure TCellEditForm.aPlusDYExecute(Sender: TObject);
+begin
+ seDY.Value := seDY.Value + seStep.Value;
+
+end;
 
 procedure TCellEditForm.aPreviewUpdate(Sender: TObject);
 begin
@@ -1157,6 +1203,25 @@ begin
   cbHelper.Items.EndUpdate;
 end;
 
+procedure TCellEditForm.seDXChange(Sender: TObject);
+var s:string;
+begin
+  if LockTransrform then exit;
+  if pcHelpher.ActivePage = tsTransform then
+  begin
+    s := '';
+
+    if seDY.Value <> 0 then
+      s := ','+IntToStr(seDY.Value);
+    if (s <> '') or (seDX.Value <> 0) then
+      s := IntToStr(seDX.Value) + s;
+
+    CellEditFrame.SynEditor.Text := s;
+    CellEditFrameSynEditorChange(Sender);
+    MainForm.aShow.Execute;
+  end;
+end;
+
 procedure TCellEditForm.SetGrid(const Value: TStringGrid);
 begin
   FGrid := Value;
@@ -1165,6 +1230,8 @@ end;
 procedure TCellEditForm.SetNodeName(const Value: string);
 begin
   FNodeName := Value;
+  tsTransform.TabVisible := (MainForm.InspectorFrame.SVGNode <> nil)
+    and (Pos('['+IntToStr(Grid.col)+']', MainForm.InspectorFrame.SVGNode.Attribute['decard:transform'])>0)
 end;
 
 procedure TCellEditForm.seTranslateChange(Sender: TObject);
@@ -1192,6 +1259,17 @@ begin
   CellEditFrame.SynEditor.OnChange := Nil;
   CellEditFrame.SynEditor.Text := s;
   CellEditFrame.SynEditor.OnChange := CellEditFrameSynEditorChange;
+
+  tsTransform.TabVisible := (MainForm.InspectorFrame.SVGNode <> nil)
+    and (Pos('['+IntToStr(Grid.col)+']', MainForm.InspectorFrame.SVGNode.Attribute['dekart:transform'])>0);
+
+  if tsTransform.TabVisible then
+  begin
+    LockTransrform := True;
+    seDX.Value := StrToIntDef(Copy(s,1,pos(',', s+',')-1),0);
+    seDY.Value := StrToIntDef(Copy(s,pos(',', s+',')+1,Length(s)),0);
+    LockTransrform := False;
+  end;
 end;
 
 
@@ -1480,5 +1558,11 @@ begin
 
 end;
 
+
+procedure TCellEditForm.seStepChange(Sender: TObject);
+begin
+   seDX.Increment := seStep.Value;
+   seDY.Increment := seStep.Value;
+end;
 
 end.

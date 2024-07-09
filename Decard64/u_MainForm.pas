@@ -237,6 +237,7 @@ type
     miRotate_90: TMenuItem;
     miRotate_180: TMenuItem;
     miRotate_270: TMenuItem;
+    chbOuterCut: TCheckBox;
     procedure sbOpenRootClick(Sender: TObject);
     procedure sbOpenTextClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -762,6 +763,7 @@ var
   Box: TPdfBox;
   PrevFile: string;
   AbsIndex: Integer;
+  CardsSection, BackSection, MirrorSection:TXML_Nod;
 
   function CheckNewFile(AName: string): string;
   var
@@ -776,6 +778,12 @@ var
     end;
 
     PrevFile := PrevFile + '[' + result + ']';
+  end;
+
+  procedure AddCutting;
+  var i:integer;
+  begin
+
   end;
 
   procedure SaveRender(FileBreak: boolean);
@@ -817,6 +825,7 @@ var
       // Image1.Picture.Bitmap.Assign(imgRender.Picture.Bitmap);
       imgRender.Width := Round(imgRender.Picture.Width * ZoomPreview);
       imgRender.Height := Round(imgRender.Picture.Height * ZoomPreview);
+
 
       lPage := lPdf.AddPage;
       inc(PdfPages);
@@ -920,7 +929,13 @@ var
     // MoveFile(pchar(edCfgRoot.text + fn), pchar(edCfgRoot.text + edCfgTemp.Text + fn));
 
     x1.xml := sx1;
-    x1bk.xml := sxb1;
+    CardsSection := x1.FindByHRef('#CardsSectionDecard');
+
+    if edBackTemplate.Text <> '' then
+    begin
+      x1bk.xml := sxb1;
+      BackSection := x1bk.FindByHRef('#CardsSectionDecard');
+    end;
   end;
 
 begin
@@ -1031,14 +1046,54 @@ begin
 
     // AddBack(x1,0);
 
-    S := x1.Nodes.Last.Attribute['fill'];
-    if S <> '' then
-      with x1.Nodes.Last.Add('rect') do
+    if edOutline.Text <> '' then
+    begin
+      MirrorSection :=x1.Nodes.Last.add('g');
+      if chbOuterCut.Checked then
+      with MirrorSection do
       begin
-        Attribute['stroke'] := 'none';
-        Attribute['fill'] := S;
-        if edOutline.Text <> '' then
+        Attribute['stroke']:='#000';
+        Attribute['fill']:='none';
+        Attribute['stroke-width']:='1';
+
+        for i:= 0 to seCountX.Value-1 do
+         with Add('rect') do
+         begin
+           Attribute['x']:= IntToStr(dlt.X + Bleed * 2 *i + Round(seWidth.Value * seScale1.Value / seScale2.Value * i));
+           Attribute['width']:= IntToStr(Round(seWidth.Value * seScale1.Value / seScale2.Value));
+           Attribute['height']:= IntToStr(PageSize.Y)
+         end;
+        for i:= 0 to seCountY.Value-1 do
+         with Add('rect') do
+         begin
+           Attribute['y']:= IntToStr(dlt.Y + Bleed * 2 *i + Round(seHeight.Value * seScale1.Value / seScale2.Value * i));
+           Attribute['height']:= IntToStr(Round(seHeight.Value * seScale1.Value / seScale2.Value));
+           Attribute['width']:= IntToStr(PageSize.X)
+         end;
+
+      end;
+      MirrorSection :=x1.Nodes.Last.add('g');
+      with MirrorSection do
+      begin
+        Attribute['id']:='MirrorOutlineDecard';
+        Attribute['clip-path']:='url(#clipOutlineDecard)';
+        with Add('clipPath') do
         begin
+          Attribute['id']:='clipOutlineDecard';
+          with Add('rect') do // Верх
+          begin
+          Attribute['x'] :=
+            IntToStr(dlt.X - Bleed - StrToIntDef(edOutline.Text, 0));
+          Attribute['y'] :=
+            IntToStr(dlt.Y - Bleed - StrToIntDef(edOutline.Text, 0));
+          Attribute['width'] :=
+            IntToStr(StrToIntDef(edOutline.Text, 0));
+          Attribute['height'] :=
+            IntToStr(CardsSize.Y + 2 * StrToIntDef(edOutline.Text, 0));
+          end;
+
+          with Add('rect') do //Лево
+          begin
           Attribute['x'] :=
             IntToStr(dlt.X - Bleed - StrToIntDef(edOutline.Text, 0));
           Attribute['y'] :=
@@ -1046,10 +1101,76 @@ begin
           Attribute['width'] :=
             IntToStr(CardsSize.X + 2 * StrToIntDef(edOutline.Text, 0));
           Attribute['height'] :=
+            IntToStr(StrToIntDef(edOutline.Text, 0));
+          end;
+
+          with Add('rect') do //Право
+          begin
+          Attribute['x'] :=
+            IntToStr(CardsSize.X + dlt.X + Bleed);
+          Attribute['y'] :=
+            IntToStr(dlt.Y - Bleed - StrToIntDef(edOutline.Text, 0));
+          Attribute['width'] :=
+            IntToStr( StrToIntDef(edOutline.Text, 0));
+          Attribute['height'] :=
             IntToStr(CardsSize.Y + 2 * StrToIntDef(edOutline.Text, 0));
-        end
-        // index := 1;
+          end;
+
+          with Add('rect') do // Низ
+          begin
+          Attribute['x'] :=
+            IntToStr(dlt.X - Bleed - StrToIntDef(edOutline.Text, 0));
+          Attribute['y'] :=
+            IntToStr(CardsSize.Y + dlt.Y + Bleed);
+          Attribute['width'] :=
+            IntToStr(CardsSize.X + 2 * StrToIntDef(edOutline.Text, 0));
+          Attribute['height'] :=
+            IntToStr(StrToIntDef(edOutline.Text, 0));
+          end;
+        end;
+
+
+        with Add('g') do
+        begin
+          Attribute['id'] :='HorizontalSectionDecard';
+          with Add('use') do
+          begin
+            Attribute['xlink:href'] :='#CardsSectionDecard';
+            Attribute['transform'] :='scale(-1,1) translate('+IntToStr(-2 * (dlt.X + Bleed))+',0)';
+          end;
+          with Add('use') do
+          begin
+            Attribute['xlink:href'] :='#CardsSectionDecard';
+            Attribute['transform'] :='scale(-1,1) translate('+IntToStr(-2 * (dlt.X + Bleed + CardsSize.X))+',0)';
+          end;
+        end;
+        with Add('use') do
+        begin
+          Attribute['xlink:href'] :='#CardsSectionDecard';
+          Attribute['transform'] :='scale(1,-1) translate(0,'+IntToStr(-2 * (dlt.Y + Bleed))+')';
+        end;
+        with Add('use') do
+        begin
+          Attribute['xlink:href'] :='#CardsSectionDecard';
+          Attribute['transform'] :='scale(1,-1) translate(0,'+IntToStr(-2 * (dlt.Y + Bleed + CardsSize.Y))+')';
+        end;
+
+        with Add('use') do
+        begin
+          Attribute['xlink:href'] :='#HorizontalSectionDecard';
+          Attribute['transform'] :='scale(1,-1) translate(0,'+IntToStr(-2 * (dlt.Y + Bleed))+')';
+        end;
+        with Add('use') do
+        begin
+          Attribute['xlink:href'] :='#HorizontalSectionDecard';
+          Attribute['transform'] :='scale(1,-1) translate(0,'+IntToStr(-2 * (dlt.Y + Bleed + CardsSize.Y))+')';
+        end;
+
       end;
+    end;
+    CardsSection := x1.Nodes.Last.add('g') ;
+    CardsSection.Attribute['id'] := 'CardsSectionDecard';
+    //BackSection
 
     if edBackTemplate.Text <> '' then
     begin
@@ -1090,29 +1211,7 @@ begin
         Attribute['width'] := '100%';
         Attribute['height'] := '100%';
       end;
-      S := x1bk.Nodes.Last.Attribute['fill'];
-      if S <> '' then
-        with x1bk.Nodes.Last.Add('rect') do
-        begin
-          Attribute['stroke'] := 'none';
-          Attribute['fill'] := S;
-          if edOutline.Text <> '' then
-          begin
-            Attribute['x'] := IntToStr(dlt.X - StrToIntDef(edOutline.Text,
-              0) - Bleed);
-            Attribute['y'] := IntToStr(dlt.Y - StrToIntDef(edOutline.Text,
-              0) - Bleed);
-            Attribute['width'] :=
-              IntToStr(CardsSize.X + StrToIntDef(edOutline.Text, 0) * 2);
-            Attribute['height'] :=
-              IntToStr(CardsSize.Y + StrToIntDef(edOutline.Text, 0) * 2);
-          end
-          else
-          begin
-            Attribute['width'] := '100%';
-            Attribute['height'] := '100%';
-          end;
-        end;
+
       if edPageBlank.Text<>'' then
         with x1bk.Nodes.Last.Add('image') do
         begin
@@ -1121,6 +1220,12 @@ begin
           Attribute['width'] := '100%';
           Attribute['height'] := '100%';
         end;
+
+      if edOutline.Text<>''  then
+        x1bk.Nodes.Last.Add('g').xml := MirrorSection.xml;
+
+      BackSection := x1bk.Nodes.Last.add('g') ;
+      BackSection.Attribute['id'] := 'CardsSectionDecard';
 
       sxb1 := x1bk.xml;
     end;
@@ -1216,7 +1321,7 @@ begin
             N mod seCountX.Value) * w) + ',' +
             IntToStr(dlt.Y + dltBK.Y + (N div seCountX.Value) * h) + ')  scale('
             + SvgFloat(seScale1.Value / seScale2.Value) + ')';
-          with x1bk.Nodes.Last.Add('g') do
+          with BackSection.Add('g') do
           begin
             xml := x2bk.Nodes.Last.xml;
             if chbFlipBack.Checked then
@@ -1225,7 +1330,7 @@ begin
 
         end;
 
-        x1.Nodes.Last.Add('g').xml := x2.Nodes.Last.xml;
+        CardsSection.Add('g').xml := x2.Nodes.Last.xml;
         inc(N);
 
 
