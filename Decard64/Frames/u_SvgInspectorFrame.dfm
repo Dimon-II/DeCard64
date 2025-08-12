@@ -186,14 +186,14 @@ object SvgInspectorFrame: TSvgInspectorFrame
         Align = alClient
         TabOrder = 0
         ExplicitWidth = 610
-        ExplicitHeight = 456
+        ExplicitHeight = 448
         inherited SynEditor: TSynEdit
           Width = 610
           Height = 420
           ReadOnly = True
           WordWrap = False
           ExplicitWidth = 610
-          ExplicitHeight = 428
+          ExplicitHeight = 420
         end
         inherited pscrSysEdit: TPageScroller
           Width = 610
@@ -237,7 +237,13 @@ object SvgInspectorFrame: TSvgInspectorFrame
         Font.Style = []
         Font.Quality = fqClearTypeNatural
         TabOrder = 0
+        CodeFolding.GutterShapeSize = 11
+        CodeFolding.CollapsedLineColor = clGrayText
+        CodeFolding.FolderBarLinesColor = clGrayText
+        CodeFolding.IndentGuidesColor = clGray
+        CodeFolding.IndentGuides = True
         CodeFolding.ShowCollapsedLine = True
+        CodeFolding.ShowHintMark = True
         UseCodeFolding = False
         Gutter.Font.Charset = DEFAULT_CHARSET
         Gutter.Font.Color = clWindowText
@@ -250,6 +256,7 @@ object SvgInspectorFrame: TSvgInspectorFrame
         Options = [eoAutoIndent, eoDragDropEditing, eoGroupUndo, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
         SearchEngine = ReplaceFrame.SynEditSearch1
         OnChange = SynEditorChange
+        FontSmoothing = fsmNone
         RemovedKeystrokes = <
           item
             Command = ecLineBreak
@@ -315,6 +322,9 @@ object SvgInspectorFrame: TSvgInspectorFrame
     end
   end
   object SynIniSyn1: TSynIniSyn
+    Options.AutoDetectEnabled = False
+    Options.AutoDetectLineLimit = 0
+    Options.Visible = False
     Left = 204
     Top = 306
   end

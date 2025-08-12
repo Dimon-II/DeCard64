@@ -7,7 +7,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, u_SynEditFrame,
   Vcl.ExtCtrls, Vcl.Grids, Profixxml, Vcl.Buttons, System.Actions,
   Vcl.ActnList, System.UITypes, Vcl.ComCtrls, SynEdit, Vcl.Menus, Vcl.ToolWin,
-  Vcl.Samples.Spin;
+  Vcl.Samples.Spin, SynEditHighlighter, SynHighlighterIni, tesseractocr;
 
 type
 
@@ -119,6 +119,31 @@ type
     aPlusDX: TAction;
     aMinusDY: TAction;
     aPlusDY: TAction;
+    tsMassReplace: TTabSheet;
+    SynIniSyn1: TSynIniSyn;
+    Panel1: TPanel;
+    meReplaceHint: TMemo;
+    pnMassReplace: TPanel;
+    btnLoadMass: TButton;
+    btnSaveMass: TButton;
+    btnMassReplace: TButton;
+    cbMassArea: TComboBox;
+    MassEditor: TSynEdit;
+    Label1: TLabel;
+    tsOCR: TTabSheet;
+    seOCR: TSynEdit;
+    pnOCR: TPanel;
+    btnOCR: TButton;
+    cbPageSegMode: TComboBox;
+    cbLng: TComboBox;
+    meOCR: TMemo;
+    pmOCR: TPopupMenu;
+    OCR1: TMenuItem;
+    Addselection1: TMenuItem;
+    SelectionOCR1: TMenuItem;
+    sbOCR: TSpeedButton;
+    aOCR: TAction;
+    Showframe1: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure CellEditFrameSynEditorChange(Sender: TObject);
     procedure lbMacrosDblClick(Sender: TObject);
@@ -187,12 +212,23 @@ type
     procedure aPlusDYExecute(Sender: TObject);
     procedure aPlusDXExecute(Sender: TObject);
     procedure aMinusDXExecute(Sender: TObject);
+    procedure btnLoadMassClick(Sender: TObject);
+    procedure btnSaveMassClick(Sender: TObject);
+    procedure btnMassReplaceClick(Sender: TObject);
+    procedure btnOCRClick(Sender: TObject);
+    procedure seOCRStatusChange(Sender: TObject; Changes: TSynStatusChanges);
+    procedure SelectionOCR1Click(Sender: TObject);
+    procedure Addselection1Click(Sender: TObject);
+    procedure AppendOCR1Click(Sender: TObject);
+    procedure OCR1Click(Sender: TObject);
+    procedure Showframe1Click(Sender: TObject);
   private
     FOldText:string;
     FGrid: TStringGrid;
     FRow: integer;
     FRepl:TStringList;
     FNodeName: string;
+    DragTS:TTabSheet;
     function GetText: string;
     procedure SetText(const Value: string);
     procedure SetGrid(const Value: TStringGrid);
@@ -212,6 +248,7 @@ type
     miRemove,
     miAddWord:TMenuItem;
     LockTransrform:Boolean;
+    ALang :string;
     procedure PrepareMacro(ANod:TXML_Nod);
     procedure btnCancelClick(Sender: TObject);
     property Text:string read GetText write SetText;
@@ -219,18 +256,23 @@ type
     property Row: integer read FRow write FRow;
     property NodeName:string read FNodeName write SetNodeName;
 
+    procedure OnRecognizeEnd(Sender: TObject; ACanceled: Boolean);
+    procedure DoOCR(rc:TRect; BMP:TBitmap);
+    procedure InitOCR;
   end;
 
 
 var
   CellEditForm: TCellEditForm;
+  OCRActive:boolean;
+  Tesseract: TTesseractOCR5;
 
 implementation
 
 {$R *.dfm}
 
 uses u_MainData, u_MainForm, u_XMLEditForm, Clipbrd, u_TraceReplace,
-SynEditSpell, SynEditHighlighter;
+SynEditSpell, Registry,tesseractocr.capi;
 
 { TCellEditForm }
 
@@ -294,6 +336,24 @@ begin
     lbCommon.ItemIndex := TAction(Sender).tag + lbCommon.TopIndex-1;
     lbCommonDblClick(nil);
   end;
+end;
+
+procedure TCellEditForm.Addselection1Click(Sender: TObject);
+var r:TRect;
+begin
+ r := MainForm.imgRender.ScreenToClient(MainForm.shpSelection1.ClientToScreen(MainForm.shpSelection1.ClientRect));
+
+ r.Create(round(r.Left / MainForm.ZoomPreview),
+          round(r.Top / MainForm.ZoomPreview),
+          round(r.Right / MainForm.ZoomPreview),
+          round(r.Bottom / MainForm.ZoomPreview));
+
+
+ seOCR.Lines.Add(Format('%d,%d,%d,%d,selection',
+   [r.Left,
+    r.Top,
+    r.Width,
+    r.Height]));
 end;
 
 procedure TCellEditForm.aGidLeftExecute(Sender: TObject);
@@ -420,6 +480,12 @@ procedure TCellEditForm.aPlusDYExecute(Sender: TObject);
 begin
  seDY.Value := seDY.Value + seStep.Value;
 
+end;
+
+procedure TCellEditForm.AppendOCR1Click(Sender: TObject);
+begin
+  CellEditFrame.SynEditor.SelStart := CellEditFrame.SynEditor.Text.Length+1;
+  btnOCR.Click;
 end;
 
 procedure TCellEditForm.aPreviewUpdate(Sender: TObject);
@@ -565,6 +631,84 @@ begin
    SelectReplace
 end;
 
+procedure TCellEditForm.btnSaveMassClick(Sender: TObject);
+begin
+  if MainData.dlgSaveCommon.execute then
+  begin
+    if MainData.dlgOpenCommon.Encodings[MainData.dlgOpenCommon.encodingindex] ='UTF-8' then
+      MassEditor.Lines.SaveToFile(MainData.dlgSaveCommon.filename, TEncoding.UTF8)
+    else
+      MassEditor.Lines.SaveToFile(MainData.dlgSaveCommon.filename);
+  end;
+end;
+
+procedure TCellEditForm.btnLoadMassClick(Sender: TObject);
+begin
+  if MainData.dlgOpenCommon.execute then
+  begin
+    if MainData.dlgOpenCommon.Encodings[MainData.dlgOpenCommon.encodingindex] ='UTF-8' then
+      MassEditor.Lines.LoadFromFile(MainData.dlgOpenCommon.filename, TEncoding.UTF8)
+    else
+      MassEditor.Lines.LoadFromFile(MainData.dlgOpenCommon.filename);
+    MainData.dlgSaveCommon.filename := MainData.dlgOpenCommon.filename;
+  end;
+end;
+
+procedure TCellEditForm.btnMassReplaceClick(Sender: TObject);
+var
+  s:string;
+  i,r,c,c1,c2,r1,r2:integer;
+  OldPrw:boolean;
+begin
+  if cbMassArea.ItemIndex>0 then
+    if MessageDlg('Mass replace '+IntToStr(MassEditor.Lines.Count)+' options ?', mtConfirmation, [mbYes, mbNo],0)=mrNo then exit;
+
+  OldPrw:=chbScrollPreview.Checked;
+  chbScrollPreview.Checked:=False;
+  TraceReplForm := TTraceReplForm.Create(Self);
+  try
+    TraceReplForm.seRepl.Lines.Text := MassEditor.Lines.Text;
+
+    r1 := Grid.Row;
+    c1 := Grid.Col;
+    case cbMassArea.ItemIndex of
+      0: begin r2 := Grid.Row; c2 := Grid.Col;end;
+      1: begin r2 := Grid.RowCount-1; c2 := Grid.Col;end;
+      2: begin r2 := Grid.RowCount-1; c2 := Grid.ColCount-1;end;
+    end;
+
+    for r := r1 to r2 do
+    begin
+      for c := c1 to c2 do
+      begin
+
+        TraceReplForm.seCell.Lines.Text := Grid.Cells[c,r];
+        TraceReplForm.aTraceAll.Execute;
+        s:= TraceReplForm.seResult.Lines.text;
+        s:= StringReplace(s, #13#10,' ',[rfReplaceAll]);
+        s := StringReplace(s, #9, ' ',[rfReplaceAll]);
+        s := StringReplace(s, '  ',' ',[rfReplaceAll]);
+        Grid.Cells[c,r] := s;
+      end;
+
+      if cbMassArea.ItemIndex=2 then
+        c1 := 0;
+    end;
+  finally
+    FreeAndNil(TraceReplForm);
+    chbScrollPreview.Checked := OldPrw;
+    CellEditFrame.SynEditor.Lines.Text := Grid.Cells[Grid.Col, Grid.Row];
+  end;
+end;
+
+procedure TCellEditForm.btnOCRClick(Sender: TObject);
+begin
+  if MainForm.tbOCR.Down then
+    SelectionOCR1.Click
+  else
+    OCR1.Click
+end;
+
 procedure TCellEditForm.cbHelperChange(Sender: TObject);
 begin
   if cbHelper.ItemIndex=-1 then
@@ -676,6 +820,42 @@ begin
 
 end;
 
+procedure TCellEditForm.DoOCR(rc: TRect; BMP: TBitmap);
+var r:TRect;
+begin
+
+  MainForm.imgRender.Width := Round(MainForm.imgRender.Picture.Width*MainForm.ZoomPreview);
+  MainForm.imgRender.Height := Round(MainForm.imgRender.Picture.Height*MainForm.ZoomPreview);
+
+    InitOCR;
+
+    r := rc;
+    if R.Left < 0 then R.Left := 0;
+    if R.Top < 0 then R.top := 0;
+
+    if R.Right >= BMP.Width then
+      R.Right := BMP.Width-1;
+
+    if R.Bottom >= BMP.Height then
+      R.Bottom := BMP.Height-1;
+
+  //BMP.SaveToFile('C:\Decard\Vagrantsong\temp\tmp.bmp');
+
+  while Tesseract.Busy do Application.ProcessMessages;
+  Tesseract.SetImage(BMP);
+
+  while Tesseract.Busy do Application.ProcessMessages;
+  Tesseract.SetRectangle(R);
+
+  while Tesseract.Busy do Application.ProcessMessages;
+  Tesseract.PageSegMode := TessPageSegMode(cbPageSegMode.ItemIndex);
+
+  while Tesseract.Busy do Application.ProcessMessages;
+//  Tesseract.Recognize(false,false);
+Tesseract.RecognizeAsText(false);
+//    Tesseract.Recognize;
+end;
+
 procedure TCellEditForm.FillbyCol1Click(Sender: TObject);
 var i,j:Integer;
 begin
@@ -741,6 +921,8 @@ end;
 var
   mi      : TMenuItem;
   i       : integer;
+  s:string;
+  sr:tsearchrec;
 
 begin
   btnCancel.OnClick := btnCancelClick;
@@ -767,6 +949,32 @@ begin
   CellEditFrame.SynEditor.Highlighter.AdditionalIdentChars:=['[',']'];
 
   MergeMenus(pmText, CellEditFrame.SynEditor.PopupMenu);
+
+
+  with TRegistry.Create do
+  try
+    RootKey := HKEY_LOCAL_MACHINE;
+    if OpenKeyReadOnly('SOFTWARE\Tesseract-OCR') and ValueExists('Path') then
+      s := ReadString('Path')
+    else
+      s := ExtractFilePath(paramstr(0));
+  finally
+    free;
+  end;
+
+  cbLng.items.Clear;
+  if FindFirst(s+'\tessdata\*.traineddata',$FF, sr)=0 then
+  repeat
+    cbLng.items.Add(ChangeFileExt(ExtractFileName(sr.Name),''));
+  until FindNext(sr)<>0;
+  FindClose(sr);
+  cbLng.itemindex := cbLng.items.IndexOf('eng');
+
+  aOCR.Visible := cbLng.items.Count >0;
+  tsOCR.TabVisible := aOCR.Visible;
+  MainForm.tbOCR.Visible := aOCR.Visible;
+
+
 end;
 
 procedure TCellEditForm.FormDeactivate(Sender: TObject);
@@ -791,6 +999,32 @@ begin
   Result := StringReplace(CellEditFrame.SynEditor.Text, #13#10,' ',[rfReplaceAll]);
   Result := StringReplace(Result, #9, ' ',[rfReplaceAll]) ;
   Result := StringReplace(Result, '  ',' ',[rfReplaceAll]) ;
+end;
+
+procedure TCellEditForm.InitOCR;
+var s:string;
+begin
+  if ALang = cbLng.Text then exit;
+
+  with TRegistry.Create do
+  try
+    RootKey := HKEY_LOCAL_MACHINE;
+    if OpenKeyReadOnly('SOFTWARE\Tesseract-OCR') and ValueExists('Path') then
+      s := ReadString('Path')
+    else
+      s := ExtractFilePath(paramstr(0));
+  finally
+    free;
+  end;
+
+  if Tesseract<> nil then Tesseract.Destroy;
+  Tesseract := TTesseractOCR5.Create(s+'\');
+
+    //  Tesseract.OnRecognizeBegin := OnRecognizeBegin;
+    //  Tesseract.OnRecognizeProgress := OnRecognizeProgress;
+  Tesseract.OnRecognizeEnd := OnRecognizeEnd;
+  ALang := cbLng.Text;
+  Tesseract.Initialize(s+'\tessdata\', ALang);
 end;
 
 procedure TCellEditForm.lbCommonDblClick(Sender: TObject);
@@ -903,6 +1137,24 @@ begin
       lbCommon.Items.SaveToFile(MainData.dlgSaveCommon.filename);
   end;
 
+end;
+
+procedure TCellEditForm.OCR1Click(Sender: TObject);
+var
+  s:string;
+  Rc:TRect;
+begin
+
+    s := seOCR.Lines[seOCR.CaretY-1];
+    Rc.Left := StrToIntDef(copy(s,1,pos(',',s+',')-1),0);
+    s:= copy(s,pos(',',s+',')+1,Length(s));
+    Rc.Top := StrToIntDef(copy(s,1,pos(',',s+',')-1),0);
+    s:= copy(s,pos(',',s+',')+1,Length(s));
+    Rc.Width := StrToIntDef(copy(s,1,pos(',',s+',')-1),MainForm.imgRender.Picture.Bitmap.Width);
+    s:= copy(s,pos(',',s+',')+1,Length(s));
+    Rc.Height := StrToIntDef(copy(s,1,pos(',',s+',')-1),MainForm.imgRender.Picture.Bitmap.Height);
+
+    DoOCR(rc,MainForm.imgRender.Picture.Bitmap);
 end;
 
 procedure TCellEditForm.pmiAddToDictionaryClick(Sender: TObject);
@@ -1111,6 +1363,9 @@ begin
 
   lbMacros.Items.Add('<br/>');
   lbMacros.Items.Add('<p/>');
+  lbMacros.Items.Add('[lng]');
+  lbMacros.Items.Add('<div align="center">[selected]</div>');
+
   if lbSelector.ItemIndex>-1 then
   ls := lbSelector.Items[lbSelector.ItemIndex];
   lbSelector.Items.Text := 'All';
@@ -1273,6 +1528,36 @@ begin
 end;
 
 
+
+procedure TCellEditForm.Showframe1Click(Sender: TObject);
+var
+  s: string;
+  Rc: TRect;
+begin
+    s := seOCR.Lines[seOCR.CaretY-1];
+    Rc.Left := StrToIntDef(copy(s,1,pos(',',s+',')-1),0);
+    s:= copy(s,pos(',',s+',')+1,Length(s));
+    Rc.Top := StrToIntDef(copy(s,1,pos(',',s+',')-1),0);
+    s:= copy(s,pos(',',s+',')+1,Length(s));
+    Rc.Width := StrToIntDef(copy(s,1,pos(',',s+',')-1),MainForm.imgRender.Picture.Bitmap.Width);
+    s:= copy(s,pos(',',s+',')+1,Length(s));
+    Rc.Height := StrToIntDef(copy(s,1,pos(',',s+',')-1),MainForm.imgRender.Picture.Bitmap.Height);
+
+    if not MainForm.tbOCR.Down then
+    begin
+      MainForm.tbOCR.Down := True;
+      MainForm.tbOCR.Click;
+    end;
+
+    MainForm.StretchHandle.Top := round(Rc.Top * MainForm.ZoomPreview) + MainForm.imgRender.Top;
+    MainForm.StretchHandle.Left := round(Rc.Left * MainForm.ZoomPreview)+ MainForm.imgRender.Left;
+
+    MainForm.StretchHandle.Width := round(Rc.Width * MainForm.ZoomPreview);
+    MainForm.StretchHandle.Height := round(Rc.Height * MainForm.ZoomPreview);
+
+    MainForm.scrlPreview1.ScrollInView(MainForm.StretchHandle);
+
+end;
 
 procedure TCellEditForm.SuggestionOnClick(Sender: TObject);
 begin
@@ -1494,6 +1779,19 @@ begin
   CellEditFrame.SynEditor.Highlighter.AdditionalWordBreakChars:=['«', '»', '“', '”'];
 end;
 
+procedure TCellEditForm.SelectionOCR1Click(Sender: TObject);
+var r:TRect;
+begin
+ r := MainForm.imgRender.ScreenToClient(MainForm.shpSelection1.ClientToScreen(MainForm.shpSelection1.ClientRect));
+
+ r.Create(round(r.Left / MainForm.ZoomPreview),
+          round(r.Top / MainForm.ZoomPreview),
+          round(r.Right / MainForm.ZoomPreview),
+          round(r.Bottom / MainForm.ZoomPreview));
+
+  DoOCR(r, MainForm.imgRender.Picture.Bitmap);
+end;
+
 function TCellEditForm.Compare(txt:string; var i:integer):Boolean;
 var
   s1,s2:string;
@@ -1526,7 +1824,6 @@ end;
 procedure TCellEditForm.SelectReplace;
 var
   s1,s2:string;
-  bl:Boolean;
 begin
   if chbMatchCase.Checked then
   begin
@@ -1559,10 +1856,45 @@ begin
 end;
 
 
+procedure TCellEditForm.seOCRStatusChange(Sender: TObject;
+  Changes: TSynStatusChanges);
+begin
+  MainForm.PaintBox.Invalidate;
+end;
+
 procedure TCellEditForm.seStepChange(Sender: TObject);
 begin
    seDX.Increment := seStep.Value;
    seDY.Increment := seStep.Value;
 end;
+
+procedure TCellEditForm.OnRecognizeEnd(Sender: TObject; ACanceled: Boolean);
+var
+  s: string;
+  i: integer;
+begin
+  s := StringReplace(Tesseract.UTF8Text,#13#10#13#10,'<p/>'#13#10,[rfReplaceAll]);
+
+  if CellEditFrame.SynEditor.SelText = '' then
+    CellEditFrame.SynEditor.SelStart := CellEditFrame.SynEditor.Text.Length;
+
+  i := CellEditFrame.SynEditor.SelStart;
+  CellEditFrame.SynEditor.SelText := s;
+  CellEditFrame.SynEditor.SelStart := i;
+  CellEditFrame.SynEditor.SelLength := s.Length;
+
+
+  Grid.Cells[Grid.Col, Grid.Row] := GetText;
+end;
+
+
+
+initialization
+
+finalization
+
+if Tesseract<>nil then
+  FreeAndNil(Tesseract);
+
 
 end.

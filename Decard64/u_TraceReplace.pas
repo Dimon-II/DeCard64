@@ -6,7 +6,7 @@ uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, SynEdit, Vcl.ExtCtrls,
   SynEditHighlighter, SynHighlighterXML, Vcl.ComCtrls, Vcl.ToolWin, Vcl.StdCtrls,
-  System.Actions, Vcl.ActnList;
+  System.Actions, Vcl.ActnList, SynEditCodeFolding;
 
 type
   TTraceReplForm = class(TForm)

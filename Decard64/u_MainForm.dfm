@@ -27,7 +27,7 @@ object MainForm: TMainForm
     Top = 0
     Width = 1089
     Height = 622
-    ActivePage = tsDesigner
+    ActivePage = tsPreview
     Align = alClient
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -1734,11 +1734,21 @@ object MainForm: TMainForm
         end
         object chbOuterCut: TCheckBox
           Left = 796
-          Top = 20
+          Top = 19
           Width = 85
           Height = 17
           Caption = 'Outer Cutting '
           TabOrder = 5
+        end
+        object seCutDelta: TSpinEdit
+          Left = 893
+          Top = 18
+          Width = 64
+          Height = 22
+          MaxValue = 128
+          MinValue = -128
+          TabOrder = 6
+          Value = 0
         end
       end
       object meAnalitics: TMemo
@@ -1829,7 +1839,7 @@ object MainForm: TMainForm
             OnChange = SvgTreeFrame1treeTemplateChange
             OnExit = SVGFrametreeTemplateExit
             ExplicitWidth = 281
-            ExplicitHeight = 306
+            ExplicitHeight = 307
           end
           inherited pscrTemplate: TPageScroller
             Width = 281
@@ -1897,7 +1907,11 @@ object MainForm: TMainForm
           end
           inherited pnFindRemind: TPanel
             Width = 281
+            StyleElements = [seFont, seClient, seBorder]
             ExplicitWidth = 281
+            inherited pnRemindDialog: TPanel
+              StyleElements = [seFont, seClient, seBorder]
+            end
           end
           inherited pmFileSVG: TPopupMenu
             inherited File1: TMenuItem
@@ -2030,20 +2044,24 @@ object MainForm: TMainForm
               Width = 315
               Height = 243
               ExplicitWidth = 315
-              ExplicitHeight = 242
+              ExplicitHeight = 243
             end
             inherited meHint: TMemo
               Top = 285
               Width = 315
-              ExplicitTop = 284
+              StyleElements = [seFont, seClient, seBorder]
+              ExplicitTop = 285
               ExplicitWidth = 315
             end
             inherited Panel1: TPanel
               Width = 315
+              StyleElements = [seFont, seClient, seBorder]
               ExplicitWidth = 315
               inherited Panel2: TPanel
+                StyleElements = [seFont, seClient, seBorder]
                 inherited cbAtrShow: TComboBox
                   Height = 21
+                  StyleElements = [seFont, seClient, seBorder]
                   ExplicitHeight = 21
                 end
               end
@@ -2124,24 +2142,22 @@ object MainForm: TMainForm
             inherited meReplaceHint: TMemo
               Top = 306
               Width = 321
+              StyleElements = [seFont, seClient, seBorder]
               ExplicitTop = 306
               ExplicitWidth = 321
             end
           end
           inherited tsLangPack: TTabSheet
             ExplicitTop = 24
-            ExplicitWidth = 321
-            ExplicitHeight = 389
+            ExplicitHeight = 533
             inherited SynEditor: TSynEdit
-              Width = 321
-              Height = 178
+              Height = 322
               Highlighter = InspectorFrame.ReplaceFrame.SynXMLSyn1
               SearchEngine = InspectorFrame.ReplaceFrame.SynEditSearch1
               ExplicitHeight = 322
             end
             inherited meLangHint: TMemo
-              Top = 178
-              Width = 321
+              Top = 322
               Lines.Strings = (
                 'SUPPORT FOR MULTIPLE LANGUAGES IN ONE TEMPLATE:'
                 'On the first line, enter the identifier of the base language '
@@ -2164,6 +2180,7 @@ object MainForm: TMainForm
                 'columns each. That is, when choosing the Russian language, '
                 'columns [15],[16],[17],[18] are not used, and data '
                 'from [22],[23],[24],[25] are substituted instead.')
+              StyleElements = [seFont, seClient, seBorder]
               ExplicitTop = 322
             end
           end
@@ -2179,8 +2196,6 @@ object MainForm: TMainForm
         Constraints.MinHeight = 200
         Constraints.MinWidth = 50
         TabOrder = 2
-        ExplicitWidth = 453
-        ExplicitHeight = 416
         object Panel3: TPanel
           Left = 2
           Top = 15
@@ -2190,7 +2205,6 @@ object MainForm: TMainForm
           AutoSize = True
           BevelOuter = bvNone
           TabOrder = 0
-          ExplicitWidth = 449
           object Label1: TLabel
             Left = 110
             Top = 4
@@ -2329,8 +2343,6 @@ object MainForm: TMainForm
           Height = 353
           Align = alClient
           TabOrder = 1
-          ExplicitWidth = 449
-          ExplicitHeight = 352
           object shpBkg: TShape
             Left = 0
             Top = 0
@@ -2411,8 +2423,6 @@ object MainForm: TMainForm
         Align = alBottom
         BevelOuter = bvNone
         TabOrder = 3
-        ExplicitTop = 421
-        ExplicitWidth = 1077
         object sgText: TStringGrid
           Left = 0
           Top = 0
@@ -2435,7 +2445,6 @@ object MainForm: TMainForm
           OnFixedCellClick = sgTextFixedCellClick
           OnKeyPress = sgTextKeyPress
           OnSelectCell = sgTextSelectCell
-          ExplicitWidth = 1077
         end
       end
     end
@@ -2526,8 +2535,10 @@ object MainForm: TMainForm
         end
         inherited pnFindRemind: TPanel
           Color = clFuchsia
+          StyleElements = [seFont, seClient, seBorder]
           inherited pnRemindDialog: TPanel
             Color = clFuchsia
+            StyleElements = [seFont, seClient, seBorder]
           end
         end
         inherited pmFileSVG: TPopupMenu
@@ -2591,15 +2602,19 @@ object MainForm: TMainForm
             inherited meHint: TMemo
               Top = 468
               Width = 626
+              StyleElements = [seFont, seClient, seBorder]
               ExplicitTop = 468
               ExplicitWidth = 626
             end
             inherited Panel1: TPanel
               Width = 626
+              StyleElements = [seFont, seClient, seBorder]
               ExplicitWidth = 626
               inherited Panel2: TPanel
+                StyleElements = [seFont, seClient, seBorder]
                 inherited cbAtrShow: TComboBox
                   Height = 21
+                  StyleElements = [seFont, seClient, seBorder]
                   ExplicitHeight = 21
                 end
               end
@@ -2680,6 +2695,7 @@ object MainForm: TMainForm
               Top = 483
               Width = 626
               Visible = False
+              StyleElements = [seFont, seClient, seBorder]
               ExplicitTop = 483
               ExplicitWidth = 626
             end
@@ -2696,6 +2712,7 @@ object MainForm: TMainForm
             end
             inherited meLangHint: TMemo
               Top = 322
+              StyleElements = [seFont, seClient, seBorder]
               ExplicitTop = 322
             end
           end
@@ -2837,9 +2854,9 @@ object MainForm: TMainForm
         TabOrder = 1
         object scrlPreview1: TScrollBox
           Left = 0
-          Top = 29
+          Top = 31
           Width = 763
-          Height = 565
+          Height = 563
           Align = alClient
           TabOrder = 0
           TabStop = True
@@ -2864,105 +2881,19 @@ object MainForm: TMainForm
             Height = 592
             Stretch = True
           end
-        end
-        object ToolBar2: TToolBar
-          Left = 0
-          Top = 0
-          Width = 763
-          Height = 29
-          ParentCustomHint = False
-          ButtonHeight = 30
-          ButtonWidth = 31
-          Images = MainData.ilDecard
-          ParentShowHint = False
-          ShowHint = True
-          TabOrder = 1
-          object tbPreviewOpen: TToolButton
-            Left = 0
-            Top = 0
-            Hint = 'Load image'
-            Caption = 'ToolButton2'
-            ImageIndex = 5
-            OnClick = tbPreviewOpenClick
-          end
-          object tbPreviewSave: TToolButton
-            Left = 31
-            Top = 0
-            Hint = 'Save image'
-            Caption = 'tbPreviewSave'
-            ImageIndex = 34
-            OnClick = tbPreviewSaveClick
-          end
-          object tbCopyImg: TToolButton
-            Left = 62
-            Top = 0
-            Action = aCopyImg
-          end
-          object tbPreviewRefresh: TToolButton
-            Left = 93
-            Top = 0
-            Hint = 'Renew'
-            Caption = 'tbPreviewRefresh'
-            ImageIndex = 40
-            OnClick = tbPreviewRefreshClick
-          end
-          object ToolButton7: TToolButton
-            Left = 124
-            Top = 0
-            Width = 8
-            Caption = 'ToolButton7'
-            ImageIndex = 41
-            Style = tbsSeparator
-          end
-          object tbRreview100: TToolButton
-            Left = 132
-            Top = 0
-            Hint = 'Real size'
-            AutoSize = True
-            Caption = 'tbRreview100'
-            ImageIndex = 52
-            OnClick = tbRreview100Click
-          end
-          object tbPreview2x: TToolButton
-            Left = 163
-            Top = 0
-            Hint = '2x Zoom'
-            Caption = 'tbPreview2x'
-            ImageIndex = 50
-            OnClick = tbPreview2xClick
-          end
-          object tbPreview05: TToolButton
-            Left = 194
-            Top = 0
-            Hint = '1/2 Zoom'
-            Caption = 'tbPreview05'
-            ImageIndex = 51
-            OnClick = tbPreview05Click
-          end
-          object tbPreviewToScreen: TToolButton
-            Left = 225
-            Top = 0
-            Hint = 'Fit to screen'
-            Caption = 'tbPreviewToScreen'
-            ImageIndex = 54
-            OnClick = tbPreviewToScreenClick
-          end
-          object tbPreviewMM: TToolButton
-            Left = 256
-            Top = 0
-            Hint = 'Real card size'
-            Caption = 'tbPreviewMM'
-            ImageIndex = 53
-            OnClick = tbPreviewMMClick
-          end
-          object tbRotate: TToolButton
-            Left = 287
-            Top = 0
-            Hint = 'Default position'
-            Caption = 'tbRotate'
-            DropdownMenu = pmRotate
-            ImageIndex = 58
-            Style = tbsDropDown
+          object shpSelection1: TShape
+            Left = 130
+            Top = 48
+            Width = 145
+            Height = 161
+            Cursor = crCross
+            Brush.Color = clLime
+            Brush.Style = bsBDiagonal
+            Pen.Color = clLime
+            Pen.Mode = pmMergePenNot
+            Pen.Width = 2
+            Visible = False
+            OnMouseDown = shpSelectionMouseDown
           end
         end
         object Rendering3: TPanel
@@ -2981,8 +2912,141 @@ object MainForm: TMainForm
           Font.Style = [fsBold]
           ParentBackground = False
           ParentFont = False
-          TabOrder = 2
+          TabOrder = 1
           Visible = False
+        end
+        object pnTop: TPanel
+          Left = 0
+          Top = 0
+          Width = 763
+          Height = 31
+          Align = alTop
+          BevelOuter = bvNone
+          TabOrder = 2
+          object ToolBar2: TToolBar
+            Left = 0
+            Top = 0
+            Width = 364
+            Height = 31
+            ParentCustomHint = False
+            Align = alLeft
+            AutoSize = True
+            ButtonHeight = 30
+            ButtonWidth = 31
+            Images = MainData.ilDecard
+            ParentShowHint = False
+            ShowHint = True
+            TabOrder = 0
+            object tbPreviewOpen: TToolButton
+              Left = 0
+              Top = 0
+              Hint = 'Load image'
+              Caption = 'ToolButton2'
+              ImageIndex = 5
+              OnClick = tbPreviewOpenClick
+            end
+            object tbPreviewSave: TToolButton
+              Left = 31
+              Top = 0
+              Hint = 'Save image'
+              Caption = 'tbPreviewSave'
+              ImageIndex = 34
+              OnClick = tbPreviewSaveClick
+            end
+            object tbCopyImg: TToolButton
+              Left = 62
+              Top = 0
+              Action = aCopyImg
+            end
+            object tbPreviewRefresh: TToolButton
+              Left = 93
+              Top = 0
+              Hint = 'Renew'
+              Caption = 'tbPreviewRefresh'
+              ImageIndex = 40
+              OnClick = tbPreviewRefreshClick
+            end
+            object ToolButton7: TToolButton
+              Left = 124
+              Top = 0
+              Width = 8
+              Caption = 'ToolButton7'
+              ImageIndex = 41
+              Style = tbsSeparator
+            end
+            object tbRreview100: TToolButton
+              Left = 132
+              Top = 0
+              Hint = 'Real size'
+              AutoSize = True
+              Caption = 'tbRreview100'
+              ImageIndex = 52
+              OnClick = tbRreview100Click
+            end
+            object tbPreview2x: TToolButton
+              Left = 163
+              Top = 0
+              Hint = '2x Zoom'
+              Caption = 'tbPreview2x'
+              ImageIndex = 50
+              OnClick = tbPreview2xClick
+            end
+            object tbPreview05: TToolButton
+              Left = 194
+              Top = 0
+              Hint = '1/2 Zoom'
+              Caption = 'tbPreview05'
+              ImageIndex = 51
+              OnClick = tbPreview05Click
+            end
+            object tbPreviewToScreen: TToolButton
+              Left = 225
+              Top = 0
+              Hint = 'Fit to screen'
+              Caption = 'tbPreviewToScreen'
+              ImageIndex = 54
+              OnClick = tbPreviewToScreenClick
+            end
+            object tbPreviewMM: TToolButton
+              Left = 256
+              Top = 0
+              Hint = 'Real card size'
+              Caption = 'tbPreviewMM'
+              ImageIndex = 53
+              OnClick = tbPreviewMMClick
+            end
+            object tbRotate: TToolButton
+              Left = 287
+              Top = 0
+              Hint = 'Default position'
+              Caption = 'tbRotate'
+              DropdownMenu = pmRotate
+              ImageIndex = 58
+              Style = tbsDropDown
+            end
+            object tbOCR: TToolButton
+              Left = 333
+              Top = 0
+              Caption = 'OCR'
+              ImageIndex = 60
+              Style = tbsCheck
+              OnClick = tbOCRClick
+            end
+          end
+          object clrOCR: TColorBox
+            AlignWithMargins = True
+            Left = 367
+            Top = 4
+            Width = 89
+            Height = 22
+            Margins.Top = 4
+            Align = alLeft
+            DefaultColorColor = clLime
+            Selected = clLime
+            TabOrder = 1
+            Visible = False
+            OnChange = clrOCRChange
+          end
         end
       end
     end
@@ -2995,8 +3059,6 @@ object MainForm: TMainForm
     Align = alBottom
     TabOrder = 1
     Visible = False
-    ExplicitTop = 621
-    ExplicitWidth = 1085
   end
   object cbLang: TComboBox
     Left = 1033
@@ -3009,7 +3071,6 @@ object MainForm: TMainForm
     TabOrder = 2
     Visible = False
     OnClick = cbLangClick
-    ExplicitLeft = 1029
   end
   object dlgTextFind: TFindDialog
     OnClose = dlgTextFindClose
@@ -3036,9 +3097,7 @@ object MainForm: TMainForm
         OnClick = sbOpenTextClick
       end
       object Save2: TMenuItem
-        Caption = 'Save table'
-        ImageIndex = 34
-        OnClick = Save2Click
+        Action = aSavetable
       end
       object N7: TMenuItem
         Caption = '-'
@@ -3112,6 +3171,12 @@ object MainForm: TMainForm
       ShortCut = 16451
       OnExecute = aCopyImgExecute
       OnUpdate = aCopyImgUpdate
+    end
+    object aSavetable: TAction
+      Caption = 'Save table'
+      ImageIndex = 34
+      ShortCut = 113
+      OnExecute = aSavetableExecute
     end
   end
   object tmrRender: TTimer

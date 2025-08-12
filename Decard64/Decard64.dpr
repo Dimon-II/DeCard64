@@ -30,7 +30,14 @@ uses
   SynEditSpell in 'HunSpell\SynEditSpell.pas',
   SynEdit in 'HunSpell\SynEdit.pas',
   SynEditHighlighter in 'HunSpell\SynEditHighlighter.pas',
-  FontsNameFunc in 'src\FontsNameFunc.pas';
+  FontsNameFunc in 'src\FontsNameFunc.pas',
+  tesseractocr.capi in 'tesseractocr\tesseractocr.capi.pas',
+  tesseractocr.consts in 'tesseractocr\tesseractocr.consts.pas',
+  tesseractocr.leptonica in 'tesseractocr\tesseractocr.leptonica.pas',
+  tesseractocr.pagelayout in 'tesseractocr\tesseractocr.pagelayout.pas',
+  tesseractocr in 'tesseractocr\tesseractocr.pas',
+  tesseractocr.utils in 'tesseractocr\tesseractocr.utils.pas',
+  StretchHandles in 'src\StretchHandles.pas';
 
 {$R *.res}
 

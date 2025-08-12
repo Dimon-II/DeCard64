@@ -359,9 +359,9 @@ begin
   if assigned(parent) then
     parent.Nodes.Delete(Index);
   while Attributes.Count>0 do
-    Attributes[Attributes.Count-1].Destroy;
+    TXML_Atr(Attributes[Attributes.Count-1]).Destroy;
   while Nodes.Count>0 do
-    Nodes[Nodes.Count-1].Destroy;
+    TXML_Nod(Nodes[Nodes.Count-1]).Destroy;
   FAttributes.Free;
   FNodes.Free;
   inherited Destroy;

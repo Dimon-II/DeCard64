@@ -41,7 +41,13 @@ object TraceReplForm: TTraceReplForm
     Font.Style = []
     Font.Quality = fqClearTypeNatural
     TabOrder = 0
+    CodeFolding.GutterShapeSize = 11
+    CodeFolding.CollapsedLineColor = clGrayText
+    CodeFolding.FolderBarLinesColor = clGrayText
+    CodeFolding.IndentGuidesColor = clGray
+    CodeFolding.IndentGuides = True
     CodeFolding.ShowCollapsedLine = True
+    CodeFolding.ShowHintMark = True
     UseCodeFolding = False
     Gutter.Font.Charset = DEFAULT_CHARSET
     Gutter.Font.Color = clWindowText
@@ -53,8 +59,7 @@ object TraceReplForm: TTraceReplForm
     Highlighter = SynXMLSyn1
     Options = [eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoScrollPastEol, eoShowScrollHint, eoShowSpecialChars, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
     ReadOnly = True
-    ExplicitWidth = 253
-    ExplicitHeight = 556
+    FontSmoothing = fsmNone
   end
   object seCell: TSynEdit
     Left = 260
@@ -70,7 +75,13 @@ object TraceReplForm: TTraceReplForm
     Font.Style = []
     Font.Quality = fqClearTypeNatural
     TabOrder = 1
+    CodeFolding.GutterShapeSize = 11
+    CodeFolding.CollapsedLineColor = clGrayText
+    CodeFolding.FolderBarLinesColor = clGrayText
+    CodeFolding.IndentGuidesColor = clGray
+    CodeFolding.IndentGuides = True
     CodeFolding.ShowCollapsedLine = True
+    CodeFolding.ShowHintMark = True
     UseCodeFolding = False
     Gutter.Font.Charset = DEFAULT_CHARSET
     Gutter.Font.Color = clWindowText
@@ -81,7 +92,7 @@ object TraceReplForm: TTraceReplForm
     Gutter.ShowLineNumbers = True
     Highlighter = SynXMLSyn1
     Options = [eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoScrollPastEol, eoShowScrollHint, eoShowSpecialChars, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
-    ExplicitHeight = 556
+    FontSmoothing = fsmNone
   end
   object seRepl: TSynEdit
     Left = 0
@@ -97,7 +108,13 @@ object TraceReplForm: TTraceReplForm
     Font.Style = []
     Font.Quality = fqClearTypeNatural
     TabOrder = 2
+    CodeFolding.GutterShapeSize = 11
+    CodeFolding.CollapsedLineColor = clGrayText
+    CodeFolding.FolderBarLinesColor = clGrayText
+    CodeFolding.IndentGuidesColor = clGray
+    CodeFolding.IndentGuides = True
     CodeFolding.ShowCollapsedLine = True
+    CodeFolding.ShowHintMark = True
     UseCodeFolding = False
     Gutter.Font.Charset = DEFAULT_CHARSET
     Gutter.Font.Color = clWindowText
@@ -110,7 +127,7 @@ object TraceReplForm: TTraceReplForm
     Options = [eoAutoIndent, eoDragDropEditing, eoEnhanceEndKey, eoGroupUndo, eoScrollPastEol, eoShowScrollHint, eoShowSpecialChars, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
     OnGutterGetText = seReplGutterGetText
     OnSpecialLineColors = seReplSpecialLineColors
-    ExplicitHeight = 556
+    FontSmoothing = fsmNone
   end
   object tbrTrace: TToolBar
     Left = 0
@@ -124,7 +141,6 @@ object TraceReplForm: TTraceReplForm
     ShowCaptions = True
     ShowHint = True
     TabOrder = 3
-    ExplicitWidth = 897
     object tbTraceTo: TToolButton
       Left = 0
       Top = 0
@@ -142,6 +158,9 @@ object TraceReplForm: TTraceReplForm
     end
   end
   object SynXMLSyn1: TSynXMLSyn
+    Options.AutoDetectEnabled = False
+    Options.AutoDetectLineLimit = 0
+    Options.Visible = False
     WantBracesParsed = False
     Left = 272
     Top = 56

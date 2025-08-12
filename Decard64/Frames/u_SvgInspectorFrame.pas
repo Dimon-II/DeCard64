@@ -161,6 +161,7 @@ begin
     frmPathEdit.UndoList.Clear;
     frmPathEdit.mePATH.Lines.Text :=sgAttr.Cells[sgAttr.Col,sgAttr.Row];
     frmPathEdit.Caption := XMLEditForm.Caption;
+    frmPathEdit.mePATHChange(frmPathEdit.mePATH);
     if frmPathEdit.ShowModal=mrOk then
     begin
       sgAttr.Cells[sgAttr.Col,sgAttr.Row] := StringReplace(frmPathEdit.mePATH.Lines.Text,#13#10,' ',[rfReplaceAll]);

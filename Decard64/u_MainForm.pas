@@ -8,7 +8,7 @@ uses
   Vcl.StdCtrls, Vcl.Samples.Spin, Vcl.Buttons, ProfixXML, u_SvgTreeFrame,
   SynEdit, SynEditHighlighter, SynHighlighterXML, Vcl.Grids, Vcl.Menus,
   u_SvgInspectorFrame, System.Math, Vcl.Imaging.jpeg, System.Actions, Vcl.ActnList,
-  Vcl.ColorGrd, System.UITypes, System.Types, SynPdf, Vcl.AppEvnts ;
+  Vcl.ColorGrd, System.UITypes, System.Types, SynPdf, Vcl.AppEvnts, StretchHandles ;
 
 type
   TMainForm = class(TForm)
@@ -196,20 +196,9 @@ type
     scrlPreview1: TScrollBox;
     shpPreview: TShape;
     imgRender: TImage;
-    ToolBar2: TToolBar;
-    tbPreviewOpen: TToolButton;
-    tbPreviewSave: TToolButton;
-    tbPreviewRefresh: TToolButton;
-    ToolButton7: TToolButton;
-    tbRreview100: TToolButton;
-    tbPreview2x: TToolButton;
-    tbPreview05: TToolButton;
-    tbPreviewToScreen: TToolButton;
-    tbPreviewMM: TToolButton;
     Rendering3: TPanel;
     miTableHead: TMenuItem;
     chbTextLayer: TCheckBox;
-    tbCopyImg: TToolButton;
     aCopyImg: TAction;
     miApplysorting: TMenuItem;
     chbFlipBack: TCheckBox;
@@ -232,12 +221,29 @@ type
     Fontello1: TMenuItem;
     N3: TMenuItem;
     pmRotate: TPopupMenu;
-    tbRotate: TToolButton;
     miRotate_0: TMenuItem;
     miRotate_90: TMenuItem;
     miRotate_180: TMenuItem;
     miRotate_270: TMenuItem;
     chbOuterCut: TCheckBox;
+    seCutDelta: TSpinEdit;
+    aSavetable: TAction;
+    shpSelection1: TShape;
+    pnTop: TPanel;
+    ToolBar2: TToolBar;
+    tbPreviewOpen: TToolButton;
+    tbPreviewSave: TToolButton;
+    tbCopyImg: TToolButton;
+    tbPreviewRefresh: TToolButton;
+    ToolButton7: TToolButton;
+    tbRreview100: TToolButton;
+    tbPreview2x: TToolButton;
+    tbPreview05: TToolButton;
+    tbPreviewToScreen: TToolButton;
+    tbPreviewMM: TToolButton;
+    tbRotate: TToolButton;
+    tbOCR: TToolButton;
+    clrOCR: TColorBox;
     procedure sbOpenRootClick(Sender: TObject);
     procedure sbOpenTextClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -316,7 +322,6 @@ type
     procedure SpeedButton7Click(Sender: TObject);
     procedure tbSaveProjectClick(Sender: TObject);
     procedure Reloadtable1Click(Sender: TObject);
-    procedure Save2Click(Sender: TObject);
     procedure SVGFrameSave1Click(Sender: TObject);
     procedure ClipartFrameSave1Click(Sender: TObject);
     procedure ImportSVG1Click(Sender: TObject);
@@ -348,9 +353,11 @@ type
     procedure chk2xClick(Sender: TObject);
     procedure Fontello1Click(Sender: TObject);
     procedure miRotate_270Click(Sender: TObject);
+    procedure aSavetableExecute(Sender: TObject);
+    procedure tbOCRClick(Sender: TObject);
+    procedure clrOCRChange(Sender: TObject);
   private
     { Private declarations }
-    FSel:TRect;
     FSelCel:TRect;
     NoTempStyle :boolean;
     fBufPreview:boolean;
@@ -372,6 +379,9 @@ type
     FStartRender:TDateTime;
     GridMouse:boolean;
     LangSet:array of Integer;
+
+    FSel:TRect;
+    StretchHandle:tStretchHandle;
 
     procedure PrepareAtr(ANod: TXML_Nod);
     procedure ReadGrid(AFilename:string);
@@ -686,6 +696,39 @@ begin
   end;
 end;
 
+procedure TMainForm.aSavetableExecute(Sender: TObject);
+begin
+  chdir(edCfgRoot.Text);
+  MainData.dlgSaveContent.DefaultExt := ExtractFileExt(edCfgCardsFile.Text);
+  MainData.dlgSaveContent.InitialDir := edCfgRoot.Text;
+  MainData.dlgSaveContent.FileName := edCfgRoot.Text + edCfgCardsFile.Text;
+
+  if  MainData.dlgSaveContent.Execute then
+  begin
+    if MainData.dlgSaveContent.FilterIndex=1 then
+      MainData.dlgSaveContent.FileName := ChangeFileExt(MainData.dlgSaveContent.FileName, '.TSV')
+    else
+    if MainData.dlgSaveContent.FilterIndex=2 then
+      MainData.dlgSaveContent.FileName := ChangeFileExt(MainData.dlgSaveContent.FileName, '.TXT');
+
+
+    if MainData.dlgSaveContent.Encodings[MainData.dlgSaveContent.EncodingIndex]='default' then
+    begin
+      if  UpperCase(ExtractFileExt(MainData.dlgSaveContent.FileName))='.TXT' then
+        lblEncoding.Caption := 'ANSI'
+      else
+        lblEncoding.Caption := 'UTF-8'
+    end
+    else
+      lblEncoding.Caption := MainData.dlgSaveContent.Encodings[MainData.dlgSaveContent.EncodingIndex];
+
+    edCfgCardsFile.Text := ExtractRelativePath(edCfgRoot.Text, MainData.dlgSaveContent.FileName);
+
+    SaveTable(edCfgRoot.Text+edCfgCardsFile.Text);
+  end;
+
+end;
+
 procedure TMainForm.aShowExecute(Sender: TObject);
 begin
   PrepareLangpack;
@@ -793,6 +836,7 @@ var
   begin
 
     fn := ChangeFileExt(ResultName(cbFileName.Text, sgText.RowCount - 1, i, j), '.SVG');
+//    ForceDirectories(ExtractFilePath(edCfgRoot.Text + edCfgResult.Text + fn));
 
     AddClipart(x1, Clipart, edCfgClipart.Text);
 
@@ -1046,10 +1090,10 @@ begin
 
     // AddBack(x1,0);
 
-    if edOutline.Text <> '' then
+
+    if chbOuterCut.Checked then
     begin
       MirrorSection :=x1.Nodes.Last.add('g');
-      if chbOuterCut.Checked then
       with MirrorSection do
       begin
         Attribute['stroke']:='#000';
@@ -1059,19 +1103,23 @@ begin
         for i:= 0 to seCountX.Value-1 do
          with Add('rect') do
          begin
-           Attribute['x']:= IntToStr(dlt.X + Bleed * 2 *i + Round(seWidth.Value * seScale1.Value / seScale2.Value * i));
-           Attribute['width']:= IntToStr(Round(seWidth.Value * seScale1.Value / seScale2.Value));
+           Attribute['x']:= IntToStr(dlt.X + Bleed * 2 *i + seCutDelta.Value + trunc(seWidth.Value * seScale1.Value / seScale2.Value) * i);
+           Attribute['width']:= IntToStr(Round(seWidth.Value * seScale1.Value / seScale2.Value - 2 * seCutDelta.Value)) ;
            Attribute['height']:= IntToStr(PageSize.Y)
          end;
         for i:= 0 to seCountY.Value-1 do
          with Add('rect') do
          begin
-           Attribute['y']:= IntToStr(dlt.Y + Bleed * 2 *i + Round(seHeight.Value * seScale1.Value / seScale2.Value * i));
-           Attribute['height']:= IntToStr(Round(seHeight.Value * seScale1.Value / seScale2.Value));
+           Attribute['y']:= IntToStr(dlt.Y + Bleed * 2 *i + seCutDelta.Value + trunc(seHeight.Value * seScale1.Value / seScale2.Value) * i);
+           Attribute['height']:= IntToStr(Round(seHeight.Value * seScale1.Value / seScale2.Value - 2 * seCutDelta.Value));
            Attribute['width']:= IntToStr(PageSize.X)
          end;
 
       end;
+    end;
+
+    if edOutline.Text <> '' then
+    begin
       MirrorSection :=x1.Nodes.Last.add('g');
       with MirrorSection do
       begin
@@ -1415,6 +1463,7 @@ procedure TMainForm.cbLangClick(Sender: TObject);
 begin
   sgText.Invalidate;
   PrepareLangpack;
+  RenderRow(sgText.Row)
 end;
 
 procedure TMainForm.cbPaperChange(Sender: TObject);
@@ -1710,6 +1759,14 @@ begin
 
   if ClipartInspectorFrame.pcAtrInspector.Activepageindex=1 then
     aClipartPreview.Execute;
+end;
+
+procedure TMainForm.clrOCRChange(Sender: TObject);
+begin
+  shpSelection1.Pen.Color := clrOCR.Selected;
+  shpSelection1.Brush.Color := shpSelection1.Pen.Color;
+  StretchHandle.SetColors(clrOCR.Selected,clrOCR.Selected)
+
 end;
 
 procedure TMainForm.CopySelection1Click(Sender: TObject);
@@ -2104,6 +2161,8 @@ begin
   BVL2.Width := 600;
   sgText.InsertControl(BVL2);
   BVL2.Visible := false;
+
+  StretchHandle := TStretchHandle.Create(scrlPreview1);
 
 end;
 
@@ -2727,6 +2786,8 @@ end;
 procedure TMainForm.PaintBoxPaint(Sender: TObject);
 var
   i,j:integer;
+  s:string;
+  rc:TRect;
 
 Function ButtonIsDown(Button:TMousebutton):Boolean;
 var Swap :Boolean;
@@ -2746,6 +2807,7 @@ else
    end;
 Result:= (State < 0);
 end;
+
 begin
   Cell.X := imgPreview.Picture.Width div w2x -seFrame.Value*2;
   Cell.Y := imgPreview.Picture.Height - seFrame.Value*2;
@@ -3218,6 +3280,9 @@ begin
   result:=ChangeFileExt(s,'');
 
   for i:=0 to sgText.ColCount-1 do
+    result := StringReplace(result, '[0' + IntToStr(i)+']', sgText.Cells[i, Npp], [rfReplaceAll, rfIgnoreCase]);
+
+  for i:=0 to sgText.ColCount-1 do
     result := StringReplace(result, '[' + IntToStr(i)+']', sgText.Cells[LangpackIdx(i), Npp], [rfReplaceAll, rfIgnoreCase]);
 
   result := StringReplace(result, '[count]', IntToStr(Cnt), [rfReplaceAll, rfIgnoreCase]);
@@ -3227,43 +3292,9 @@ begin
     result := StringReplace(result, '[npp]', FormatFloat(Stringofchar('0', Length(IntToStr(Cnt))), Npp), [rfReplaceAll, rfIgnoreCase]);
     result := StringReplace(result, '[lng]', cbLang.Text, [rfReplaceAll, rfIgnoreCase]);
 
-
   if result='' then
     result := 'CARD' + IntToStr(Cnt) + 'x'+ FormatFloat(Stringofchar('0', Length(IntToStr(Cnt))), Npp);
 
-end;
-
-procedure TMainForm.Save2Click(Sender: TObject);
-
-begin
-  chdir(edCfgRoot.Text);
-  MainData.dlgSaveContent.DefaultExt := ExtractFileExt(edCfgCardsFile.Text);
-  MainData.dlgSaveContent.InitialDir := edCfgRoot.Text;
-  MainData.dlgSaveContent.FileName := edCfgRoot.Text + edCfgCardsFile.Text;
-
-  if  MainData.dlgSaveContent.Execute then
-  begin
-    if MainData.dlgSaveContent.FilterIndex=1 then
-      MainData.dlgSaveContent.FileName := ChangeFileExt(MainData.dlgSaveContent.FileName, '.TSV')
-    else
-    if MainData.dlgSaveContent.FilterIndex=2 then
-      MainData.dlgSaveContent.FileName := ChangeFileExt(MainData.dlgSaveContent.FileName, '.TXT');
-
-
-    if MainData.dlgSaveContent.Encodings[MainData.dlgSaveContent.EncodingIndex]='default' then
-    begin
-      if  UpperCase(ExtractFileExt(MainData.dlgSaveContent.FileName))='.TXT' then
-        lblEncoding.Caption := 'ANSI'
-      else
-        lblEncoding.Caption := 'UTF-8'
-    end
-    else
-      lblEncoding.Caption := MainData.dlgSaveContent.Encodings[MainData.dlgSaveContent.EncodingIndex];
-
-    edCfgCardsFile.Text := ExtractRelativePath(edCfgRoot.Text, MainData.dlgSaveContent.FileName);
-
-    SaveTable(edCfgRoot.Text+edCfgCardsFile.Text);
-  end;
 end;
 
 procedure TMainForm.SaveTable(AFileName: string);
@@ -3571,8 +3602,7 @@ end;
 procedure TMainForm.shpSelectionMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
-   shpSelection.Visible := False;
-
+  shpSelection.Visible := False;
 end;
 
 procedure TMainForm.sbCfgTempClick(Sender: TObject);
@@ -3959,6 +3989,30 @@ begin
   CellEditForm.Show;
 end;
 
+procedure TMainForm.tbOCRClick(Sender: TObject);
+begin
+  imgRender.Width := Round(imgRender.Picture.Width*ZoomPreview);
+  imgRender.Height := Round(imgRender.Picture.Height*ZoomPreview);
+
+  shpSelection1.Visible := tbOCR.Down;
+  if tbOCR.Down then
+  begin
+    shpSelection1.left := 50;
+    shpSelection1.top := 50;
+  end;
+  StretchHandle.Box5 := 10;
+
+  if shpSelection1.Visible then
+    StretchHandle.Attach(shpSelection1)
+  else
+    StretchHandle.Detach;
+  clrOCRChange(nil);
+
+  clrOCR.Visible := tbOCR.Down;
+
+  CellEditForm.InitOcr;
+end;
+
 procedure TMainForm.tbOpenProjectClick(Sender: TObject);
 var i:integer;
 begin
@@ -4016,6 +4070,16 @@ begin
       PrepareLangpack;
       if cbLang.Items.IndexOf(Attribute['lang'])>-1 then
         cbLang.ItemIndex := cbLang.Items.IndexOf(Attribute['lang']);
+      CellEditForm.seOCR.Lines.CommaText := Attribute['OCR'];
+
+      if Attribute['cutting']<>'' then
+      begin
+        chbOuterCut.Checked := True;
+        seCutDelta.Text := Attribute['cutting'];
+      end
+      else
+        chbOuterCut.Checked := False;
+
     end;
     if Config.Nodes.ByName('Hunspell')<>nil then
     with TStringList.Create do
@@ -4125,6 +4189,7 @@ end;
 
 procedure TMainForm.tbPreviewRefreshClick(Sender: TObject);
 var s:string;
+ BMP:TBitmap;
 begin
 
 
@@ -4154,6 +4219,12 @@ begin
 
   end;
   imgRender.Picture.LoadFromFile(MainData.dlgOpenPicture.FileName);
+
+  bmp:= TBitmap.Create(imgRender.Picture.Width, imgRender.Picture.Height);
+  bmp.Canvas.Draw(0,0,imgRender.Picture.Graphic);
+  imgRender.Picture.Bitmap.Assign(bmp);
+  bmp.Free;
+
   imgRender.Width := Round(imgRender.Picture.Width*ZoomPreview);
   imgRender.Height := Round(imgRender.Picture.Height*ZoomPreview);
 
@@ -4289,6 +4360,9 @@ begin
       Attribute['wrap'] := CellEditForm.seWrap.Lines.CommaText;
       Attribute['langpack'] := InspectorFrame.SynEditor.Text;
       Attribute['lang'] := cbLang.text;
+      Attribute['OCR'] := CellEditForm.seOCR.Lines.CommaText;
+      if chbOuterCut.Checked then
+        Attribute['cutting'] := seCutDelta.Text;
     end;
     Config.Add('Hunspell').data := MainData.SynEditSpellCheck.UserDict.CommaText;
     SaveXML(MainData.dlgSaveXML.FileName, Config.xml);

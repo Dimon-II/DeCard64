@@ -4,7 +4,7 @@ object CellEditForm: TCellEditForm
   BorderIcons = [biSystemMenu, biMaximize]
   Caption = 'CellEditForm'
   ClientHeight = 282
-  ClientWidth = 788
+  ClientWidth = 899
   Color = clBtnFace
   Constraints.MinHeight = 320
   Constraints.MinWidth = 480
@@ -33,15 +33,13 @@ object CellEditForm: TCellEditForm
   object pnBottom: TPanel
     Left = 0
     Top = 240
-    Width = 788
+    Width = 899
     Height = 42
     Align = alBottom
     BevelOuter = bvNone
     TabOrder = 0
-    ExplicitTop = 239
-    ExplicitWidth = 784
     DesignSize = (
-      788
+      899
       42)
     object sbaLeftCell: TSpeedButton
       Left = 3
@@ -108,7 +106,7 @@ object CellEditForm: TCellEditForm
     end
     object sbPreview: TSpeedButton
       Left = 185
-      Top = 8
+      Top = 6
       Width = 110
       Height = 27
       Action = aPreview
@@ -207,8 +205,21 @@ object CellEditForm: TCellEditForm
       Font.Style = []
       ParentFont = False
     end
+    object sbOCR: TSpeedButton
+      Left = 448
+      Top = 6
+      Width = 49
+      Height = 27
+      Action = aOCR
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -13
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentFont = False
+    end
     object btnApply: TButton
-      Left = 548
+      Left = 659
       Top = 9
       Width = 75
       Height = 25
@@ -223,10 +234,9 @@ object CellEditForm: TCellEditForm
       ParentFont = False
       TabOrder = 0
       OnClick = btnApplyClick
-      ExplicitLeft = 544
     end
     object btnCancel: TButton
-      Left = 629
+      Left = 740
       Top = 9
       Width = 75
       Height = 25
@@ -240,7 +250,6 @@ object CellEditForm: TCellEditForm
       Font.Style = []
       ParentFont = False
       TabOrder = 1
-      ExplicitLeft = 625
     end
     object chbScrollPreview: TCheckBox
       Left = 82
@@ -273,8 +282,8 @@ object CellEditForm: TCellEditForm
       OnKeyDown = CellEditFrameSynEditorKeyDown
       OnChange = CellEditFrameSynEditorChange
       OnGutterGetText = CellEditFrameSynEditorGutterGetText
-      ExplicitWidth = 492
-      ExplicitHeight = 211
+      ExplicitWidth = 496
+      ExplicitHeight = 212
     end
     inherited pscrSysEdit: TPageScroller
       Width = 496
@@ -292,9 +301,9 @@ object CellEditForm: TCellEditForm
   object pcHelpher: TPageControl
     Left = 499
     Top = 0
-    Width = 289
+    Width = 400
     Height = 240
-    ActivePage = tsTransform
+    ActivePage = tsCommon
     Align = alRight
     TabOrder = 2
     object tsTransform: TTabSheet
@@ -426,7 +435,7 @@ object CellEditForm: TCellEditForm
       object lbCommon: TListBox
         Left = 41
         Top = 0
-        Width = 240
+        Width = 351
         Height = 191
         Align = alClient
         DragMode = dmAutomatic
@@ -462,7 +471,7 @@ object CellEditForm: TCellEditForm
       object SynEdit1: TSynEdit
         Left = 0
         Top = 191
-        Width = 281
+        Width = 392
         Height = 21
         Align = alBottom
         Color = clBtnFace
@@ -500,7 +509,7 @@ object CellEditForm: TCellEditForm
       Caption = 'Replace'
       ImageIndex = 5
       object pnButtons: TPanel
-        Left = 210
+        Left = 321
         Top = 77
         Width = 71
         Height = 135
@@ -508,7 +517,6 @@ object CellEditForm: TCellEditForm
         BevelOuter = bvNone
         BorderWidth = 5
         TabOrder = 0
-        ExplicitHeight = 134
         object btnReplaceAll: TButton
           AlignWithMargins = True
           Left = 5
@@ -564,26 +572,24 @@ object CellEditForm: TCellEditForm
       object pnReplace: TPanel
         Left = 0
         Top = 77
-        Width = 210
+        Width = 321
         Height = 135
         Align = alClient
         BevelOuter = bvNone
         TabOrder = 1
-        ExplicitHeight = 134
         object gbOptions: TGroupBox
           Left = 0
           Top = 0
-          Width = 210
+          Width = 321
           Height = 135
           Align = alClient
           Caption = 'Options:'
           TabOrder = 0
-          ExplicitHeight = 134
           object chbColumn: TCheckBox
             AlignWithMargins = True
             Left = 11
             Top = 18
-            Width = 194
+            Width = 305
             Height = 17
             Margins.Left = 9
             Align = alTop
@@ -594,7 +600,7 @@ object CellEditForm: TCellEditForm
             AlignWithMargins = True
             Left = 11
             Top = 110
-            Width = 194
+            Width = 305
             Height = 17
             Margins.Left = 9
             Align = alTop
@@ -607,7 +613,7 @@ object CellEditForm: TCellEditForm
             AlignWithMargins = True
             Left = 11
             Top = 87
-            Width = 194
+            Width = 305
             Height = 17
             Margins.Left = 9
             Align = alTop
@@ -618,7 +624,7 @@ object CellEditForm: TCellEditForm
             AlignWithMargins = True
             Left = 11
             Top = 64
-            Width = 194
+            Width = 305
             Height = 17
             Margins.Left = 9
             Align = alTop
@@ -629,7 +635,7 @@ object CellEditForm: TCellEditForm
             AlignWithMargins = True
             Left = 11
             Top = 41
-            Width = 194
+            Width = 305
             Height = 17
             Margins.Left = 9
             Align = alTop
@@ -641,7 +647,7 @@ object CellEditForm: TCellEditForm
       object pbReplaceText: TPanel
         Left = 0
         Top = 0
-        Width = 281
+        Width = 392
         Height = 77
         Align = alTop
         AutoSize = True
@@ -651,7 +657,7 @@ object CellEditForm: TCellEditForm
           AlignWithMargins = True
           Left = 3
           Top = 0
-          Width = 275
+          Width = 386
           Height = 13
           Margins.Top = 0
           Margins.Bottom = 0
@@ -664,7 +670,7 @@ object CellEditForm: TCellEditForm
           AlignWithMargins = True
           Left = 3
           Top = 40
-          Width = 275
+          Width = 386
           Height = 13
           Margins.Top = 0
           Margins.Bottom = 0
@@ -677,7 +683,7 @@ object CellEditForm: TCellEditForm
           AlignWithMargins = True
           Left = 0
           Top = 16
-          Width = 276
+          Width = 387
           Height = 21
           Margins.Left = 0
           Margins.Right = 5
@@ -688,7 +694,7 @@ object CellEditForm: TCellEditForm
           AlignWithMargins = True
           Left = 0
           Top = 56
-          Width = 276
+          Width = 387
           Height = 21
           Margins.Left = 0
           Margins.Right = 5
@@ -713,7 +719,7 @@ object CellEditForm: TCellEditForm
         OnDblClick = lbMacrosDblClick
       end
       object lbSelector: TListBox
-        Left = 216
+        Left = 327
         Top = 0
         Width = 65
         Height = 212
@@ -727,7 +733,7 @@ object CellEditForm: TCellEditForm
       object lbFiltered: TListBox
         Left = 87
         Top = 0
-        Width = 129
+        Width = 240
         Height = 212
         Align = alClient
         ItemHeight = 13
@@ -741,7 +747,7 @@ object CellEditForm: TCellEditForm
       object seTags: TSynEdit
         Left = 0
         Top = 0
-        Width = 281
+        Width = 392
         Height = 212
         Align = alClient
         Color = clBtnFace
@@ -801,7 +807,7 @@ object CellEditForm: TCellEditForm
       object seWrap: TSynEdit
         Left = 0
         Top = 0
-        Width = 281
+        Width = 392
         Height = 212
         Align = alClient
         Color = clWhite
@@ -843,17 +849,18 @@ object CellEditForm: TCellEditForm
       object splRevers: TSplitter
         Left = 0
         Top = 208
-        Width = 281
+        Width = 392
         Height = 4
         Cursor = crVSplit
         Align = alBottom
         Beveled = True
         ExplicitTop = 102
+        ExplicitWidth = 281
       end
       object tbrTranslate: TToolBar
         Left = 0
         Top = 0
-        Width = 281
+        Width = 392
         Height = 21
         AutoSize = True
         ButtonHeight = 21
@@ -882,7 +889,7 @@ object CellEditForm: TCellEditForm
       object seTranslate: TSynEdit
         Left = 0
         Top = 21
-        Width = 281
+        Width = 392
         Height = 187
         Align = alClient
         Font.Charset = DEFAULT_CHARSET
@@ -926,6 +933,283 @@ object CellEditForm: TCellEditForm
         AddedKeystrokes = <>
       end
     end
+    object tsMassReplace: TTabSheet
+      Caption = 'MassReplace'
+      ImageIndex = 7
+      object Panel1: TPanel
+        Left = 0
+        Top = 0
+        Width = 321
+        Height = 212
+        Align = alClient
+        BevelOuter = bvNone
+        Caption = 'Panel1'
+        TabOrder = 0
+        object meReplaceHint: TMemo
+          Left = 0
+          Top = 171
+          Width = 321
+          Height = 41
+          Align = alBottom
+          BorderStyle = bsNone
+          Color = clInfoBk
+          Ctl3D = False
+          Lines.Strings = (
+            'macro=value (case insensitive)'
+            'Macros==value (case sensitive)'
+            'macro=$regexp')
+          ParentCtl3D = False
+          ReadOnly = True
+          TabOrder = 0
+        end
+        object MassEditor: TSynEdit
+          Left = 0
+          Top = 0
+          Width = 321
+          Height = 171
+          Align = alClient
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clWindowText
+          Font.Height = -13
+          Font.Name = 'Courier New'
+          Font.Style = []
+          Font.Quality = fqClearTypeNatural
+          TabOrder = 1
+          CodeFolding.GutterShapeSize = 11
+          CodeFolding.CollapsedLineColor = clGrayText
+          CodeFolding.FolderBarLinesColor = clGrayText
+          CodeFolding.IndentGuidesColor = clGray
+          CodeFolding.IndentGuides = True
+          CodeFolding.ShowCollapsedLine = True
+          CodeFolding.ShowHintMark = True
+          UseCodeFolding = False
+          Gutter.Font.Charset = DEFAULT_CHARSET
+          Gutter.Font.Color = clWindowText
+          Gutter.Font.Height = -11
+          Gutter.Font.Name = 'Courier New'
+          Gutter.Font.Style = []
+          Gutter.Font.Quality = fqClearTypeNatural
+          Gutter.ShowLineNumbers = True
+          Highlighter = SynIniSyn1
+          Options = [eoAutoIndent, eoDragDropEditing, eoGroupUndo, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
+          FontSmoothing = fsmNone
+          RemovedKeystrokes = <
+            item
+              Command = ecLineBreak
+              ShortCut = 8205
+            end
+            item
+              Command = ecContextHelp
+              ShortCut = 112
+            end>
+          AddedKeystrokes = <>
+        end
+      end
+      object pnMassReplace: TPanel
+        Left = 321
+        Top = 0
+        Width = 71
+        Height = 212
+        Align = alRight
+        BevelOuter = bvNone
+        BorderWidth = 5
+        TabOrder = 1
+        object Label1: TLabel
+          Left = 5
+          Top = 5
+          Width = 61
+          Height = 13
+          Align = alTop
+          Caption = 'Target:'
+          ExplicitWidth = 36
+        end
+        object btnLoadMass: TButton
+          AlignWithMargins = True
+          Left = 5
+          Top = 83
+          Width = 61
+          Height = 25
+          Hint = 'Replace '
+          Margins.Left = 0
+          Margins.Right = 0
+          Align = alTop
+          Caption = 'Load'
+          TabOrder = 0
+          OnClick = btnLoadMassClick
+        end
+        object btnSaveMass: TButton
+          AlignWithMargins = True
+          Left = 5
+          Top = 114
+          Width = 61
+          Height = 25
+          Hint = 'Replace '
+          Margins.Left = 0
+          Margins.Right = 0
+          Align = alTop
+          Caption = 'Save'
+          TabOrder = 1
+          OnClick = btnSaveMassClick
+        end
+        object btnMassReplace: TButton
+          AlignWithMargins = True
+          Left = 5
+          Top = 42
+          Width = 61
+          Height = 25
+          Hint = 'Mass replace '
+          Margins.Left = 0
+          Margins.Right = 0
+          Margins.Bottom = 13
+          Align = alTop
+          Caption = 'Replace'
+          TabOrder = 2
+          OnClick = btnMassReplaceClick
+        end
+        object cbMassArea: TComboBox
+          Left = 5
+          Top = 18
+          Width = 61
+          Height = 21
+          Align = alTop
+          Style = csDropDownList
+          ItemIndex = 0
+          TabOrder = 3
+          Text = 'Cell'
+          Items.Strings = (
+            'Cell'
+            'Column'
+            'All')
+        end
+      end
+    end
+    object tsOCR: TTabSheet
+      Caption = 'OCR'
+      ImageIndex = 8
+      object seOCR: TSynEdit
+        Left = 0
+        Top = 19
+        Width = 392
+        Height = 166
+        Align = alClient
+        ActiveLineColor = clMoneyGreen
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -13
+        Font.Name = 'Courier New'
+        Font.Style = []
+        Font.Quality = fqClearTypeNatural
+        PopupMenu = pmOCR
+        TabOrder = 0
+        OnDblClick = Showframe1Click
+        CodeFolding.GutterShapeSize = 11
+        CodeFolding.CollapsedLineColor = clGrayText
+        CodeFolding.FolderBarLinesColor = clGrayText
+        CodeFolding.IndentGuidesColor = clGray
+        CodeFolding.IndentGuides = True
+        CodeFolding.ShowCollapsedLine = True
+        CodeFolding.ShowHintMark = True
+        UseCodeFolding = False
+        Gutter.Font.Charset = DEFAULT_CHARSET
+        Gutter.Font.Color = clWindowText
+        Gutter.Font.Height = -11
+        Gutter.Font.Name = 'Courier New'
+        Gutter.Font.Style = []
+        Gutter.Font.Quality = fqClearTypeNatural
+        Gutter.ShowLineNumbers = True
+        Highlighter = SynIniSyn1
+        Options = [eoAutoIndent, eoDragDropEditing, eoGroupUndo, eoShowScrollHint, eoSmartTabDelete, eoSmartTabs, eoTabsToSpaces]
+        OnStatusChange = seOCRStatusChange
+        FontSmoothing = fsmNone
+        RemovedKeystrokes = <
+          item
+            Command = ecLineBreak
+            ShortCut = 8205
+          end
+          item
+            Command = ecContextHelp
+            ShortCut = 112
+          end>
+        AddedKeystrokes = <>
+      end
+      object pnOCR: TPanel
+        Left = 0
+        Top = 0
+        Width = 392
+        Height = 19
+        Align = alTop
+        BevelOuter = bvNone
+        TabOrder = 1
+        object btnOCR: TButton
+          Left = 336
+          Top = 0
+          Width = 56
+          Height = 19
+          Align = alRight
+          Caption = 'OCR'
+          TabOrder = 0
+          OnClick = btnOCRClick
+        end
+        object cbPageSegMode: TComboBox
+          Left = 49
+          Top = 0
+          Width = 287
+          Height = 21
+          Align = alClient
+          Style = csDropDownList
+          ItemIndex = 6
+          TabOrder = 1
+          Text = 'Assume a single uniform block of text'
+          Items.Strings = (
+            'Orientation and script detection only'
+            
+              'Automatic page segmentation with orientation and script detectio' +
+              'n'
+            'Automatic page segmentation, but no OSD, or OCR'
+            'Fully automatic page segmentation, but no OSD'
+            'Assume a single column of text of variable sizes'
+            'Assume a single uniform block of vertically aligned text'
+            'Assume a single uniform block of text'
+            'Treat the image as a single text line'
+            'Treat the image as a single word'
+            'Treat the image as a single word in a circle'
+            'Treat the image as a single character'
+            'Find as much text as possible in no particular order'
+            'Sparse text with orientation and script det.'
+            'Treat the image as a single text line, Tesseract-specific'
+            'Number of enum entries')
+        end
+        object cbLng: TComboBox
+          Left = 0
+          Top = 0
+          Width = 49
+          Height = 21
+          Align = alLeft
+          Style = csDropDownList
+          ItemIndex = 0
+          TabOrder = 2
+          Text = 'eng'
+          Items.Strings = (
+            'eng')
+        end
+      end
+      object meOCR: TMemo
+        Left = 0
+        Top = 185
+        Width = 392
+        Height = 27
+        Align = alBottom
+        BorderStyle = bsNone
+        Color = clInfoBk
+        Ctl3D = False
+        Lines.Strings = (
+          'Set of text area rectangles: Left, Top,Width,Height,Name'
+          'sample: 0,0,600,100,Caption')
+        ParentCtl3D = False
+        ReadOnly = True
+        TabOrder = 2
+      end
+    end
   end
   object cbHelper: TComboBox
     Left = 184
@@ -967,7 +1251,7 @@ object CellEditForm: TCellEditForm
       OnUpdate = aGridUpUpdate
     end
     object aGridDown: TAction
-      Hint = 'Diwn cell'
+      Hint = 'Down cell'
       ImageIndex = 2
       ShortCut = 32808
       OnExecute = aGridDownExecute
@@ -1102,6 +1386,11 @@ object CellEditForm: TCellEditForm
       ShortCut = 49192
       OnExecute = aPlusDYExecute
     end
+    object aOCR: TAction
+      Caption = 'OCR F6'
+      ShortCut = 117
+      OnExecute = btnOCRClick
+    end
   end
   object pmCommon: TPopupMenu
     Images = MainData.ilEditor
@@ -1195,6 +1484,34 @@ object CellEditForm: TCellEditForm
     object pmiRemove: TMenuItem
       Caption = 'Erase from dictionary'
       OnClick = pmiRemoveClick
+    end
+  end
+  object SynIniSyn1: TSynIniSyn
+    Options.AutoDetectEnabled = False
+    Options.AutoDetectLineLimit = 0
+    Options.Visible = False
+    Left = 204
+    Top = 254
+  end
+  object pmOCR: TPopupMenu
+    Left = 644
+    Top = 128
+    object OCR1: TMenuItem
+      Caption = 'OCR rectangle'
+      ShortCut = 117
+      OnClick = OCR1Click
+    end
+    object SelectionOCR1: TMenuItem
+      Caption = 'Selection OCR'
+      OnClick = SelectionOCR1Click
+    end
+    object Addselection1: TMenuItem
+      Caption = 'Selection ADD'
+      OnClick = Addselection1Click
+    end
+    object Showframe1: TMenuItem
+      Caption = 'Show frame'
+      OnClick = Showframe1Click
     end
   end
 end

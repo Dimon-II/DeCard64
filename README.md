@@ -36,5 +36,11 @@ https://github.com/SynEdit/SynEdit
 SynEdit interface to checking system **Hunspell** 
 https://github.com/jrathlev/SynEdit-Spell-Checker
 
+Tesseract OCR (optional)
+https://github.com/amancini/TTesseractOCR5
+It's optional - if Tesseract OCR installed on your computer, new buttons and menus will be available in the program.
+https://sourceforge.net/projects/tesseract-ocr.mirror/files/5.5.0/tesseract-ocr-w64-setup-5.5.0.20241111.exe/download
+
+
 Icon pack
 https://www.flaticon.com/
